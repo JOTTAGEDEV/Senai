@@ -1,0 +1,66 @@
+body{
+    background:#222;
+}
+
+.jogo{
+    width:720px;
+    margin:auto;
+    position:relative;
+}
+
+.jogo img{
+    width:100%;
+    display:block;
+}
+
+.erro{
+    position:absolute;
+    width:35px;
+    height:35px;
+}
+
+.erro span{
+    display:none;
+    font-size:30px;
+}
+
+.erro:hover span{
+    display:block;
+}
+
+/* Ajuste as posições */
+
+.erro1{
+    top:90px;
+    left:365px;
+}
+
+.erro2{
+    top:345px;
+    left:420px;
+}
+
+.erro3{
+    top:470px;
+    left:620px;
+}
+
+.erro4{
+    top:95px;
+    left:205px;
+}
+
+.erro5{
+    top:350px;
+    left:215px;
+}
+
+.erro6{
+    top:255px;
+    left:500px;
+}
+
+.erro7{
+    top:510px;
+    left:350px;
+}
