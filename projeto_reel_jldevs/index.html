@@ -181,13 +181,13 @@ img{display:block}
 #tabs{position:absolute;left:0;right:0;top:226px;z-index:9;text-align:center}
 .tabs{display:inline-flex;position:relative;gap:10px;padding:9px;border-radius:999px}
 .tab{position:relative;z-index:2;height:62px;display:flex;align-items:center;justify-content:center;border-radius:999px;font-size:26px;font-weight:700;color:var(--ink2)}
-.tabInd{position:absolute;z-index:1;top:9px;left:9px;height:62px;border-radius:999px;width:300px;animation:tabMove 22.5s 11.5s linear both}
+.tabInd{position:absolute;z-index:1;top:9px;left:9px;height:62px;border-radius:999px;width:300px;animation:tabMove 26.9s 14s linear both}
 @keyframes tabMove{
   0%{transform:translateX(0);width:300px}
-  32.6%{transform:translateX(0);width:300px;animation-timing-function:cubic-bezier(.65,0,.35,1)}
-  34.4%{transform:translateX(310px);width:322px}
-  65.9%{transform:translateX(310px);width:322px;animation-timing-function:cubic-bezier(.65,0,.35,1)}
-  67.7%{transform:translateX(642px);width:258px}
+  36.19%{transform:translateX(0);width:300px;animation-timing-function:cubic-bezier(.65,0,.35,1)}
+  37.67%{transform:translateX(310px);width:322px}
+  67.79%{transform:translateX(310px);width:322px;animation-timing-function:cubic-bezier(.65,0,.35,1)}
+  69.28%{transform:translateX(642px);width:258px}
   100%{transform:translateX(642px);width:258px}}
 
 /* =============== segmentos (comum) =============== */
@@ -374,10 +374,10 @@ img{display:block}
   font-family:'Inter Display';font-weight:900;font-size:56px;letter-spacing:-.02em;color:#0b3a08}
 .cta svg{width:54px;height:54px}
 .shine{position:absolute;inset:0;z-index:2;border-radius:999px;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.75) 50%,transparent 65%);
-  background-size:260% 100%;background-repeat:no-repeat;animation:shineA 1.8s 40.1s ease-in-out infinite both}
+  background-size:260% 100%;background-repeat:no-repeat;animation:shineA 1.8s 48.4s ease-in-out infinite both}
 @keyframes shineA{0%{background-position:130% 0}60%,100%{background-position:-60% 0}}
 @keyframes glowPulse{0%{box-shadow:0 0 0 0 rgba(120,220,40,.45)}100%{box-shadow:0 0 0 34px rgba(120,220,40,0)}}
-.pulse{position:absolute;inset:0;border-radius:999px;animation:glowPulse 1.4s 39.6s ease-out infinite both}
+.pulse{position:absolute;inset:0;border-radius:999px;animation:glowPulse 1.4s 47.9s ease-out infinite both}
 
 /* =============== transições =============== */
 .wipe{position:absolute;top:-40px;left:0;width:1800px;height:2000px;z-index:8;pointer-events:none;animation-name:wipe;--dur:.72s;--ease:cubic-bezier(.76,0,.24,1)}
@@ -459,14 +459,14 @@ img{display:block}
   <div class="blob" style="left:-330px;top:-260px;width:980px;height:980px;background:radial-gradient(closest-side,rgba(168,240,60,.55),rgba(168,240,60,0));animation:bIn 1s 0s both,drift1 9s ease-in-out infinite alternate"></div>
   <div class="blob" style="left:420px;top:1180px;width:1050px;height:1050px;background:radial-gradient(closest-side,rgba(74,222,128,.42),rgba(74,222,128,0));animation:bIn 1s 0s both,drift2 11s ease-in-out infinite alternate"></div>
   <!-- cena 2: tensão -->
-  <div class="blob" style="left:180px;top:520px;width:900px;height:900px;background:radial-gradient(closest-side,rgba(251,113,133,.30),rgba(251,113,133,0));animation:bIn .6s 3s both,bOut .6s 6.1s forwards,drift3 6s ease-in-out infinite alternate"></div>
+  <div class="blob" style="left:180px;top:520px;width:900px;height:900px;background:radial-gradient(closest-side,rgba(251,113,133,.30),rgba(251,113,133,0));animation:bIn .6s 3s both,bOut .6s 6.4s forwards,drift3 6s ease-in-out infinite alternate"></div>
   <!-- cenas 3 e 8: luz de estúdio sob o logo -->
-  <div class="blob" style="left:40px;top:120px;width:1000px;height:900px;background:radial-gradient(closest-side,rgba(190,255,90,.62),rgba(190,255,90,0));animation:bIn .6s 7.4s both,bOut .5s 11.3s forwards"></div>
-  <div class="blob" style="left:90px;top:130px;width:900px;height:860px;background:radial-gradient(closest-side,rgba(190,255,90,.62),rgba(190,255,90,0));animation:bIn .6s 37.4s both"></div>
+  <div class="blob" style="left:40px;top:120px;width:1000px;height:900px;background:radial-gradient(closest-side,rgba(190,255,90,.62),rgba(190,255,90,0));animation:bIn .6s 7.7s both,bOut .5s 13.8s forwards"></div>
+  <div class="blob" style="left:90px;top:130px;width:900px;height:860px;background:radial-gradient(closest-side,rgba(190,255,90,.62),rgba(190,255,90,0));animation:bIn .6s 45.7s both"></div>
   <!-- segmentos: tom do cliente -->
-  <div class="blob" style="left:520px;top:300px;width:900px;height:900px;background:radial-gradient(closest-side,rgba(255,170,90,.42),rgba(255,170,90,0));animation:bIn .6s 11.4s both,bOut .5s 18.9s forwards,drift3 7s ease-in-out infinite alternate"></div>
-  <div class="blob" style="left:-200px;top:820px;width:900px;height:900px;background:radial-gradient(closest-side,rgba(96,165,250,.40),rgba(96,165,250,0));animation:bIn .6s 18.9s both,bOut .5s 26.4s forwards,drift1 8s ease-in-out infinite alternate"></div>
-  <div class="blob" style="left:480px;top:240px;width:950px;height:950px;background:radial-gradient(closest-side,rgba(45,212,191,.36),rgba(45,212,191,0));animation:bIn .6s 26.4s both,bOut .5s 33.9s forwards,drift2 9s ease-in-out infinite alternate"></div>
+  <div class="blob" style="left:520px;top:300px;width:900px;height:900px;background:radial-gradient(closest-side,rgba(255,170,90,.42),rgba(255,170,90,0));animation:bIn .6s 13.9s both,bOut .5s 23.8s forwards,drift3 7s ease-in-out infinite alternate"></div>
+  <div class="blob" style="left:-200px;top:820px;width:900px;height:900px;background:radial-gradient(closest-side,rgba(96,165,250,.40),rgba(96,165,250,0));animation:bIn .6s 23.8s both,bOut .5s 32.3s forwards,drift1 8s ease-in-out infinite alternate"></div>
+  <div class="blob" style="left:480px;top:240px;width:950px;height:950px;background:radial-gradient(closest-side,rgba(45,212,191,.36),rgba(45,212,191,0));animation:bIn .6s 32.3s both,bOut .5s 40.8s forwards,drift2 9s ease-in-out infinite alternate"></div>
   <div id="grid"></div>
   <div id="vig"></div>
 </div>
@@ -491,7 +491,7 @@ img{display:block}
 <!-- ======================================================
      CENA 2 · PROBLEMA (3 – 7.5s)
      ====================================================== -->
-<section class="scene" id="s2" data-s="3" data-e="7.5" style="--t:3s;animation:outZoom .3s 7.2s cubic-bezier(.6,0,.9,.4) forwards">
+<section class="scene" id="s2" data-s="3" data-e="7.8" style="--t:3s;animation:outZoom .3s 7.5s cubic-bezier(.6,0,.9,.4) forwards">
   <div class="layer a outUp" style="--d:2.62s">
     <div class="h2 D" style="top:300px">
       <div class="mask"><span class="a rise" style="--d:.04s">Mas ainda</span></div>
@@ -521,7 +521,7 @@ img{display:block}
 <!-- ======================================================
      CENA 3 · MARCA (7.5 – 11.5s)
      ====================================================== -->
-<section class="scene" id="s3" data-s="7.5" data-e="11.5" style="--t:7.5s;animation:outLeft .36s 11.14s cubic-bezier(.5,0,.75,0) forwards">
+<section class="scene" id="s3" data-s="7.8" data-e="14" style="--t:7.8s;animation:outLeft .36s 13.64s cubic-bezier(.5,0,.75,0) forwards">
   <div class="logoBox" style="left:230px;top:300px;transform:scale(.605)">
     <div class="refl"><div class="inner">
       <div class="lp j a dropJ" style="--d:.05s"><img src="assets/jl-j.png" alt=""></div>
@@ -534,19 +534,19 @@ img{display:block}
     <div class="glint a glintA" style="--d:1.45s"></div>
   </div>
   <div class="row wm M" style="top:812px"><span class="ib a upS" style="--d:1.0s">JL DEVS</span></div>
-  <div class="row tag" style="top:884px"><span class="ib a upS" style="--d:1.15s">Tecnologia sob medida para o seu negócio</span></div>
+  <div class="row tag" style="top:884px"><span class="ib a upS" style="--d:1.25s">Tecnologia sob medida para o seu negócio</span></div>
   <div class="svcs">
-    <div class="svc glass a pop" style="--d:1.6s"><div class="si gg"><svg><use href="#i-web"/></svg></div><b>Sites</b><small>que vendem 24h</small></div>
-    <div class="svc glass a pop" style="--d:1.78s"><div class="si gg"><svg><use href="#i-bolt"/></svg></div><b>Automações</b><small>que poupam tempo</small></div>
-    <div class="svc glass a pop" style="--d:1.96s"><div class="si gg"><svg><use href="#i-dash"/></svg></div><b>SaaS</b><small>sistemas sob medida</small></div>
+    <div class="svc glass a pop" style="--d:2.38s"><div class="si gg"><svg><use href="#i-web"/></svg></div><b>Sites</b><small>que vendem 24h</small></div>
+    <div class="svc glass a pop" style="--d:2.93s"><div class="si gg"><svg><use href="#i-bolt"/></svg></div><b>Automações</b><small>que poupam tempo</small></div>
+    <div class="svc glass a pop" style="--d:3.95s"><div class="si gg"><svg><use href="#i-dash"/></svg></div><b>SaaS</b><small>sistemas sob medida</small></div>
   </div>
-  <div class="row prat" style="top:1386px"><span class="ib a up" style="--d:2.55s">Olha só na prática 👇</span></div>
+  <div class="row prat" style="top:1386px"><span class="ib a up" style="--d:5.15s">Olha só na prática 👇</span></div>
 </section>
 
 <!-- ======================================================
      CENA 4 · HAMBURGUERIA (11.5 – 19s)
      ====================================================== -->
-<section class="scene" id="s4" data-s="11.5" data-e="19" style="--t:11.5s;animation:outLeft .36s 18.64s cubic-bezier(.5,0,.75,0) forwards">
+<section class="scene" id="s4" data-s="14" data-e="23.9" style="--t:14s;animation:outLeft .36s 23.54s cubic-bezier(.5,0,.75,0) forwards">
   <div class="segH D">
     <div class="mask"><span class="a rise" style="--d:.12s">Cardápio digital</span></div>
     <div class="mask"><span class="a rise acc" style="--d:.24s">que vende sozinho</span></div>
@@ -558,7 +558,7 @@ img{display:block}
       <div class="bs bhd a fade" style="--d:.8s">
         <div class="bbrand">🔥 BRASA BURGER</div>
         <div class="cartBtn"><svg><use href="#i-cart"/></svg>
-          <div class="badgeW a pop" style="--d:2.08s"><div class="a pressB" style="--d:2.83s"><div class="badge" data-steps="0:1|14.33:2">1</div></div></div>
+          <div class="badgeW a pop" style="--d:2.08s"><div class="a pressB" style="--d:2.83s"><div class="badge" data-steps="0:1|16.83:2">1</div></div></div>
         </div>
       </div>
       <div class="bs bhero a upS" style="--d:.88s">
@@ -604,9 +604,9 @@ img{display:block}
   </div>
   <div class="fc" style="left:24px;top:850px"><div class="a fromL" style="--d:4.6s"><div class="fl" style="animation-delay:-2s">
     <div class="card glass"><div class="ci gg"><span>🔔</span></div><div><b>Novo pedido #1284</b><small>Smash Duplo + Batata · R$ 51,80</small></div></div></div></div></div>
-  <div class="fc" style="left:612px;top:604px"><div class="a pop" style="--d:5.1s"><div class="fl" style="animation-delay:-.9s">
+  <div class="fc" style="left:612px;top:604px"><div class="a pop" style="--d:5.9s"><div class="fl" style="animation-delay:-.9s">
     <div class="bubble"><div class="bh">🤖 MENSAGEM AUTOMÁTICA</div><p>Oi, João! 🍔 Seu pedido saiu pra entrega 🛵</p><div class="bt">agora ✓✓</div></div></div></div></div>
-  <div class="fc" style="left:586px;top:1012px"><div class="a pop" style="--d:5.6s"><div style="transform:rotate(4deg)"><div class="sticker gg"><span>✅ Zero comissão de app</span></div></div></div></div>
+  <div class="fc" style="left:586px;top:1012px"><div class="a pop" style="--d:7.25s"><div style="transform:rotate(4deg)"><div class="sticker gg"><span>✅ Zero comissão de app</span></div></div></div></div>
 
   <!-- cursor: bolinha de vidro -->
   <div class="rip a" style="left:705px;top:1113px;--d:2.02s"></div>
@@ -620,7 +620,7 @@ img{display:block}
 <!-- ======================================================
      CENA 5 · VENDA DE CARROS (19 – 26.5s)
      ====================================================== -->
-<section class="scene" id="s5" data-s="19" data-e="26.5" style="--t:19s;animation:outLeft .36s 26.14s cubic-bezier(.5,0,.75,0) forwards">
+<section class="scene" id="s5" data-s="23.9" data-e="32.4" style="--t:23.9s;animation:outLeft .36s 32.04s cubic-bezier(.5,0,.75,0) forwards">
   <div class="segH D">
     <div class="mask"><span class="a rise" style="--d:.12s">Seu estoque online</span></div>
     <div class="mask"><span class="a rise acc" style="--d:.24s">vendendo 24 horas</span></div>
@@ -637,49 +637,49 @@ img{display:block}
       <div class="cars">
         <div class="car a upS" style="--d:.8s"><div class="im"><span class="tg">⭐ DESTAQUE</span><svg style="--car:#d7dee8"><use href="#car"/></svg></div>
           <div class="bd"><div class="nm">Sedan Turbo 2023</div><div class="sp">28.000 km · Automático</div><div class="pr">R$ 139.900</div>
-          <div class="btn a pressB" style="--d:1.95s">Tenho interesse</div></div></div>
+          <div class="btn a pressB" style="--d:2.6s">Tenho interesse</div></div></div>
         <div class="car a upS" style="--d:.9s"><div class="im"><span class="tg">OFERTA</span><svg style="--car:#ef4444"><use href="#car"/></svg></div>
           <div class="bd"><div class="nm">Esportivo GT 2022</div><div class="sp">41.000 km · Automático</div><div class="pr">R$ 112.500</div><div class="btn">Tenho interesse</div></div></div>
         <div class="car a upS" style="--d:1.0s"><div class="im"><span class="tg">NOVO</span><svg style="--car:#3b82f6"><use href="#car"/></svg></div>
           <div class="bd"><div class="nm">Hatch Flex 2024</div><div class="sp">12.000 km · Manual</div><div class="pr">R$ 89.900</div><div class="btn">Tenho interesse</div></div></div>
       </div>
     </div>
-    <div class="layer a outFade" style="--d:4.25s;z-index:10">
-      <div class="ovl a fade" style="--d:2.1s;--dur:.3s"></div>
-      <div class="modal a pop" style="--d:2.15s;--dur:.55s">
+    <div class="layer a outFade" style="--d:5.0s;z-index:10">
+      <div class="ovl a fade" style="--d:2.75s;--dur:.3s"></div>
+      <div class="modal a pop" style="--d:2.8s;--dur:.55s">
         <div class="mh"><div class="mi"><svg style="--car:#d7dee8"><use href="#car"/></svg></div><div><small>Sedan Turbo 2023 · R$ 139.900</small><b>Fale com um vendedor</b></div></div>
-        <div class="fld"><label>Nome</label><div class="ip"><span data-type="Carlos Silva" data-at="21.45" data-len=".5"></span><i class="caret" data-show="21.3:22.0"></i></div></div>
-        <div class="fld"><label>WhatsApp</label><div class="ip"><span data-type="(11) 98765-4321" data-at="22.05" data-len=".55"></span><i class="caret" data-show="22.0:22.8"></i></div></div>
-        <div class="sendB a pressB" style="--d:3.68s">Enviar<div class="ok a" style="--d:3.82s">✓ Enviado!</div></div>
+        <div class="fld"><label>Nome</label><div class="ip"><span data-type="Carlos Silva" data-at="26.95" data-len=".5"></span><i class="caret" data-show="26.8:27.5"></i></div></div>
+        <div class="fld"><label>WhatsApp</label><div class="ip"><span data-type="(11) 98765-4321" data-at="27.55" data-len=".55"></span><i class="caret" data-show="27.5:28.3"></i></div></div>
+        <div class="sendB a pressB" style="--d:4.43s">Enviar<div class="ok a" style="--d:4.57s">✓ Enviado!</div></div>
       </div>
     </div>
   </div>
 
   <!-- fluxo automático -->
   <div class="pipe">
-    <div class="link" style="left:240px;width:100px;--d:1.3s"><i class="a" style="--d:4.66s"></i></div>
-    <div class="link" style="left:460px;width:100px"><i class="a" style="--d:5.01s"></i></div>
-    <div class="link" style="left:680px;width:100px"><i class="a" style="--d:5.36s"></i></div>
-    <div class="node a pop" style="left:180px;--d:1.05s"><div class="nc glass">🌐<div class="on gg a" style="--d:4.35s"><span>🌐</span></div><div class="tick gg a pop" style="--d:4.5s"><svg><use href="#i-check"/></svg></div></div><b>Site</b></div>
-    <div class="node a pop" style="left:400px;--d:1.13s"><div class="nc glass">🗂️<div class="on gg a" style="--d:4.7s"><span>🗂️</span></div><div class="tick gg a pop" style="--d:4.85s"><svg><use href="#i-check"/></svg></div></div><b>CRM</b></div>
-    <div class="node a pop" style="left:620px;--d:1.21s"><div class="nc glass">💬<div class="on gg a" style="--d:5.05s"><span>💬</span></div><div class="tick gg a pop" style="--d:5.2s"><svg><use href="#i-check"/></svg></div></div><b>Vendedor</b></div>
-    <div class="node a pop" style="left:840px;--d:1.29s"><div class="nc glass">📅<div class="on gg a" style="--d:5.4s"><span>📅</span></div><div class="tick gg a pop" style="--d:5.55s"><svg><use href="#i-check"/></svg></div></div><b>Test drive</b></div>
+    <div class="link" style="left:240px;width:100px;--d:1.3s"><i class="a" style="--d:5.4s"></i></div>
+    <div class="link" style="left:460px;width:100px"><i class="a" style="--d:5.8s"></i></div>
+    <div class="link" style="left:680px;width:100px"><i class="a" style="--d:6.2s"></i></div>
+    <div class="node a pop" style="left:180px;--d:1.05s"><div class="nc glass">🌐<div class="on gg a" style="--d:5.35s"><span>🌐</span></div><div class="tick gg a pop" style="--d:5.5s"><svg><use href="#i-check"/></svg></div></div><b>Site</b></div>
+    <div class="node a pop" style="left:400px;--d:1.13s"><div class="nc glass">🗂️<div class="on gg a" style="--d:5.75s"><span>🗂️</span></div><div class="tick gg a pop" style="--d:5.9s"><svg><use href="#i-check"/></svg></div></div><b>CRM</b></div>
+    <div class="node a pop" style="left:620px;--d:1.21s"><div class="nc glass">💬<div class="on gg a" style="--d:6.15s"><span>💬</span></div><div class="tick gg a pop" style="--d:6.3s"><svg><use href="#i-check"/></svg></div></div><b>Vendedor</b></div>
+    <div class="node a pop" style="left:840px;--d:1.29s"><div class="nc glass">📅<div class="on gg a" style="--d:6.55s"><span>📅</span></div><div class="tick gg a pop" style="--d:6.7s"><svg><use href="#i-check"/></svg></div></div><b>Test drive</b></div>
   </div>
-  <div class="row" style="top:1452px"><div class="ib a pop" style="--d:5.75s"><div class="sticker gg"><span>⚡ Cliente atendido em segundos</span></div></div></div>
-  <div class="fc" style="left:520px;top:1012px"><div class="a pop" style="--d:5.15s"><div class="fl" style="animation-delay:-.7s">
+  <div class="row" style="top:1452px"><div class="ib a pop" style="--d:7.2s"><div class="sticker gg"><span>⚡ Cliente atendido em segundos</span></div></div></div>
+  <div class="fc" style="left:520px;top:1012px"><div class="a pop" style="--d:6.62s"><div class="fl" style="animation-delay:-.7s">
     <div class="bubble"><div class="bh">🤖 MENSAGEM AUTOMÁTICA</div><p>Olá, Carlos! 👋 Bora agendar seu test drive?</p><div class="bt">agora ✓✓</div></div></div></div></div>
 
-  <div class="rip a" style="left:232px;top:1095px;--d:1.97s"></div>
-  <div class="rip a" style="left:540px;top:1027px;--d:3.7s"></div>
-  <div class="ball a" style="--d:1.55s;--dur:2.7s;--ease:linear;animation-name:pathS5">
-    <div class="a pressB" style="--d:1.93s"><div class="a pressB" style="--d:3.66s"><img src="assets/jl-dot.png" alt=""></div></div>
+  <div class="rip a" style="left:232px;top:1095px;--d:2.62s"></div>
+  <div class="rip a" style="left:540px;top:1027px;--d:4.45s"></div>
+  <div class="ball a" style="--d:2.2s;--dur:2.85s;--ease:linear;animation-name:pathS5">
+    <div class="a pressB" style="--d:2.58s"><div class="a pressB" style="--d:4.41s"><img src="assets/jl-dot.png" alt=""></div></div>
   </div>
 </section>
 
 <!-- ======================================================
      CENA 6 · EMPRESÁRIOS (26.5 – 34s)
      ====================================================== -->
-<section class="scene" id="s6" data-s="26.5" data-e="34" style="--t:26.5s;animation:outLeft .36s 33.64s cubic-bezier(.5,0,.75,0) forwards">
+<section class="scene" id="s6" data-s="32.4" data-e="40.9" style="--t:32.4s;animation:outLeft .36s 40.54s cubic-bezier(.5,0,.75,0) forwards">
   <div class="segH D">
     <div class="mask"><span class="a rise" style="--d:.12s">Sua empresa inteira</span></div>
     <div class="mask"><span class="a rise acc" style="--d:.24s">num só sistema</span></div>
@@ -688,9 +688,9 @@ img{display:block}
   <div class="dash glass a devIn" style="--d:.3s">
     <div class="dhead a fade" style="--d:.6s"><div class="av gg"><span>SE</span></div><div class="dt"><b>Painel de gestão</b><small>Sua Empresa Ltda</small></div><div class="live"><i></i>Ao vivo</div></div>
     <div class="kpis">
-      <div class="kpi a upS" style="--d:.66s"><small>Faturamento do mês</small><b data-count="248390" data-at="27.3" data-len="1.5" data-fmt="brl">R$ 0</b><span class="delta">▲ 18%</span></div>
-      <div class="kpi a upS" style="--d:.74s"><small>Clientes ativos</small><b data-count="1284" data-at="27.4" data-len="1.4">0</b><span class="delta">▲ 9%</span></div>
-      <div class="kpi a upS" style="--d:.82s"><small>Pedidos no mês</small><b data-count="3906" data-at="27.5" data-len="1.4">0</b><span class="delta">▲ 12%</span></div>
+      <div class="kpi a upS" style="--d:.66s"><small>Faturamento do mês</small><b data-count="248390" data-at="33.2" data-len="1.5" data-fmt="brl">R$ 0</b><span class="delta">▲ 18%</span></div>
+      <div class="kpi a upS" style="--d:.74s"><small>Clientes ativos</small><b data-count="1284" data-at="33.3" data-len="1.4">0</b><span class="delta">▲ 9%</span></div>
+      <div class="kpi a upS" style="--d:.82s"><small>Pedidos no mês</small><b data-count="3906" data-at="33.4" data-len="1.4">0</b><span class="delta">▲ 12%</span></div>
     </div>
     <div class="cc a upS" style="left:28px;width:560px;--d:.86s"><h6>Vendas da semana <span>R$ mil</span></h6>
       <svg class="chart" viewBox="0 0 524 240">
@@ -709,43 +709,43 @@ img{display:block}
     </div>
   </div>
 
-  <div class="auto glass a up" style="--d:2.3s">
+  <div class="auto glass a up" style="--d:2.6s">
     <div class="autoH">⚡ Automações <span>rodando 24h</span></div>
-    <div class="arow a upS" style="--d:2.45s"><div class="ai glass">🧾</div><div class="al">Emissão de nota fiscal</div><span class="as a fade" style="--d:3.28s;--dur:.3s">ativo</span>
-      <div class="tog"><div class="tb a" style="--d:3.25s"></div><div class="k a" style="--d:3.25s"></div></div></div>
-    <div class="arow a upS" style="--d:2.55s"><div class="ai glass">💸</div><div class="al">Cobrança automática por Pix</div><span class="as a fade" style="--d:3.68s;--dur:.3s">ativo</span>
+    <div class="arow a upS" style="--d:2.75s"><div class="ai glass">🧾</div><div class="al">Emissão de nota fiscal</div><span class="as a fade" style="--d:3.68s;--dur:.3s">ativo</span>
       <div class="tog"><div class="tb a" style="--d:3.65s"></div><div class="k a" style="--d:3.65s"></div></div></div>
-    <div class="arow a upS" style="--d:2.65s"><div class="ai glass">📈</div><div class="al">Relatório semanal no seu e-mail</div><span class="as a fade" style="--d:4.08s;--dur:.3s">ativo</span>
-      <div class="tog"><div class="tb a" style="--d:4.05s"></div><div class="k a" style="--d:4.05s"></div></div></div>
+    <div class="arow a upS" style="--d:2.85s"><div class="ai glass">💸</div><div class="al">Cobrança automática por Pix</div><span class="as a fade" style="--d:4.43s;--dur:.3s">ativo</span>
+      <div class="tog"><div class="tb a" style="--d:4.4s"></div><div class="k a" style="--d:4.4s"></div></div></div>
+    <div class="arow a upS" style="--d:2.95s"><div class="ai glass">📈</div><div class="al">Relatório semanal no seu e-mail</div><span class="as a fade" style="--d:5.18s;--dur:.3s">ativo</span>
+      <div class="tog"><div class="tb a" style="--d:5.15s"></div><div class="k a" style="--d:5.15s"></div></div></div>
   </div>
-  <div class="fc" style="left:560px;top:1150px"><div class="a pop" style="--d:4.75s"><div class="fl" style="animation-delay:-1.2s">
+  <div class="fc" style="left:560px;top:1150px"><div class="a pop" style="--d:6.3s"><div class="fl" style="animation-delay:-1.2s">
     <div class="card glass"><div class="ci gg"><span>📊</span></div><div><b>Relatório pronto!</b><small>Enviado pro seu e-mail ✓</small></div></div></div></div></div>
 
-  <div class="rip a" style="left:0;top:0;--d:3.22s"></div>
   <div class="rip a" style="left:0;top:0;--d:3.62s"></div>
-  <div class="rip a" style="left:0;top:0;--d:4.02s"></div>
-  <div class="ball a" style="--d:2.85s;--dur:1.6s;--ease:linear;animation-name:pathS6">
-    <div class="a pressB" style="--d:3.18s"><div class="a pressB" style="--d:3.58s"><div class="a pressB" style="--d:3.98s"><img src="assets/jl-dot.png" alt=""></div></div></div>
+  <div class="rip a" style="left:0;top:0;--d:4.37s"></div>
+  <div class="rip a" style="left:0;top:0;--d:5.12s"></div>
+  <div class="ball a" style="--d:3.2s;--dur:2.4s;--ease:linear;animation-name:pathS6">
+    <div class="a pressB" style="--d:3.58s"><div class="a pressB" style="--d:4.33s"><div class="a pressB" style="--d:5.08s"><img src="assets/jl-dot.png" alt=""></div></div></div>
   </div>
 </section>
 
 <!-- ======================================================
      CENA 7 · BENEFÍCIOS (34 – 37.5s)
      ====================================================== -->
-<section class="scene" id="s7" data-s="34" data-e="37.5" style="--t:34s;animation:outZoom .3s 37.2s cubic-bezier(.6,0,.9,.4) forwards">
+<section class="scene" id="s7" data-s="40.9" data-e="45.8" style="--t:40.9s;animation:outZoom .3s 45.5s cubic-bezier(.6,0,.9,.4) forwards">
   <div class="row" style="top:548px"><div class="ib a down" style="--d:.1s"><div class="kicker glass M">COM A JL DEVS VOCÊ TEM</div></div></div>
   <div class="bens"><div class="in">
-    <div class="bl a slideIn" style="--d:.3s"><div class="ck gg"><svg><use href="#i-check"/></svg></div>Mais vendas.</div>
-    <div class="bl a slideIn" style="--d:.65s"><div class="ck gg"><svg><use href="#i-check"/></svg></div>Menos planilha.</div>
-    <div class="bl a slideIn" style="--d:1.0s"><div class="ck gg"><svg><use href="#i-check"/></svg></div><span class="acc">Mais tempo livre.</span></div>
+    <div class="bl a slideIn" style="--d:.2s"><div class="ck gg"><svg><use href="#i-check"/></svg></div>Mais vendas.</div>
+    <div class="bl a slideIn" style="--d:1.25s"><div class="ck gg"><svg><use href="#i-check"/></svg></div>Menos planilha.</div>
+    <div class="bl a slideIn" style="--d:2.8s"><div class="ck gg"><svg><use href="#i-check"/></svg></div><span class="acc">Mais tempo livre.</span></div>
   </div></div>
-  <div class="row" style="top:1218px;font-size:44px;font-weight:600;color:var(--ink2)"><span class="ib a up" style="--d:1.65s">Tudo sob medida pro seu negócio.</span></div>
+  <div class="row" style="top:1218px;font-size:44px;font-weight:600;color:var(--ink2)"><span class="ib a up" style="--d:3.95s">Tudo sob medida pro seu negócio.</span></div>
 </section>
 
 <!-- ======================================================
      CENA 8 · CTA (37.5 – 44s)
      ====================================================== -->
-<section class="scene" id="s8" data-s="37.5" data-e="999" style="--t:37.5s">
+<section class="scene" id="s8" data-s="45.8" data-e="999" style="--t:45.8s">
   <div class="logoBox" style="left:315px;top:382px;transform:scale(.44)">
     <div class="refl"><div class="inner">
       <div class="lp j a dropJ" style="--d:.05s"><img src="assets/jl-j.png" alt=""></div>
@@ -764,19 +764,19 @@ img{display:block}
   </div>
   <div class="row" style="top:1060px"><div class="ib a pop" style="--d:1.75s"><div style="position:relative">
     <div class="pulse"></div>
-    <div class="a pressB" style="--d:3.05s"><div class="cta gg"><svg><use href="#i-send"/></svg><span>Chama no direct</span><div class="shine"></div></div></div>
+    <div class="a pressB" style="--d:4.95s"><div class="cta gg"><svg><use href="#i-send"/></svg><span>Chama no direct</span><div class="shine"></div></div></div>
   </div></div></div>
-  <div class="row" style="top:1246px;font-size:38px;font-weight:600;color:var(--ink2)"><span class="ib a up" style="--d:2.15s">Orçamento sem compromisso ✨</span></div>
-  <div class="row M" style="top:1318px;font-size:28px;font-weight:700;color:var(--muted);letter-spacing:.04em"><span class="ib a up" style="--d:2.35s">— JL Devs · tecnologia que trabalha por você</span></div>
-  <div class="rip a" style="left:852px;top:1135px;--d:3.08s"></div>
-  <div class="ball a" style="--d:2.6s;--dur:1.2s;--ease:linear;animation-name:pathS8">
-    <div class="a pressB" style="--d:3.02s"><img src="assets/jl-dot.png" alt=""></div>
+  <div class="row" style="top:1246px;font-size:38px;font-weight:600;color:var(--ink2)"><span class="ib a up" style="--d:5.45s">Orçamento sem compromisso ✨</span></div>
+  <div class="row M" style="top:1318px;font-size:28px;font-weight:700;color:var(--muted);letter-spacing:.04em"><span class="ib a up" style="--d:5.9s">— JL Devs · tecnologia que trabalha por você</span></div>
+  <div class="rip a" style="left:852px;top:1135px;--d:4.98s"></div>
+  <div class="ball a" style="--d:4.5s;--dur:1.2s;--ease:linear;animation-name:pathS8">
+    <div class="a pressB" style="--d:4.92s"><img src="assets/jl-dot.png" alt=""></div>
   </div>
 </section>
 
 <!-- ========== abas dos segmentos (sobre as transições) ========== -->
-<div id="tabs" class="a outUp" style="--d:33.86s">
-  <div class="ib a down" style="--d:11.42s">
+<div id="tabs" class="a outUp" style="--d:40.76s">
+  <div class="ib a down" style="--d:13.92s">
     <div class="tabs glass">
       <div class="tabInd gg"></div>
       <div class="tab" style="width:300px">🍔 Hamburguerias</div>
@@ -787,10 +787,10 @@ img{display:block}
 </div>
 
 <!-- ========== transições (lâmina de vidro verde) ========== -->
-<div class="wipe w2 a" style="--d:11.14s"></div><div class="wipe w1 a" style="--d:11.14s"></div>
-<div class="wipe w2 a" style="--d:18.64s"></div><div class="wipe w1 a" style="--d:18.64s"></div>
-<div class="wipe w2 a" style="--d:26.14s"></div><div class="wipe w1 a" style="--d:26.14s"></div>
-<div class="wipe w2 a" style="--d:33.64s"></div><div class="wipe w1 a" style="--d:33.64s"></div>
+<div class="wipe w2 a" style="--d:13.64s"></div><div class="wipe w1 a" style="--d:13.64s"></div>
+<div class="wipe w2 a" style="--d:23.54s"></div><div class="wipe w1 a" style="--d:23.54s"></div>
+<div class="wipe w2 a" style="--d:32.04s"></div><div class="wipe w1 a" style="--d:32.04s"></div>
+<div class="wipe w2 a" style="--d:40.54s"></div><div class="wipe w1 a" style="--d:40.54s"></div>
 
 <div id="noise"></div>
 </div>
@@ -800,8 +800,8 @@ img{display:block}
 const PATHS = {
   // [tempo relativo ao início do caminho (s), x, y, visível]
   pathS4: {dur:2.65, pts:[[0,800,1230,0],[.35,705,1113,1],[.70,705,1113,1],[1.10,705,1361,1],[1.50,705,1361,1],[1.90,610,1455,1],[2.30,610,1455,1],[2.65,680,1560,0]]},
-  pathS5: {dur:2.7,  pts:[[0,330,1210,0],[.30,232,1095,1],[.75,232,1095,1],[1.15,800,930,1],[1.80,800,930,1],[2.05,540,1027,1],[2.40,540,1027,1],[2.70,620,1130,0]]},
-  pathS6: {dur:1.6,  pts:[[0,980,1500,0],[.25,0,1,1],[.45,0,1,1],[.65,0,2,1],[.85,0,2,1],[1.05,0,3,1],[1.25,0,3,1],[1.6,960,1600,0]]},
+  pathS5: {dur:2.85, pts:[[0,330,1210,0],[.30,232,1095,1],[.75,232,1095,1],[1.15,800,930,1],[1.90,800,930,1],[2.15,540,1027,1],[2.50,540,1027,1],[2.85,620,1130,0]]},
+  pathS6: {dur:2.4,  pts:[[0,980,1500,0],[.25,0,1,1],[.6,0,1,1],[1.05,0,2,1],[1.35,0,2,1],[1.8,0,3,1],[2.05,0,3,1],[2.4,960,1600,0]]},
   pathS8: {dur:1.2,  pts:[[0,960,1290,0],[.35,852,1135,1],[.75,852,1135,1],[1.2,900,1250,0]]},
 };
 /* ---------- utilidades ---------- */
@@ -885,7 +885,7 @@ function seek(t){
   for(const {el,a,b} of shows) el.style.display=(t>=a&&t<b)?'inline-block':'none';
 }
 
-window.DURATION=44;
+window.DURATION=54.4;
 window.seek=seek;
 window.ready=(async()=>{
   await document.fonts.ready;
