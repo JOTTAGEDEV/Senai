@@ -13,6 +13,6 @@ export function FotoCapa({ fotos, className = "" }: { fotos: Foto[]; className?:
   }
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={capa.dataUrl} alt="" className={`object-cover ${className}`} />
+    <img src={capa.src} alt="" className={`object-cover ${className}`} />
   );
 }

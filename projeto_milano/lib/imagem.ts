@@ -41,7 +41,7 @@ function carregarImagem(src: string): Promise<HTMLImageElement> {
 }
 
 /** Tamanho aproximado de um data URL em KB */
-export function tamanhoKB(dataUrl: string): number {
-  const base64 = dataUrl.split(",")[1] ?? "";
+export function tamanhoKB(src: string): number {
+  const base64 = src.split(",")[1] ?? "";
   return Math.round((base64.length * 3) / 4 / 1024);
 }

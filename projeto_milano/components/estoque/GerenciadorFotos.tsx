@@ -21,7 +21,7 @@ export function GerenciadorFotos({ fotos, onChange }: Props) {
 
   const restantes = MAX_FOTOS - fotos.length;
   const totalIA = fotos.filter((f) => f.enviarIA).length;
-  const totalKB = fotos.reduce((soma, f) => soma + tamanhoKB(f.dataUrl), 0);
+  const totalKB = fotos.reduce((soma, f) => soma + tamanhoKB(f.src), 0);
 
   async function adicionarArquivos(lista: FileList | File[]) {
     setAviso("");
@@ -39,9 +39,9 @@ export function GerenciadorFotos({ fotos, onChange }: Props) {
     let iaDisponivel = MAX_FOTOS_IA - totalIA;
     for (const arquivo of aceitas) {
       try {
-        const dataUrl = await comprimirImagem(arquivo);
+        const src = await comprimirImagem(arquivo);
         // As primeiras fotos já entram marcadas para a IA enviar, até o limite
-        novas.push({ id: gerarId(), dataUrl, enviarIA: iaDisponivel-- > 0 });
+        novas.push({ id: gerarId(), src, enviarIA: iaDisponivel-- > 0 });
       } catch {
         setAviso(`Não foi possível ler "${arquivo.name}".`);
       }
@@ -108,7 +108,7 @@ export function GerenciadorFotos({ fotos, onChange }: Props) {
             } ${i === 0 ? "border-marca-500 ring-2 ring-marca-100" : "border-zinc-200"}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={foto.dataUrl} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" draggable={false} />
+            <img src={foto.src} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" draggable={false} />
 
             <div className="absolute left-1.5 top-1.5 flex gap-1">
               {i === 0 && (

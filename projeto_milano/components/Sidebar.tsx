@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   CalendarDays,
@@ -15,6 +15,9 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { sair, useUsuario } from "@/lib/auth";
+import { iniciais } from "@/lib/crm";
+import { useDados } from "@/lib/dados";
 import { LOJA } from "@/lib/loja";
 import { Logo } from "./Logo";
 
@@ -29,6 +32,8 @@ const ITENS = [
 
 function Navegacao({ aoClicar }: { aoClicar?: () => void }) {
   const caminho = usePathname();
+  const { leads } = useDados();
+  const naoLidas = leads.reduce((soma, l) => soma + (l.naoLidas > 0 ? 1 : 0), 0);
   return (
     <nav className="flex flex-1 flex-col gap-1">
       {ITENS.map(({ href, rotulo, icone: Icone }) => {
@@ -44,6 +49,11 @@ function Navegacao({ aoClicar }: { aoClicar?: () => void }) {
           >
             <Icone className={`h-4.5 w-4.5 ${ativo ? "text-marca-500" : ""}`} />
             {rotulo}
+            {href === "/conversas" && naoLidas > 0 && (
+              <span className="ml-auto rounded-full bg-milano-verde px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                {naoLidas}
+              </span>
+            )}
           </Link>
         );
       })}
@@ -52,19 +62,31 @@ function Navegacao({ aoClicar }: { aoClicar?: () => void }) {
 }
 
 function Rodape() {
+  const { usuario } = useUsuario();
+  const { modo } = useDados();
+  const router = useRouter();
+  const nome = usuario?.nome ?? "";
   return (
     <div className="border-t border-white/10 pt-4">
       <div className="flex items-center gap-3 px-1">
         <div className="grid h-8 w-8 place-items-center rounded-full bg-zinc-700 text-xs font-semibold text-white">
-          ML
+          {iniciais(nome) || "?"}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-white">Dona da loja</p>
-          <p className="truncate text-xs text-zinc-500">Administradora</p>
+          <p className="truncate text-sm font-medium text-white">{nome}</p>
+          <p className="truncate text-xs text-zinc-500">{modo === "local" ? "Modo demonstração" : usuario?.email}</p>
         </div>
-        <Link href="/login" className="rounded-md p-1.5 text-zinc-400 hover:bg-white/10 hover:text-white" aria-label="Sair">
+        <button
+          onClick={async () => {
+            await sair();
+            router.push("/login");
+          }}
+          className="rounded-md p-1.5 text-zinc-400 hover:bg-white/10 hover:text-white"
+          aria-label="Sair"
+          title="Sair"
+        >
           <LogOut className="h-4 w-4" />
-        </Link>
+        </button>
       </div>
     </div>
   );

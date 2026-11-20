@@ -1,17 +1,32 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Bot, CalendarCheck, MapPin, MessageCircle } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { entrar } from "@/lib/auth";
 import { ENDERECO_COMPLETO, LOJA } from "@/lib/loja";
+import { SUPABASE_ATIVO } from "@/lib/supabase";
 
 export default function LoginPage() {
   const router = useRouter();
 
-  function entrar(e: React.FormEvent) {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState("");
+  const [enviando, setEnviando] = useState(false);
+
+  async function aoEnviar(e: React.FormEvent) {
     e.preventDefault();
-    // Sem back-end ainda: qualquer e-mail/senha entra no painel
-    router.push("/estoque");
+    setEnviando(true);
+    setErro("");
+    const falha = await entrar(email, senha);
+    setEnviando(false);
+    if (falha) {
+      setErro(falha);
+      return;
+    }
+    router.push("/dashboard");
   }
 
   return (
@@ -47,7 +62,7 @@ export default function LoginPage() {
       </section>
 
       <section className="flex items-center justify-center px-4 py-12">
-        <form onSubmit={entrar} className="w-full max-w-sm space-y-6">
+        <form onSubmit={aoEnviar} className="w-full max-w-sm space-y-6">
           <div className="lg:hidden">
             <Logo />
           </div>
@@ -60,17 +75,22 @@ export default function LoginPage() {
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="rotulo">E-mail</label>
-              <input id="email" type="email" required className="campo" placeholder="voce@milano.com.br" autoComplete="email" />
+              <input id="email" type="email" required className="campo" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="voce@milano.com.br" autoComplete="email" />
             </div>
             <div>
               <label htmlFor="senha" className="rotulo">Senha</label>
-              <input id="senha" type="password" required className="campo" placeholder="••••••••" autoComplete="current-password" />
+              <input id="senha" type="password" required className="campo" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="••••••••" autoComplete="current-password" />
             </div>
           </div>
-          <button type="submit" className="botao-primario w-full py-2.5">Entrar</button>
-          <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
-            Versão de demonstração: qualquer e-mail e senha entram.
-          </p>
+          {erro && <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">{erro}</p>}
+          <button type="submit" disabled={enviando} className="botao-primario w-full py-2.5">
+            {enviando ? "Entrando..." : "Entrar"}
+          </button>
+          {!SUPABASE_ATIVO && (
+            <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              Modo demonstração: qualquer e-mail e senha entram. Os dados ficam só neste navegador.
+            </p>
+          )}
         </form>
       </section>
     </main>
