@@ -46,14 +46,16 @@ function Navegacao({ aoClicar }: { aoClicar?: () => void }) {
             key={href}
             href={href}
             onClick={aoClicar}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
-              ativo ? "bg-white/10 text-white" : "text-zinc-400 hover:bg-white/5 hover:text-white"
+            className={`flex items-center gap-3 rounded-2xl border px-3 py-2 text-sm font-medium transition ${
+              ativo
+                ? "border-white/20 bg-white/[0.14] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_6px_18px_-8px_rgba(0,0,0,0.6)]"
+                : "border-transparent text-white/60 hover:bg-white/[0.07] hover:text-white"
             }`}
           >
-            <Icone className={`h-4.5 w-4.5 ${ativo ? "text-marca-500" : ""}`} />
+            <Icone className={`h-4.5 w-4.5 ${ativo ? "text-white" : ""}`} />
             {rotulo}
             {href === "/conversas" && naoLidas > 0 && (
-              <span className="ml-auto rounded-full bg-milano-verde px-1.5 py-0.5 text-[10px] font-semibold text-white">
+              <span className="ml-auto rounded-full bg-emerald-500/80 px-1.5 py-0.5 text-[10px] font-semibold text-white shadow-[0_0_12px_rgba(16,185,129,0.6)]">
                 {naoLidas}
               </span>
             )}
@@ -70,21 +72,21 @@ function Rodape() {
   const router = useRouter();
   const nome = usuario?.nome ?? "";
   return (
-    <div className="border-t border-white/10 pt-4">
+    <div className="border-t border-white/10 pt-3">
       <div className="flex items-center gap-3 px-1">
-        <div className="grid h-8 w-8 place-items-center rounded-full bg-zinc-700 text-xs font-semibold text-white">
+        <div className="grid h-8 w-8 place-items-center rounded-full border border-white/20 bg-white/10 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]">
           {iniciais(nome) || "?"}
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium text-white">{nome}</p>
-          <p className="truncate text-xs text-zinc-500">{modo === "local" ? "Modo demonstração" : usuario?.email}</p>
+          <p className="truncate text-xs text-white/45">{modo === "local" ? "Modo demonstração" : usuario?.email}</p>
         </div>
         <button
           onClick={async () => {
             await sair();
             router.push("/login");
           }}
-          className="rounded-md p-1.5 text-zinc-400 hover:bg-white/10 hover:text-white"
+          className="rounded-full p-1.5 text-white/55 hover:bg-white/10 hover:text-white"
           aria-label="Sair"
           title="Sair"
         >
@@ -104,22 +106,24 @@ export function Sidebar() {
   return (
     <>
       {/* Barra superior no celular */}
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-white/10 bg-milano-fundo/90 px-4 py-3 backdrop-blur-xl lg:hidden">
-        <Logo claro className="h-10" />
+      <div className="sticky top-0 z-30 px-3 pt-3 lg:hidden">
+      <header className="vidro flex items-center justify-between rounded-full py-1.5 pl-4 pr-1.5">
+        <Logo claro className="h-9" />
         <button
           onClick={() => setAberto(true)}
-          className="rounded-md p-2 text-zinc-300 hover:bg-white/10"
+          className="rounded-full p-2.5 text-white/80 hover:bg-white/10"
           aria-label="Abrir menu"
         >
           <Menu className="h-5 w-5" />
         </button>
       </header>
+      </div>
 
       {/* Menu lateral fixo no computador */}
-      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col gap-6 border-r border-white/5 bg-milano-fundo/95 p-4 backdrop-blur-xl lg:flex">
-        <div className="space-y-2 px-1 pt-1">
+      <aside className="vidro fixed inset-y-3 left-3 z-30 hidden w-56 flex-col gap-5 rounded-[28px] p-3.5 lg:flex">
+        <div className="space-y-2 px-1.5 pt-1.5">
           <Logo claro />
-          <p className="flex items-center gap-1 text-xs text-zinc-500">
+          <p className="flex items-center gap-1 text-xs text-white/45">
             <MapPin className="h-3 w-3" /> {LOJA.cidade} · {LOJA.uf}
           </p>
         </div>
@@ -130,13 +134,13 @@ export function Sidebar() {
       {/* Gaveta no celular */}
       {aberto && (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setAberto(false)} />
-          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col gap-6 bg-milano-fundo p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setAberto(false)} />
+          <aside className="vidro-forte absolute inset-y-3 left-3 flex w-64 flex-col gap-5 rounded-[28px] p-4">
             <div className="flex items-center justify-between px-1 pt-1">
               <Logo claro />
               <button
                 onClick={() => setAberto(false)}
-                className="rounded-md p-1.5 text-zinc-400 hover:bg-white/10"
+                className="rounded-full p-1.5 text-white/60 hover:bg-white/10"
                 aria-label="Fechar menu"
               >
                 <X className="h-5 w-5" />

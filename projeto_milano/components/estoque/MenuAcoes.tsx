@@ -42,7 +42,7 @@ export function MenuAcoes({ veiculo }: { veiculo: Veiculo }) {
         <MoreVertical className="h-4 w-4" />
       </button>
       {aberto && (
-        <div className="vidro-forte absolute right-0 z-30 mt-1 w-52 overflow-hidden rounded-xl py-1 text-white/80">
+        <div className="vidro-forte absolute right-0 z-30 mt-1 w-52 overflow-hidden rounded-xl bg-[rgba(24,20,28,0.94)] py-1 text-white/80">
           <Link href={`/estoque/${veiculo.id}`} className={item}>
             <Pencil className="h-4 w-4 text-white/35" /> Editar
           </Link>
