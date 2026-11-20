@@ -59,7 +59,7 @@ export default function LoginPage() {
               </h1>
               <p className="max-w-md text-base text-white/65 sm:text-lg">Atendimento com IA, leads, estoque e agenda num lugar só.</p>
             </div>
-            <ul className="grid gap-3 sm:grid-cols-3">
+            <ul className="hidden gap-3 sm:grid sm:grid-cols-3">
               {RECURSOS.map(({ icone: Icone, titulo, texto }) => (
                 <li key={titulo} className="vidro p-4">
                   <span className="mb-3 grid h-9 w-9 place-items-center rounded-xl border border-white/15 bg-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]">

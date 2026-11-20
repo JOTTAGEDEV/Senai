@@ -96,8 +96,8 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">{saudacao}!</h1>
-        <p className="text-sm text-zinc-500">
+        <h1 className="texto-metal text-4xl font-extrabold italic tracking-tight">{saudacao}!</h1>
+        <p className="text-sm text-white/50">
           Resumo de hoje da {config.nome}. A IA está {config.ia.modo === "desligado" ? "desligada" : config.ia.modo === "sempre" ? "atendendo 24h" : "atendendo fora do horário da loja"}.
         </p>
       </div>
@@ -119,14 +119,14 @@ export default function DashboardPage() {
 
       {/* Alertas */}
       {dados.alertas.length > 0 && (
-        <section className="cartao border-amber-200 bg-amber-50/60 p-4">
-          <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-900">
+        <section className="cartao p-5 ring-1 ring-inset ring-amber-400/25">
+          <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-200">
             <AlertTriangle className="h-4 w-4" /> Atenção
           </h2>
           <ul className="space-y-1.5">
             {dados.alertas.map((a) => (
               <li key={a.texto}>
-                <Link href={a.href} className="flex items-center gap-2 text-sm text-amber-900 hover:underline">
+                <Link href={a.href} className="flex items-center gap-2 text-sm text-amber-100/90 hover:text-white hover:underline">
                   {a.tipo === "lead" ? <UserRound className="h-3.5 w-3.5 shrink-0" /> : <Car className="h-3.5 w-3.5 shrink-0" />}
                   {a.texto}
                 </Link>
@@ -140,49 +140,49 @@ export default function DashboardPage() {
         <Cartao titulo="Funil de vendas" subtitulo={`Leads que chegaram em cada etapa · ${dados.perdidos} perdidos`}>
           <Barras itens={dados.funil} unidade="leads" />
         </Cartao>
-        <Cartao titulo="Leads quentes" subtitulo="Prontos para fechar — priorize estes" acao={<Link href="/leads" className="text-xs text-marca-700 hover:underline">Ver todos</Link>}>
+        <Cartao titulo="Leads quentes" subtitulo="Prontos para fechar — priorize estes" acao={<Link href="/leads" className="text-xs text-white/60 hover:text-white">Ver todos</Link>}>
           {dados.quentes.length === 0 ? (
-            <p className="text-sm text-zinc-500">Nenhum lead quente agora.</p>
+            <p className="text-sm text-white/50">Nenhum lead quente agora.</p>
           ) : (
-            <ul className="divide-y divide-zinc-100">
+            <ul className="divide-y divide-white/10">
               {dados.quentes.slice(0, 5).map((l) => (
                 <li key={l.id}>
-                  <Link href={`/conversas?lead=${l.id}`} className="flex items-start gap-3 py-2.5 hover:bg-zinc-50">
+                  <Link href={`/conversas?lead=${l.id}`} className="-mx-2 flex items-start gap-3 rounded-xl px-2 py-2.5 transition hover:bg-white/5">
                     <TemperaturaBadge t={l.temperatura} />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-zinc-900">{l.nome}</p>
-                      <p className="truncate text-xs text-zinc-500">{l.proximaAcao || l.resumo}</p>
+                      <p className="text-sm font-medium text-white">{l.nome}</p>
+                      <p className="truncate text-xs text-white/50">{l.proximaAcao || l.resumo}</p>
                     </div>
-                    <span className="shrink-0 text-[11px] text-zinc-400">{tempoRelativo(l.ultimaMensagemEm)}</span>
+                    <span className="shrink-0 text-[11px] text-white/35">{tempoRelativo(l.ultimaMensagemEm)}</span>
                   </Link>
                 </li>
               ))}
             </ul>
           )}
         </Cartao>
-        <Cartao titulo="Carros mais procurados" subtitulo="Leads em aberto interessados em cada carro" acao={<Link href="/estoque" className="text-xs text-marca-700 hover:underline">Estoque</Link>}>
+        <Cartao titulo="Carros mais procurados" subtitulo="Leads em aberto interessados em cada carro" acao={<Link href="/estoque" className="text-xs text-white/60 hover:text-white">Estoque</Link>}>
           <Barras itens={dados.maisProcurados} unidade="interessados" />
         </Cartao>
         <Cartao titulo="Assuntos mais frequentes" subtitulo="Etiquetas colocadas pela IA nas conversas">
-          {dados.assuntos.length === 0 ? <p className="text-sm text-zinc-500">Sem etiquetas ainda.</p> : <Barras itens={dados.assuntos} unidade="leads" />}
+          {dados.assuntos.length === 0 ? <p className="text-sm text-white/50">Sem etiquetas ainda.</p> : <Barras itens={dados.assuntos} unidade="leads" />}
         </Cartao>
       </div>
 
-      <Cartao titulo="Próximos agendamentos" acao={<Link href="/agenda" className="text-xs text-marca-700 hover:underline">Agenda</Link>}>
+      <Cartao titulo="Próximos agendamentos" acao={<Link href="/agenda" className="text-xs text-white/60 hover:text-white">Agenda</Link>}>
         {dados.proximas.length === 0 ? (
-          <p className="text-sm text-zinc-500">Nenhuma visita nos próximos 7 dias.</p>
+          <p className="text-sm text-white/50">Nenhuma visita nos próximos 7 dias.</p>
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {dados.proximas.map((a) => {
               const v = veiculos.find((x) => x.id === a.veiculoId);
               return (
-                <li key={a.id} className="rounded-lg border border-zinc-200 p-3">
-                  <p className="text-xs font-medium capitalize text-zinc-500">
+                <li key={a.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                  <p className="text-xs font-medium capitalize text-white/50">
                     {new Date(a.inicio).toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" })} ·{" "}
                     {new Date(a.inicio).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                   </p>
-                  <p className="mt-1 text-sm font-medium text-zinc-900">{a.clienteNome}</p>
-                  <p className="text-xs text-zinc-500">
+                  <p className="mt-1 text-sm font-medium text-white">{a.clienteNome}</p>
+                  <p className="text-xs text-white/50">
                     {a.tipo === "test-drive" ? "Test-drive" : "Visita"}
                     {v ? ` · ${v.modelo}` : ""}
                     {v ? ` · ${formatarPreco(v.preco)}` : ""}
@@ -214,25 +214,25 @@ function Indicador({
 }) {
   const conteudo = (
     <>
-      <p className={`flex items-center gap-1.5 text-xs font-medium ${alerta ? "text-amber-800" : "text-zinc-500"}`}>
+      <p className={`flex items-center gap-1.5 text-xs font-medium ${alerta ? "text-amber-200" : "text-white/55"}`}>
         {icone}
         {rotulo}
       </p>
-      <p className={`mt-1 text-2xl font-semibold tabular-nums ${alerta ? "text-amber-900" : "text-zinc-900"}`}>{valor}</p>
-      {detalhe && <p className="text-[11px] text-zinc-500">{detalhe}</p>}
+      <p className={`mt-1 text-3xl font-semibold tabular-nums ${alerta ? "text-amber-100" : "text-white"}`}>{valor}</p>
+      {detalhe && <p className="text-[11px] text-white/50">{detalhe}</p>}
     </>
   );
-  const classe = `cartao block p-4 ${alerta ? "border-amber-300 bg-amber-50" : ""} ${href ? "transition hover:shadow-md" : ""}`;
+  const classe = `cartao block p-4 ${alerta ? "ring-1 ring-inset ring-amber-400/40 bg-amber-500/10" : ""} ${href ? "transition hover:-translate-y-0.5 hover:bg-white/[0.09]" : ""}`;
   return href ? <Link href={href} className={classe}>{conteudo}</Link> : <div className={classe}>{conteudo}</div>;
 }
 
 function Cartao({ titulo, subtitulo, acao, children }: { titulo: string; subtitulo?: string; acao?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="cartao min-w-0 p-5">
+    <section className="cartao min-w-0 p-5 sm:p-6">
       <div className="mb-4 flex items-start justify-between gap-2">
         <div>
-          <h2 className="text-sm font-semibold text-zinc-900">{titulo}</h2>
-          {subtitulo && <p className="text-xs text-zinc-500">{subtitulo}</p>}
+          <h2 className="text-sm font-semibold text-white">{titulo}</h2>
+          {subtitulo && <p className="text-xs text-white/50">{subtitulo}</p>}
         </div>
         {acao}
       </div>
@@ -248,14 +248,14 @@ function Barras({ itens, unidade }: { itens: { rotulo: string; valor: number }[]
     <ul className="space-y-2.5">
       {itens.map((i) => (
         <li key={i.rotulo} className="group grid grid-cols-[minmax(0,9rem)_1fr_2.5rem] items-center gap-3 text-sm" title={`${i.rotulo}: ${i.valor} ${unidade}`}>
-          <span className="truncate text-zinc-700">{i.rotulo}</span>
-          <span className="h-2.5 rounded-full bg-zinc-100">
+          <span className="truncate text-white/75">{i.rotulo}</span>
+          <span className="h-2.5 rounded-full bg-white/10 shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
             <span
-              className="block h-full rounded-full bg-milano-fundo transition-[width] group-hover:bg-marca-600"
+              className="block h-full rounded-full bg-gradient-to-r from-white/70 to-white shadow-[0_0_12px_rgba(255,255,255,0.25)] transition-[width] group-hover:from-marca-500 group-hover:to-marca-400"
               style={{ width: `${(i.valor / max) * 100}%`, minWidth: i.valor > 0 ? 6 : 0 }}
             />
           </span>
-          <span className="text-right font-medium tabular-nums text-zinc-900">{i.valor}</span>
+          <span className="text-right font-medium tabular-nums text-white">{i.valor}</span>
         </li>
       ))}
     </ul>
