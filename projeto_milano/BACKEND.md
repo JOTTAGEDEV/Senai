@@ -43,6 +43,18 @@ Vendedor responde no painel ──▶ Edge Function enviar-mensagem ──▶ Wh
 
 ---
 
+## Projeto já criado
+
+| | |
+|---|---|
+| Projeto Supabase | `milano-multimarcas` (ref `tobmcmqluydaxrdxsxbi`, região São Paulo) |
+| URL | `https://tobmcmqluydaxrdxsxbi.supabase.co` |
+| Webhook para a Meta | `https://tobmcmqluydaxrdxsxbi.supabase.co/functions/v1/whatsapp-webhook` |
+| Feito | Passo 1 (banco + ajustes dos advisors) e Passo 4 (as 3 funções publicadas) |
+| Falta | Passo 2 (usuário da loja), secrets do Passo 4, Passo 5 (Meta) e Passo 6 (cron) |
+
+Nos comandos abaixo, `SEU_REF` = `tobmcmqluydaxrdxsxbi`.
+
 ## Passo 1 — Banco de dados (Supabase)
 
 1. Em [supabase.com](https://supabase.com), crie um projeto (região **São Paulo**, `sa-east-1`, para ficar mais rápido no Brasil).
