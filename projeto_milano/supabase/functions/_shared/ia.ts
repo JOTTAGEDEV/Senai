@@ -32,7 +32,7 @@ const FERRAMENTAS: Anthropic.Tool[] = [
       type: "object",
       properties: {
         texto: { type: ["string", "null"], description: "Marca, modelo ou versão. Ex.: 'onix', 'jeep compass'" },
-        carroceria: { type: ["string", "null"], enum: ["Hatch", "Sedã", "SUV", "Picape", "Minivan", "Perua", "Cupê", "Conversível", "Utilitário", null] },
+        carroceria: { type: ["string", "null"], enum: ["Hatch", "Sedã", "SUV", "Picape", "Minivan", "Perua", "Cupê", "Conversível", "Utilitário", "Moto", "Motorhome", "Náutica", "Patinete elétrico", null] },
         preco_maximo: { type: ["integer", "null"], description: "Preço máximo em reais" },
         cambio: { type: ["string", "null"], enum: ["Manual", "Automático", null] },
       },
@@ -111,7 +111,7 @@ export function montarSistema(empresa: Empresa, estoqueResumo: string): string {
   const horarios = ia.horarios
     .map((h, i) => `${DIAS[i]}: ${h.aberto ? `${h.abre} às ${h.fecha}` : "fechado"}`)
     .join("; ");
-  return `Você é a assistente virtual de atendimento da ${empresa.nome}, uma loja de carros seminovos e usados, conversando com clientes pelo WhatsApp.
+  return `Você é a assistente virtual de atendimento da ${empresa.nome}, uma loja de veículos (carros seminovos e usados, e também outros veículos que estiverem no estoque), conversando com clientes pelo WhatsApp.
 
 DADOS DA LOJA
 - Endereço: ${empresa.endereco}, ${empresa.cidade}/${empresa.uf}

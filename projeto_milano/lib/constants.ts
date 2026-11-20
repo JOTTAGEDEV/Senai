@@ -23,7 +23,7 @@ export const MARCAS = [
   "Outra",
 ];
 
-export const CARROCERIAS = ["Hatch", "Sedã", "SUV", "Picape", "Minivan", "Perua", "Cupê", "Conversível", "Utilitário"];
+export const CARROCERIAS = ["Hatch", "Sedã", "SUV", "Picape", "Minivan", "Perua", "Cupê", "Conversível", "Utilitário", "Moto", "Motorhome", "Náutica", "Patinete elétrico"];
 export const CAMBIOS = ["Manual", "Automático", "CVT", "Automatizado"];
 export const COMBUSTIVEIS = ["Flex", "Gasolina", "Etanol", "Diesel", "Híbrido", "Elétrico"];
 export const MOTORES = ["1.0", "1.0 Turbo", "1.3", "1.4", "1.4 Turbo", "1.5", "1.6", "1.8", "2.0", "2.0 Turbo", "2.8 Diesel", "3.0+", "Elétrico"];
