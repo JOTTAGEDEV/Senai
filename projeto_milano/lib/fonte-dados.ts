@@ -133,8 +133,12 @@ const TABELA_SQL: Record<Tabela, string> = {
   configuracoes: "empresas",
 };
 
-const paraSnake = (s: string) => s.replace(/[A-Z]/g, (l) => `_${l.toLowerCase()}`);
-const paraCamel = (s: string) => s.replace(/_([a-z])/g, (_, l: string) => l.toUpperCase());
+// Campos cujo nome não segue a regra simples (sigla "IA" no fim)
+const EXCECOES_SNAKE: Record<string, string> = { instrucoesIA: "instrucoes_ia" };
+const EXCECOES_CAMEL: Record<string, string> = Object.fromEntries(Object.entries(EXCECOES_SNAKE).map(([c, s]) => [s, c]));
+
+const paraSnake = (s: string) => EXCECOES_SNAKE[s] ?? s.replace(/[A-Z]/g, (l) => `_${l.toLowerCase()}`);
+const paraCamel = (s: string) => EXCECOES_CAMEL[s] ?? s.replace(/_([a-z])/g, (_, l: string) => l.toUpperCase());
 
 /** Converte só as chaves do primeiro nível (colunas). Campos JSON por dentro ficam como estão. */
 function paraLinha(obj: Record<string, unknown>): Record<string, unknown> {
@@ -149,6 +153,10 @@ function deLinha(linha: Record<string, unknown>): Registro {
 function criarFonteSupabase(): FonteDados {
   const sb = supabase();
   let empresaId: string | null = null;
+  // Trocou de conta na mesma aba: esquece a empresa guardada
+  sb.auth.onAuthStateChange(() => {
+    empresaId = null;
+  });
 
   async function idEmpresa(): Promise<string> {
     if (empresaId) return empresaId;
@@ -168,7 +176,7 @@ function criarFonteSupabase(): FonteDados {
         const blob = await (await fetch(f.src)).blob();
         const extensao = blob.type.split("/")[1] ?? "webp";
         const caminho = `${empresa}/${veiculoId}/${f.id}.${extensao}`;
-        const { error } = await sb.storage.from("fotos").upload(caminho, blob, { contentType: blob.type, upsert: true });
+        const { error } = await sb.storage.from("fotos").upload(caminho, blob, { contentType: blob.type, upsert: false });
         if (error) throw error;
         const { data } = sb.storage.from("fotos").getPublicUrl(caminho);
         return { ...f, src: data.publicUrl };
@@ -186,9 +194,13 @@ function criarFonteSupabase(): FonteDados {
   return {
     modo: "supabase",
     async listar<T>(t: Tabela) {
-      let consulta = sb.from(TABELA_SQL[t]).select("*");
-      if (t === "mensagens") consulta = consulta.order("criada_em", { ascending: true }).limit(5000);
-      const { data, error } = await consulta;
+      // Mensagens: as 1000 mais RECENTES (o Supabase devolve no máximo 1000 linhas por consulta)
+      if (t === "mensagens") {
+        const { data, error } = await sb.from("mensagens").select("*").order("criada_em", { ascending: false }).limit(1000);
+        if (error) throw error;
+        return (data ?? []).reverse().map(deLinha) as unknown as T[];
+      }
+      const { data, error } = await sb.from(TABELA_SQL[t]).select("*").limit(1000);
       if (error) throw error;
       return (data ?? []).map(deLinha) as unknown as T[];
     },
