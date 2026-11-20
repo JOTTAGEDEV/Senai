@@ -1,9 +1,6 @@
-# Milano Multimarcas — Painel (front-end)
+# Milano Multimarcas — Painel com IA no WhatsApp
 
-Painel de atendimento com IA no WhatsApp para a Milano Multimarcas: estoque, conversas, leads, agenda e dashboard.
-
-> **Fase atual:** só o front-end. Os dados ficam salvos no navegador (IndexedDB) com carros de exemplo.
-> Quando o back-end (Supabase + WhatsApp Cloud API + IA) for ligado, só a camada `lib/estoque-store.tsx` muda.
+Sistema de atendimento da Milano Multimarcas (Palhoça/SC): a IA responde os clientes no WhatsApp oficial, consulta o estoque, agenda visitas e classifica os leads; a loja acompanha tudo num painel.
 
 ## Rodar
 
@@ -13,47 +10,51 @@ npm install
 npm run dev
 ```
 
-Abra http://localhost:3000 — qualquer e-mail e senha entram.
+Abra http://localhost:3000.
+
+- **Sem configurar nada**: modo demonstração — qualquer e-mail/senha entra, dados de exemplo, IA simulada (dá para "simular" um cliente escrevendo e ver a IA responder).
+- **Para ligar de verdade** (Supabase + WhatsApp + IA): siga o [BACKEND.md](./BACKEND.md).
 
 ## Telas
 
-| Tela | Status |
+| Tela | O que faz |
 |---|---|
-| Login | ✅ visual |
-| Estoque — lista, filtros, resumo, ações (editar, duplicar, status, excluir) | ✅ |
-| Estoque — cadastro/edição completo, até 15 fotos com capa, ordem e 3 fotos para a IA | ✅ |
-| Dashboard, Conversas, Leads, Agenda, Configurações | 🚧 em construção |
+| **Dashboard** | Números do dia, alertas (lead quente sem resposta, carro parado), funil, carros mais procurados, assuntos, próximas visitas |
+| **Conversas** | Caixa de entrada estilo WhatsApp, IA/vendedor, botões Assumir e Devolver para IA, painel lateral com resumo e etiquetas |
+| **Leads** | Lista com filtros por temperatura, etapa, etiqueta e vendedor; ficha completa do cliente |
+| **Estoque** | Lista com filtros e resumo; cadastro completo do carro com até 15 fotos (capa, ordem, 3 para a IA) |
+| **Agenda** | Visitas e test-drives por dia, marcados pela IA ou manualmente |
+| **Configurações** | Dados da loja, quando a IA atende, horário da loja, regras da IA, vendedores, conexão |
 
 ## Estrutura
 
 ```
-app/
-  login/                 tela de login
-  (painel)/              telas com menu lateral
-    estoque/             lista
-    estoque/novo/        cadastrar carro
-    estoque/[id]/        editar carro
-components/
-  Sidebar.tsx, Logo.tsx, EmBreve.tsx
-  estoque/               formulário, fotos, badges, menu de ações
+app/                       telas (Next.js App Router)
+  login/
+  (painel)/dashboard, conversas, leads, estoque, agenda, configuracoes
+components/                peças das telas
 lib/
-  types.ts               tipo Veiculo
-  constants.ts           marcas, opcionais, status...
-  estoque-store.tsx      onde os dados são salvos (trocar por Supabase depois)
-  imagem.ts              compressão de fotos (1280px, WebP)
-  mock-data.ts           carros de exemplo
+  dados.tsx                estado do painel (usado por todas as telas)
+  fonte-dados.ts           de onde vêm os dados: navegador (demo) ou Supabase
+  ia-simulada.ts           IA de mentira para o modo demonstração
+  crm.ts, constants.ts     listas e regras (etapas, etiquetas, status, horário da IA)
+  types.ts                 tipos (Veiculo, Lead, Mensagem, Agendamento...)
+supabase/
+  migrations/              banco de dados
+  functions/               servidor: webhook do WhatsApp, IA atendente, IA analista, envio pelo painel
+BACKEND.md                 passo a passo para ligar tudo
 ```
 
-## Dados da loja e logo
+## Logo e dados da loja
 
-Os dados ficam em `lib/loja.ts` (endereço encontrado em anúncios públicos: Rua Caetano Silveira de Matos, 2371 – Centro, Palhoça/SC).
-WhatsApp, Instagram e horário ainda precisam ser confirmados com a loja.
+Logo original em `public/logo-milano-original.gif`, redesenhada em vetor em `components/Logo.tsx`. Cores: grafite, verde e vermelho da bandeira italiana.
+Endereço (de anúncios públicos): Rua Caetano Silveira de Matos, 2371 – Centro, Palhoça/SC. WhatsApp, Instagram e horário: confirmar com a loja (editável em Configurações).
 
-**Logo:** arquivo original em `public/logo-milano-original.gif`, redesenhado em vetor (SVG) em `components/Logo.tsx`. Cores do painel baseadas na logo: grafite, verde e vermelho da bandeira italiana.
+O estoque de exemplo usa modelos reais dos anúncios da loja; km, opcionais, status, leads e conversas são fictícios.
 
-O estoque de exemplo usa modelos reais dos anúncios da loja (Taos, Tracker, Pajero Sport, Nivus, Mobi, Compass, Azera);
-quilometragem, opcionais, status e parte dos preços são ilustrativos.
+## Testes
 
-## Campos internos
-
-Campos marcados como **interno** (placa completa, preço mínimo, custo de compra, observações internas) nunca serão enviados para a IA.
+```bash
+npm run lint && npx tsc --noEmit                    # painel
+cd supabase/functions && deno test --allow-env tests/   # servidor
+```

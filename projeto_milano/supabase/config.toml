@@ -1,0 +1,13 @@
+project_id = "milano"
+
+# A Meta chama o webhook sem login do Supabase (a segurança é a assinatura X-Hub-Signature-256)
+[functions.whatsapp-webhook]
+verify_jwt = false
+
+# Chamada pelo pg_cron com o cabeçalho x-cron-secret
+[functions.ia-analista]
+verify_jwt = false
+
+# Chamada pelo painel com o login do usuário
+[functions.enviar-mensagem]
+verify_jwt = true

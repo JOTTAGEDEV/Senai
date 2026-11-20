@@ -1,0 +1,4 @@
+{
+  "nodeModulesDir": "none",
+  "compilerOptions": { "lib": ["deno.ns", "dom", "deno.unstable"] }
+}
