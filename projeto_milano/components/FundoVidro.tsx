@@ -1,7 +1,8 @@
 /**
  * Fundo das telas (referência "AE Glass"): quase preto com a logo de vidro da JL Devs
- * no centro e objetos 3D coloridos flutuando atrás do vidro — anel de cobre, esfera roxa
- * metálica, cruz de cápsulas azuis e pentágono dourado com brilho. Só decoração (aria-hidden).
+ * no centro, folhas reais de costela-de-adão nos cantos (foto Burst/Shopify, uso comercial livre)
+ * e objetos 3D flutuando atrás do vidro — anel de cobre, cruz de cápsulas azuis e pentágono
+ * dourado com brilho. Só decoração (aria-hidden).
  */
 "use client";
 
@@ -25,21 +26,6 @@ function Anel({ tamanho }: { tamanho: string }) {
       <ellipse cx="60" cy="60" rx="46" ry="50" fill="none" stroke="url(#an-cobre)" strokeWidth="9" />
       <ellipse cx="57" cy="56" rx="46" ry="50" fill="none" stroke="#fff" strokeOpacity="0.28" strokeWidth="1.5" strokeDasharray="60 260" />
     </svg>
-  );
-}
-
-function Esfera({ tamanho }: { tamanho: string }) {
-  return (
-    <div
-      style={{
-        width: tamanho,
-        height: tamanho,
-        borderRadius: "9999px",
-        background:
-          "radial-gradient(circle at 32% 28%, #e9d5ff 0%, #a78bfa 14%, #6d28d9 38%, #312e81 62%, #0b0820 88%)",
-        boxShadow: "inset -18px -22px 40px rgba(0,0,0,0.55), inset 10px 10px 30px rgba(255,255,255,0.12), 0 30px 60px -20px rgba(109,40,217,0.6)",
-      }}
-    />
   );
 }
 
@@ -83,6 +69,26 @@ function LogoJL({ destaque }: { destaque: boolean }) {
   );
 }
 
+/** Folha real (foto recortada do fundo preto). `girar` espelha para o canto oposto. */
+function Planta({ altura, girar = false, apagada = false }: { altura: string; girar?: boolean; apagada?: boolean }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/planta-monstera.webp"
+      alt=""
+      draggable={false}
+      style={{
+        height: altura,
+        width: "auto",
+        maxWidth: "none",
+        transform: girar ? "rotate(180deg)" : undefined,
+        opacity: apagada ? 0.6 : 0.9,
+        filter: "saturate(1.1) drop-shadow(0 0 40px rgba(132,204,22,0.15))",
+      }}
+    />
+  );
+}
+
 function Pentagono({ tamanho }: { tamanho: string }) {
   return (
     <svg viewBox="0 0 120 120" style={{ width: tamanho, height: tamanho, filter: "drop-shadow(0 0 10px rgba(251,191,36,0.55)) drop-shadow(0 0 24px rgba(245,158,11,0.35))" }}>
@@ -101,7 +107,6 @@ function Pentagono({ tamanho }: { tamanho: string }) {
 
 const OBJETOS: { el: React.ReactNode; estilo: Estilo }[] = [
   { el: <Anel tamanho="min(16vw, 200px)" />, estilo: { top: "4%", right: "10%", "--tempo": "15s", "--giro": "18deg" } },
-  { el: <Esfera tamanho="min(20vw, 260px)" />, estilo: { bottom: "4%", left: "30%", "--tempo": "17s" } },
   { el: <Cruz tamanho="min(15vw, 190px)" />, estilo: { bottom: "14%", right: "6%", "--tempo": "14s", "--giro": "10deg" } },
   { el: <Pentagono tamanho="min(13vw, 160px)" />, estilo: { top: "38%", left: "3%", "--tempo": "16s", "--giro": "-12deg" } },
   { el: <Anel tamanho="min(8vw, 100px)" />, estilo: { bottom: "6%", left: "4%", opacity: 0.8, "--tempo": "12s", "--giro": "-25deg" } },
@@ -116,6 +121,13 @@ export function FundoVidro() {
     : { top: "55%", left: "58%", translate: "-50% -50%", "--tempo": "18s", "--giro": "-3deg" };
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      {/* plantas nos cantos: entram pela borda da tela */}
+      <div className="absolute left-0 top-0">
+        <Planta altura="min(80vh, 760px)" apagada={login} />
+      </div>
+      <div className="absolute bottom-0 right-0">
+        <Planta altura="min(72vh, 680px)" girar />
+      </div>
       <div className="flutuar absolute" style={posicaoLogo}>
         <LogoJL destaque={login} />
       </div>
