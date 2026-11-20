@@ -12,6 +12,7 @@ import {
   Menu,
   MessageCircle,
   Settings,
+  Sparkles,
   Users,
   X,
 } from "lucide-react";
@@ -19,6 +20,7 @@ import { sair, useUsuario } from "@/lib/auth";
 import { iniciais } from "@/lib/crm";
 import { useDados } from "@/lib/dados";
 import { LOJA } from "@/lib/loja";
+import { AssinaturaJL } from "./AssinaturaJL";
 import { Logo } from "./Logo";
 
 const ITENS = [
@@ -27,6 +29,7 @@ const ITENS = [
   { href: "/leads", rotulo: "Leads", icone: Users },
   { href: "/estoque", rotulo: "Estoque", icone: Car },
   { href: "/agenda", rotulo: "Agenda", icone: CalendarDays },
+  { href: "/testar-ia", rotulo: "Testar IA", icone: Sparkles },
   { href: "/configuracoes", rotulo: "Configurações", icone: Settings },
 ];
 
@@ -88,6 +91,9 @@ function Rodape() {
           <LogOut className="h-4 w-4" />
         </button>
       </div>
+      <div className="mt-3 flex justify-center">
+        <AssinaturaJL compacto />
+      </div>
     </div>
   );
 }
@@ -98,7 +104,7 @@ export function Sidebar() {
   return (
     <>
       {/* Barra superior no celular */}
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-white/10 bg-milano-fundo px-4 py-3 lg:hidden">
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-white/10 bg-milano-fundo/90 px-4 py-3 backdrop-blur-xl lg:hidden">
         <Logo claro className="h-10" />
         <button
           onClick={() => setAberto(true)}
@@ -110,7 +116,7 @@ export function Sidebar() {
       </header>
 
       {/* Menu lateral fixo no computador */}
-      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col gap-6 bg-milano-fundo p-4 lg:flex">
+      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col gap-6 border-r border-white/5 bg-milano-fundo/95 p-4 backdrop-blur-xl lg:flex">
         <div className="space-y-2 px-1 pt-1">
           <Logo claro />
           <p className="flex items-center gap-1 text-xs text-zinc-500">

@@ -11,3 +11,7 @@ verify_jwt = false
 # Chamada pelo painel com o login do usuário
 [functions.enviar-mensagem]
 verify_jwt = true
+
+# Chamada pelo painel (botão Testar IA) com o login do usuário
+[functions.testar-ia]
+verify_jwt = true

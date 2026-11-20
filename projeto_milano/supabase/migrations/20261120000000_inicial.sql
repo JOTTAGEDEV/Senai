@@ -169,7 +169,7 @@ create index on public.agendamentos (empresa_id, inicio);
 create table public.uso_ia (
   id               bigint generated always as identity primary key,
   empresa_id       uuid not null references public.empresas(id) on delete cascade,
-  tipo             text not null,      -- 'atendente' | 'analista'
+  tipo             text not null,      -- 'atendente' | 'analista' | 'teste'
   modelo           text not null,
   tokens_entrada   int not null default 0,
   tokens_saida     int not null default 0,

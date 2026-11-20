@@ -5,17 +5,26 @@ import { ok } from "./supabase.ts";
 import type { Agendamento, CredenciaisWhatsApp, Empresa, Lead, Mensagem, Veiculo, Vendedor } from "./tipos.ts";
 import { ORDEM_ETAPAS } from "./tipos.ts";
 import { enviarImagem, enviarTexto } from "./whatsapp.ts";
+import { type ConteudoGemini, esquemaParaGemini, GEMINI_MODELO, gerarGemini, textoGemini } from "./gemini.ts";
 
 /** Modelo barato e rápido para atendimento. Pode trocar pela variável IA_MODELO. */
 export const MODELO = Deno.env.get("IA_MODELO") ?? "claude-haiku-5-5";
 const MAX_RODADAS = 6;
 
 let clienteIA: Anthropic | null = null;
-export function anthropic(): Anthropic {
-  // Lê ANTHROPIC_API_KEY do ambiente (secret da Edge Function).
+/** Cliente do Claude. Sem chave: usa ANTHROPIC_API_KEY (secret). Com chave: usada só nesta chamada (Testar IA). */
+export function anthropic(chave?: string): Anthropic {
   // O fetch é resolvido a cada chamada (permite testar sem internet).
-  if (!clienteIA) clienteIA = new Anthropic({ fetch: (...args: Parameters<typeof fetch>) => fetch(...args) });
+  const fetchAtual = (...args: Parameters<typeof fetch>) => fetch(...args);
+  if (chave) return new Anthropic({ apiKey: chave, fetch: fetchAtual });
+  if (!clienteIA) clienteIA = new Anthropic({ fetch: fetchAtual });
   return clienteIA;
+}
+
+/** Chaves informadas no painel (Testar IA). Têm prioridade sobre os secrets e não são guardadas. */
+export interface ChavesIA {
+  anthropic?: string;
+  gemini?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -200,6 +209,14 @@ export interface Contexto {
   whatsapp: CredenciaisWhatsApp;
   veiculos: Veiculo[];
   agora?: Date;
+  /** Modo "Testar IA" do painel: não envia nada pelo WhatsApp e não grava nada no banco. */
+  teste?: boolean;
+  /** No modo teste, as fotos que a IA "enviaria" ficam aqui para o painel mostrar. */
+  fotosTeste?: string[];
+  /** Forçar uma IA (usado pelo Testar IA); senão segue IA_PROVEDOR / chave disponível. */
+  provedor?: string | null;
+  /** Chaves vindas do Testar IA (só para aquela resposta). */
+  chaves?: ChavesIA;
 }
 
 async function executarFerramenta(ctx: Contexto, nome: string, entrada: Record<string, unknown>): Promise<string> {
@@ -226,6 +243,10 @@ async function executarFerramenta(ctx: Contexto, nome: string, entrada: Record<s
       const escolhidas = (v.fotos ?? []).filter((f) => f.enviarIA && f.src.startsWith("http"));
       const fotos = (escolhidas.length ? escolhidas : (v.fotos ?? []).filter((f) => f.src.startsWith("http"))).slice(0, 3);
       if (!fotos.length) return "Este carro ainda não tem fotos cadastradas. Ofereça que o vendedor envie depois.";
+      if (ctx.teste) {
+        ctx.fotosTeste?.push(...fotos.map((f) => f.src));
+        return `${fotos.length} foto(s) enviada(s).`;
+      }
       for (const [i, f] of fotos.entries()) {
         const legenda = i === 0 ? `${v.marca} ${v.modelo} ${v.ano_fabricacao}/${v.ano_modelo}` : undefined;
         const waId = await enviarImagem(whatsapp.phone_number_id, whatsapp.access_token, lead.telefone, f.src, legenda);
@@ -257,6 +278,7 @@ async function executarFerramenta(ctx: Contexto, nome: string, entrada: Record<s
       const livres = await calcularLivres(ctx, data);
       if (!livres.includes(hora)) return `Horário indisponível. Livres em ${data}: ${livres.join(", ") || "nenhum"}.`;
 
+      if (ctx.teste) return `(Teste: nada foi gravado) Agendado: ${entrada.tipo} em ${data} às ${hora}. Endereço: ${empresa.endereco}, ${empresa.cidade}/${empresa.uf}. Confirme para o cliente.`;
       const vendedorId = lead.vendedor_id ?? (await vendedorComMenosVisitas(ctx));
       const nomeCliente = (entrada.nome_cliente as string | null) || lead.nome || "Cliente";
       const veiculoId = (entrada.veiculo_id as string | null) && ctx.veiculos.some((v) => v.id === entrada.veiculo_id) ? String(entrada.veiculo_id) : lead.veiculo_id;
@@ -289,6 +311,7 @@ async function executarFerramenta(ctx: Contexto, nome: string, entrada: Record<s
     }
 
     case "chamar_vendedor": {
+      if (ctx.teste) return "Pronto: um vendedor vai continuar o atendimento. Avise o cliente que um vendedor responde em breve.";
       await db.from("leads").update({ atendente: "humano", importancia: "importante", proxima_acao: String(entrada.motivo) }).eq("id", lead.id);
       await db.from("mensagens").insert({
         empresa_id: empresa.id,
@@ -361,27 +384,64 @@ export interface Uso {
   entrada: number;
   saida: number;
   cache: number;
+  modelo: string;
 }
 
-/**
- * Gera e envia a resposta da IA para o cliente.
- * Retorna o texto enviado (ou null se a IA passou para o vendedor sem responder).
- */
-export async function responderCliente(ctx: Contexto, historico: Mensagem[]): Promise<{ texto: string | null; uso: Uso }> {
-  const uso: Uso = { entrada: 0, saida: 0, cache: 0 };
-  const sistema = montarSistema(ctx.empresa, resumoEstoque(ctx.veiculos, ctx.empresa.ia.podeInformarPreco));
+export type Provedor = "anthropic" | "gemini";
+
+/** Qual IA usar: pedido explícito (Testar IA) > variável IA_PROVEDOR > a chave que existir. */
+export function escolherProvedor(pedido?: string | null, chaves?: ChavesIA): Provedor | null {
+  const temAnthropic = Boolean(chaves?.anthropic || Deno.env.get("ANTHROPIC_API_KEY"));
+  const temGemini = Boolean(chaves?.gemini || Deno.env.get("GEMINI_API_KEY"));
+  const disponivel = (p: string | null | undefined): p is Provedor =>
+    (p === "anthropic" && temAnthropic) || (p === "gemini" && temGemini);
+  if (disponivel(pedido)) return pedido;
+  const padrao = Deno.env.get("IA_PROVEDOR");
+  if (disponivel(padrao)) return padrao;
+  if (temAnthropic) return "anthropic";
+  if (temGemini) return "gemini";
+  return null;
+}
+
+export function provedoresDisponiveis(): Provedor[] {
+  return (["anthropic", "gemini"] as Provedor[]).filter((p) => Boolean(Deno.env.get(p === "anthropic" ? "ANTHROPIC_API_KEY" : "GEMINI_API_KEY")));
+}
+
+interface Geracao {
+  texto: string | null;
+  uso: Uso;
+  /** A IA se recusou a responder (filtro de segurança do provedor) */
+  recusou?: boolean;
+  /** Passou do limite de rodadas de ferramentas */
+  esgotou?: boolean;
+}
+
+function lembreteAgora(ctx: Contexto): string {
   const agora = momentoLocal(ctx.agora);
+  return `Agora em ${ctx.empresa.cidade}: ${DIAS[agora.diaSemana]}, ${agora.data} ${agora.hora}. Cliente: ${ctx.lead.nome || "nome não informado"}.`;
+}
+
+async function rodarFerramenta(ctx: Contexto, nome: string, entrada: Record<string, unknown>): Promise<{ resultado: string; erro: boolean }> {
+  try {
+    return { resultado: await executarFerramenta(ctx, nome, entrada), erro: false };
+  } catch (e) {
+    return { resultado: `Erro: ${e instanceof Error ? e.message : e}`, erro: true };
+  }
+}
+
+/* ---------- Claude (Anthropic) ---------- */
+
+async function gerarComAnthropic(ctx: Contexto, historico: Mensagem[]): Promise<Geracao> {
+  const uso: Uso = { entrada: 0, saida: 0, cache: 0, modelo: MODELO };
+  const sistema = montarSistema(ctx.empresa, resumoEstoque(ctx.veiculos, ctx.empresa.ia.podeInformarPreco));
   const mensagens = montarHistorico(historico);
   if (!mensagens.length) return { texto: null, uso };
 
   // Data/hora vão como mensagem de sistema no fim (não quebra o cache do prompt fixo)
-  mensagens.push({
-    role: "system" as Anthropic.MessageParam["role"],
-    content: `Agora em ${ctx.empresa.cidade}: ${DIAS[agora.diaSemana]}, ${agora.data} ${agora.hora}. Cliente: ${ctx.lead.nome || "nome não informado"}.`,
-  } as Anthropic.MessageParam);
+  mensagens.push({ role: "system" as Anthropic.MessageParam["role"], content: lembreteAgora(ctx) } as Anthropic.MessageParam);
 
   for (let rodada = 0; rodada < MAX_RODADAS; rodada++) {
-    const resposta = await anthropic().messages.create({
+    const resposta = await anthropic(ctx.chaves?.anthropic).messages.create({
       model: MODELO,
       max_tokens: 4000,
       system: [{ type: "text", text: sistema, cache_control: { type: "ephemeral" } }],
@@ -393,22 +453,15 @@ export async function responderCliente(ctx: Contexto, historico: Mensagem[]): Pr
     uso.saida += resposta.usage.output_tokens;
     uso.cache += resposta.usage.cache_read_input_tokens ?? 0;
 
-    if (resposta.stop_reason === "refusal") {
-      await executarFerramenta(ctx, "chamar_vendedor", { motivo: "A IA não pôde responder esta mensagem." });
-      return { texto: null, uso };
-    }
+    if (resposta.stop_reason === "refusal") return { texto: null, uso, recusou: true };
 
     const chamadas = resposta.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
     if (resposta.stop_reason === "tool_use" && chamadas.length) {
       mensagens.push({ role: "assistant", content: resposta.content });
       const resultados: Anthropic.ToolResultBlockParam[] = [];
       for (const chamada of chamadas) {
-        try {
-          const resultado = await executarFerramenta(ctx, chamada.name, chamada.input as Record<string, unknown>);
-          resultados.push({ type: "tool_result", tool_use_id: chamada.id, content: resultado });
-        } catch (e) {
-          resultados.push({ type: "tool_result", tool_use_id: chamada.id, content: `Erro: ${e instanceof Error ? e.message : e}`, is_error: true });
-        }
+        const { resultado, erro } = await rodarFerramenta(ctx, chamada.name, chamada.input as Record<string, unknown>);
+        resultados.push({ type: "tool_result", tool_use_id: chamada.id, content: resultado, ...(erro ? { is_error: true } : {}) });
       }
       mensagens.push({ role: "user", content: resultados });
       continue;
@@ -419,38 +472,107 @@ export async function responderCliente(ctx: Contexto, historico: Mensagem[]): Pr
       .map((b) => b.text)
       .join("\n")
       .trim();
-    if (!texto) return { texto: null, uso };
-
-    const waId = await enviarTexto(ctx.whatsapp.phone_number_id, ctx.whatsapp.access_token, ctx.lead.telefone, texto);
-    ok(await ctx.db.from("mensagens").insert({
-      empresa_id: ctx.empresa.id,
-      lead_id: ctx.lead.id,
-      autor: "ia",
-      autor_nome: "Assistente IA",
-      texto,
-      wa_message_id: waId,
-    }));
-    await ctx.db
-      .from("leads")
-      .update({
-        ultima_mensagem_em: new Date().toISOString(),
-        ...(ctx.lead.etapa === "novo" ? { etapa: "atendimento" } : {}),
-      })
-      .eq("id", ctx.lead.id);
-    return { texto, uso };
+    return { texto: texto || null, uso };
   }
-
-  // Passou do limite de rodadas: não deixa o cliente sem resposta
-  await executarFerramenta(ctx, "chamar_vendedor", { motivo: "A IA não conseguiu concluir a resposta." });
-  return { texto: null, uso };
+  return { texto: null, uso, esgotou: true };
 }
 
-export async function registrarUso(db: SupabaseClient, empresaId: string, tipo: "atendente" | "analista", uso: Uso) {
+/* ---------- Gemini (Google) ---------- */
+
+const FERRAMENTAS_GEMINI = [{
+  functionDeclarations: FERRAMENTAS.map((f) => ({
+    name: f.name,
+    description: f.description,
+    parameters: esquemaParaGemini(f.input_schema),
+  })),
+}];
+
+async function gerarComGemini(ctx: Contexto, historico: Mensagem[]): Promise<Geracao> {
+  const uso: Uso = { entrada: 0, saida: 0, cache: 0, modelo: GEMINI_MODELO };
+  const sistema = montarSistema(ctx.empresa, resumoEstoque(ctx.veiculos, ctx.empresa.ia.podeInformarPreco)) + `\n\n${lembreteAgora(ctx)}`;
+  const contents: ConteudoGemini[] = montarHistorico(historico).map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: typeof m.content === "string" ? m.content : "" }],
+  }));
+  if (!contents.length) return { texto: null, uso };
+
+  for (let rodada = 0; rodada < MAX_RODADAS; rodada++) {
+    const resposta = await gerarGemini({
+      systemInstruction: { parts: [{ text: sistema }] },
+      contents,
+      tools: FERRAMENTAS_GEMINI,
+    }, ctx.chaves?.gemini);
+    uso.entrada += resposta.usageMetadata?.promptTokenCount ?? 0;
+    uso.saida += (resposta.usageMetadata?.candidatesTokenCount ?? 0) + (resposta.usageMetadata?.thoughtsTokenCount ?? 0);
+    uso.cache += resposta.usageMetadata?.cachedContentTokenCount ?? 0;
+
+    const candidato = resposta.candidates?.[0];
+    if (!candidato?.content || resposta.promptFeedback?.blockReason || candidato.finishReason === "SAFETY") {
+      return { texto: null, uso, recusou: true };
+    }
+
+    const chamadas = (candidato.content.parts ?? []).filter((p) => p.functionCall);
+    if (chamadas.length) {
+      // Devolve o conteúdo do modelo como veio (inclui as "thought signatures" que o Gemini exige)
+      contents.push(candidato.content);
+      const respostas = [];
+      for (const p of chamadas) {
+        const { resultado } = await rodarFerramenta(ctx, p.functionCall!.name, p.functionCall!.args ?? {});
+        respostas.push({ functionResponse: { name: p.functionCall!.name, response: { resultado } } });
+      }
+      contents.push({ role: "user", parts: respostas });
+      continue;
+    }
+    return { texto: textoGemini(candidato.content) || null, uso };
+  }
+  return { texto: null, uso, esgotou: true };
+}
+
+/* ---------- Resposta ao cliente ---------- */
+
+/**
+ * Gera a resposta da IA e envia ao cliente pelo WhatsApp (ou só devolve, no modo teste).
+ * Retorna o texto enviado (ou null se a IA passou para o vendedor sem responder).
+ */
+export async function responderCliente(ctx: Contexto, historico: Mensagem[]): Promise<{ texto: string | null; uso: Uso; provedor: Provedor | null }> {
+  const provedor = escolherProvedor(ctx.provedor, ctx.chaves);
+  if (!provedor) throw new Error("Nenhuma chave de IA configurada (ANTHROPIC_API_KEY ou GEMINI_API_KEY).");
+  const r = provedor === "gemini" ? await gerarComGemini(ctx, historico) : await gerarComAnthropic(ctx, historico);
+
+  if (r.recusou || r.esgotou) {
+    if (ctx.teste) return { texto: "(A IA não conseguiu responder esta mensagem e passaria para um vendedor.)", uso: r.uso, provedor };
+    await executarFerramenta(ctx, "chamar_vendedor", { motivo: r.recusou ? "A IA não pôde responder esta mensagem." : "A IA não conseguiu concluir a resposta." });
+    return { texto: null, uso: r.uso, provedor };
+  }
+  const texto = r.texto;
+  if (!texto) return { texto: null, uso: r.uso, provedor };
+  if (ctx.teste) return { texto, uso: r.uso, provedor };
+
+  const waId = await enviarTexto(ctx.whatsapp.phone_number_id, ctx.whatsapp.access_token, ctx.lead.telefone, texto);
+  ok(await ctx.db.from("mensagens").insert({
+    empresa_id: ctx.empresa.id,
+    lead_id: ctx.lead.id,
+    autor: "ia",
+    autor_nome: "Assistente IA",
+    texto,
+    wa_message_id: waId,
+  }));
+  await ctx.db
+    .from("leads")
+    .update({
+      ultima_mensagem_em: new Date().toISOString(),
+      ...(ctx.lead.etapa === "novo" ? { etapa: "atendimento" } : {}),
+    })
+    .eq("id", ctx.lead.id);
+  return { texto, uso: r.uso, provedor };
+}
+
+export async function registrarUso(db: SupabaseClient, empresaId: string, tipo: "atendente" | "analista" | "teste", uso: Uso) {
   if (!uso.entrada && !uso.saida) return;
   await db.from("uso_ia").insert({
     empresa_id: empresaId,
     tipo,
-    modelo: MODELO,
+    modelo: uso.modelo,
     tokens_entrada: uso.entrada,
     tokens_saida: uso.saida,
     tokens_cache: uso.cache,
