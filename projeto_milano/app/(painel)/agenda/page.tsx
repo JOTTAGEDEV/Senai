@@ -68,8 +68,8 @@ function Agenda() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">Agenda</h1>
-          <p className="text-sm text-zinc-500">Visitas e test-drives. Os marcados pela IA aparecem aqui sozinhos.</p>
+          <h1 className="text-2xl font-semibold text-white">Agenda</h1>
+          <p className="text-sm text-white/50">Visitas e test-drives. Os marcados pela IA aparecem aqui sozinhos.</p>
         </div>
         <button onClick={() => setFormAberto(true)} className="botao-primario">
           <Plus className="h-4 w-4" /> Novo agendamento
@@ -87,55 +87,55 @@ function Agenda() {
           <option value="">Todos os vendedores</option>
           {vendedores.map((v) => <option key={v.id} value={v.id}>{v.nome}</option>)}
         </select>
-        <label className="flex items-center gap-2 text-sm text-zinc-600">
+        <label className="flex items-center gap-2 text-sm text-white/70">
           <input type="checkbox" className="h-4 w-4 accent-marca-600" checked={mostrarPassados} onChange={(e) => setMostrarPassados(e.target.checked)} />
           Mostrar passados
         </label>
       </div>
 
       {grupos.length === 0 ? (
-        <div className="cartao flex flex-col items-center gap-2 p-12 text-center text-sm text-zinc-500">
-          <CalendarDays className="h-8 w-8 text-zinc-300" />
+        <div className="cartao flex flex-col items-center gap-2 p-12 text-center text-sm text-white/50">
+          <CalendarDays className="h-8 w-8 text-white/25" />
           Nenhum agendamento.
         </div>
       ) : (
         <div className="space-y-6">
           {grupos.map(([dia, itens]) => (
             <section key={dia}>
-              <h2 className="mb-2 text-sm font-semibold text-zinc-700">{tituloDia(dia)}</h2>
-              <div className="cartao divide-y divide-zinc-100">
+              <h2 className="mb-2 text-sm font-semibold text-white/80">{tituloDia(dia)}</h2>
+              <div className="cartao divide-y divide-white/10">
                 {itens.map((a) => {
                   const v = veiculos.find((x) => x.id === a.veiculoId);
                   const vend = vendedores.find((x) => x.id === a.vendedorId);
                   return (
                     <div key={a.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
                       <div className="flex items-center gap-2 sm:w-24">
-                        <Clock className="h-4 w-4 text-zinc-400" />
-                        <span className="text-lg font-semibold tabular-nums text-zinc-900">
+                        <Clock className="h-4 w-4 text-white/40" />
+                        <span className="text-lg font-semibold tabular-nums text-white">
                           {new Date(a.inicio).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                         </span>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="flex flex-wrap items-center gap-2 font-medium text-zinc-900">
+                        <p className="flex flex-wrap items-center gap-2 font-medium text-white">
                           {a.clienteNome}
-                          <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-medium text-zinc-600">
+                          <span className="rounded bg-white/10 px-1.5 py-0.5 text-[11px] font-medium text-white/70">
                             {a.tipo === "test-drive" ? "Test-drive" : "Visita"}
                           </span>
                           {a.origem === "ia" && (
-                            <span className="inline-flex items-center gap-1 rounded bg-zinc-900 px-1.5 py-0.5 text-[11px] text-white">
+                            <span className="inline-flex items-center gap-1 rounded border border-emerald-400/30 bg-emerald-500/20 px-1.5 py-0.5 text-[11px] text-emerald-200">
                               <Bot className="h-3 w-3" /> pela IA
                             </span>
                           )}
                         </p>
-                        <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-500">
+                        <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-white/50">
                           <span className="inline-flex items-center gap-1"><Phone className="h-3 w-3" /> {formatarTelefone(a.telefone)}</span>
                           {v && <span className="inline-flex items-center gap-1"><Car className="h-3 w-3" /> {v.marca} {v.modelo} {v.anoModelo}</span>}
                           <span className="inline-flex items-center gap-1"><UserRound className="h-3 w-3" /> {vend?.nome ?? "Sem vendedor"}</span>
                         </p>
-                        {a.observacao && <p className="mt-1 text-xs text-zinc-600">{a.observacao}</p>}
+                        {a.observacao && <p className="mt-1 text-xs text-white/60">{a.observacao}</p>}
                       </div>
                       <select
-                        className={`rounded-full border-0 px-3 py-1 text-xs font-medium ring-1 ring-inset ${STATUS_AGENDAMENTO[a.status].classe}`}
+                        className={`rounded-full border-0 px-3 py-1 text-xs font-medium ring-1 ring-inset [&>option]:bg-zinc-900 [&>option]:text-white ${STATUS_AGENDAMENTO[a.status].classe}`}
                         value={a.status}
                         onChange={(e) => atualizar<Agendamento>("agendamentos", a.id, { status: e.target.value as StatusAgendamento })}
                         aria-label="Status do agendamento"
@@ -161,8 +161,8 @@ function Agenda() {
 function Numero({ rotulo, valor }: { rotulo: string; valor: number }) {
   return (
     <div className="cartao p-4">
-      <p className="text-xs font-medium text-zinc-500">{rotulo}</p>
-      <p className="mt-1 text-2xl font-semibold text-zinc-900">{valor}</p>
+      <p className="text-xs font-medium text-white/50">{rotulo}</p>
+      <p className="mt-1 text-2xl font-semibold text-white">{valor}</p>
     </div>
   );
 }
@@ -203,9 +203,9 @@ function FormAgendamento({ lead, fechar }: { lead?: Lead; fechar: () => void }) 
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/40 p-4" onClick={fechar}>
-      <form onSubmit={salvar} onClick={(e) => e.stopPropagation()} className="cartao w-full max-w-lg space-y-4 p-5">
-        <h2 className="text-base font-semibold text-zinc-900">Novo agendamento</h2>
+    <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm" onClick={fechar}>
+      <form onSubmit={salvar} onClick={(e) => e.stopPropagation()} className="vidro-forte w-full max-w-lg space-y-4 rounded-3xl p-5">
+        <h2 className="text-base font-semibold text-white">Novo agendamento</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className="rotulo" htmlFor="ag-nome">Cliente</label>

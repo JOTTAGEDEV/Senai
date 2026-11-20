@@ -37,16 +37,6 @@ export default function LoginPage() {
 
   return (
     <main className="relative isolate min-h-dvh overflow-x-hidden text-white">
-      {/* Fundo: foto real da loja + véu escuro para leitura + luzes da marca */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/fundo-login.webp" alt="" className="h-full w-full scale-105 object-cover object-[70%_center]" />
-        <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(6,6,10,0.92)_0%,rgba(6,6,10,0.72)_42%,rgba(6,6,10,0.35)_75%,rgba(6,6,10,0.55)_100%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,10,0.25)_0%,transparent_30%,rgba(6,6,10,0.85)_100%)]" />
-        <div className="absolute -left-40 -top-40 h-[30rem] w-[30rem] rounded-full bg-[#ce2b37] opacity-30 blur-[140px]" />
-        <div className="absolute -bottom-48 right-0 h-[30rem] w-[30rem] rounded-full bg-[#009246] opacity-20 blur-[140px]" />
-      </div>
-
       <div className="mx-auto flex min-h-dvh max-w-6xl flex-col px-4 py-5 sm:px-8 sm:py-8">
         {/* Barra superior em pílula de vidro */}
         <header className="vidro flex items-center justify-between rounded-full py-2 pl-5 pr-2">
@@ -64,11 +54,8 @@ export default function LoginPage() {
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_2px_rgba(52,211,153,0.6)]" />
                 {LOJA.nome} · {LOJA.cidade}/{LOJA.uf}
               </p>
-              <h1 className="text-4xl font-semibold leading-[1.05] tracking-[-0.02em] sm:text-6xl">
-                Seu WhatsApp vendendo,
-                <span className="block bg-gradient-to-r from-white via-white/85 to-white/45 bg-clip-text text-transparent">
-                  mesmo com a loja fechada.
-                </span>
+              <h1 className="texto-metal text-4xl font-extrabold italic leading-[1.05] tracking-[-0.02em] sm:text-6xl">
+                Seu WhatsApp vendendo, mesmo com a loja fechada.
               </h1>
               <p className="max-w-md text-base text-white/65 sm:text-lg">Atendimento com IA, leads, estoque e agenda num lugar só.</p>
             </div>
@@ -89,7 +76,7 @@ export default function LoginPage() {
           <section className="w-full max-w-md justify-self-center lg:justify-self-end">
             <form onSubmit={aoEnviar} className="vidro space-y-5 rounded-[32px] p-7 sm:p-9">
               <div>
-                <h2 className="text-[28px] font-semibold tracking-tight">Entrar</h2>
+                <h2 className="texto-metal text-3xl font-extrabold italic tracking-tight">Entrar</h2>
                 <p className="mt-1 text-sm text-white/55">Use o e-mail cadastrado pela loja.</p>
               </div>
 
