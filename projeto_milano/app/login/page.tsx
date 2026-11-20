@@ -16,23 +16,23 @@ export default function LoginPage() {
 
   return (
     <main className="grid min-h-dvh lg:grid-cols-2">
-      <section className="hidden flex-col justify-between bg-zinc-950 p-10 text-white lg:flex">
-        <Logo claro />
+      <section className="hidden flex-col justify-between bg-milano-fundo p-10 text-white lg:flex">
+        <Logo claro className="h-20" />
         <div className="max-w-md space-y-6">
           <h1 className="text-3xl font-semibold leading-tight">
             Seu WhatsApp atendendo, qualificando e agendando — mesmo com a loja fechada.
           </h1>
           <ul className="space-y-4 text-zinc-300">
             <li className="flex gap-3">
-              <Bot className="mt-0.5 h-5 w-5 shrink-0 text-marca-500" />
+              <Bot className="mt-0.5 h-5 w-5 shrink-0 text-milano-verde" />
               IA responde os clientes com base no seu estoque real.
             </li>
             <li className="flex gap-3">
-              <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-marca-500" />
+              <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-milano-verde" />
               Todas as conversas num lugar só, com etiquetas e temperatura do lead.
             </li>
             <li className="flex gap-3">
-              <CalendarCheck className="mt-0.5 h-5 w-5 shrink-0 text-marca-500" />
+              <CalendarCheck className="mt-0.5 h-5 w-5 shrink-0 text-milano-verde" />
               Visitas e test-drives marcados automaticamente.
             </li>
           </ul>

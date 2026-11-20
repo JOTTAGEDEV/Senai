@@ -76,8 +76,8 @@ export function Sidebar() {
   return (
     <>
       {/* Barra superior no celular */}
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4 py-3 lg:hidden">
-        <Logo claro />
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-white/10 bg-milano-fundo px-4 py-3 lg:hidden">
+        <Logo claro className="h-10" />
         <button
           onClick={() => setAberto(true)}
           className="rounded-md p-2 text-zinc-300 hover:bg-white/10"
@@ -88,7 +88,7 @@ export function Sidebar() {
       </header>
 
       {/* Menu lateral fixo no computador */}
-      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col gap-6 bg-zinc-950 p-4 lg:flex">
+      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col gap-6 bg-milano-fundo p-4 lg:flex">
         <div className="space-y-2 px-1 pt-1">
           <Logo claro />
           <p className="flex items-center gap-1 text-xs text-zinc-500">
@@ -103,7 +103,7 @@ export function Sidebar() {
       {aberto && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setAberto(false)} />
-          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col gap-6 bg-zinc-950 p-4">
+          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col gap-6 bg-milano-fundo p-4">
             <div className="flex items-center justify-between px-1 pt-1">
               <Logo claro />
               <button

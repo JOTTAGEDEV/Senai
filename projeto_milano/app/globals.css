@@ -3,12 +3,16 @@
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --color-marca-50: #fef2f2;
-  --color-marca-100: #fee2e2;
-  --color-marca-200: #fecaca;
-  --color-marca-500: #dc2626;
-  --color-marca-600: #b91c1c;
-  --color-marca-700: #991b1b;
+  /* Cores da marca Milano: vermelho e verde da bandeira italiana + fundo grafite da logo */
+  --color-marca-50: #fdf2f3;
+  --color-marca-100: #fbe3e5;
+  --color-marca-200: #f6c3c7;
+  --color-marca-500: #ce2b37;
+  --color-marca-600: #b8232f;
+  --color-marca-700: #961c26;
+  --color-milano-verde: #009246;
+  --color-milano-vermelho: #ce2b37;
+  --color-milano-fundo: #1c181c;
 }
 
 html {

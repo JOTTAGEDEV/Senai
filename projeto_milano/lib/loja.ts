@@ -1,6 +1,6 @@
 /**
  * Dados da loja. Fonte: anúncios públicos da Milano Multimarcas (LitoralCar / Mercado Livre).
- * Para usar a logo oficial: salve o arquivo em `public/logo-milano.png` e troque `logoUrl` por "/logo-milano.png".
+ * Logo: arquivo original em public/logo-milano-original.gif, redesenhada em vetor em components/Logo.tsx.
  */
 export const LOJA = {
   nome: "Milano Multimarcas",
@@ -9,7 +9,7 @@ export const LOJA = {
   endereco: "Rua Caetano Silveira de Matos, 2371 – Centro",
   cidade: "Palhoça",
   uf: "SC",
-  logoUrl: null as string | null,
+  logoUrl: "/logo-milano-original.gif",
   // Ainda não confirmados — preencher com a loja
   whatsapp: "",
   instagram: "",

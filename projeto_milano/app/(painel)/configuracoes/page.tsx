@@ -42,9 +42,16 @@ export default function ConfiguracoesPage() {
             ))}
           </dl>
           <div className="space-y-3">
-            <div className="grid h-28 place-items-center rounded-lg bg-zinc-950">
-              <Logo claro />
+            <div className="grid h-28 place-items-center rounded-lg bg-milano-fundo">
+              <Logo claro className="h-16" />
             </div>
+            {LOJA.logoUrl && (
+              <p className="flex items-center gap-2 text-xs text-zinc-500">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={LOJA.logoUrl} alt="Logo original" className="h-8 rounded" />
+                Arquivo original (redesenhado em vetor acima)
+              </p>
+            )}
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${LOJA.nome}, ${LOJA.endereco}, ${LOJA.cidade} ${LOJA.uf}`)}`}
               target="_blank"

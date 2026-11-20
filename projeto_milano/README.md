@@ -49,7 +49,7 @@ lib/
 Os dados ficam em `lib/loja.ts` (endereço encontrado em anúncios públicos: Rua Caetano Silveira de Matos, 2371 – Centro, Palhoça/SC).
 WhatsApp, Instagram e horário ainda precisam ser confirmados com a loja.
 
-**Para colocar a logo oficial:** salve o arquivo em `public/logo-milano.png` e, em `lib/loja.ts`, troque `logoUrl: null` por `logoUrl: "/logo-milano.png"`.
+**Logo:** arquivo original em `public/logo-milano-original.gif`, redesenhado em vetor (SVG) em `components/Logo.tsx`. Cores do painel baseadas na logo: grafite, verde e vermelho da bandeira italiana.
 
 O estoque de exemplo usa modelos reais dos anúncios da loja (Taos, Tracker, Pajero Sport, Nivus, Mobi, Compass, Azera);
 quilometragem, opcionais, status e parte dos preços são ilustrativos.
