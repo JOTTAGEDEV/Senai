@@ -76,17 +76,17 @@ export function GerenciadorFotos({ fotos, onChange }: Props) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-        <p className="text-zinc-600">
-          <span className="font-semibold text-zinc-900">{fotos.length}</span>/{MAX_FOTOS} fotos
-          <span className="mx-2 text-zinc-300">·</span>
-          <span className="font-semibold text-zinc-900">{totalIA}</span>/{MAX_FOTOS_IA} enviadas pela IA
+        <p className="text-white/60">
+          <span className="font-semibold text-white">{fotos.length}</span>/{MAX_FOTOS} fotos
+          <span className="mx-2 text-white/25">·</span>
+          <span className="font-semibold text-white">{totalIA}</span>/{MAX_FOTOS_IA} enviadas pela IA
           {fotos.length > 0 && (
             <>
-              <span className="mx-2 text-zinc-300">·</span>~{(totalKB / 1024).toFixed(1)} MB
+              <span className="mx-2 text-white/25">·</span>~{(totalKB / 1024).toFixed(1)} MB
             </>
           )}
         </p>
-        <p className="text-xs text-zinc-500">Arraste para reordenar. A primeira foto é a capa.</p>
+        <p className="text-xs text-white/50">Arraste para reordenar. A primeira foto é a capa.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
@@ -103,9 +103,9 @@ export function GerenciadorFotos({ fotos, onChange }: Props) {
               if (arrastando !== null) mover(arrastando, i);
               setArrastando(null);
             }}
-            className={`group relative aspect-[4/3] cursor-grab overflow-hidden rounded-lg border bg-zinc-100 active:cursor-grabbing ${
+            className={`group relative aspect-[4/3] cursor-grab overflow-hidden rounded-lg border bg-white/10 active:cursor-grabbing ${
               arrastando === i ? "opacity-40" : ""
-            } ${i === 0 ? "border-marca-500 ring-2 ring-marca-100" : "border-zinc-200"}`}
+            } ${i === 0 ? "border-marca-500/60 ring-2 ring-marca-500/20" : "border-white/10"}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={foto.src} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" draggable={false} />
@@ -117,7 +117,7 @@ export function GerenciadorFotos({ fotos, onChange }: Props) {
                 </span>
               )}
               {foto.enviarIA && (
-                <span className="inline-flex items-center gap-1 rounded bg-zinc-900/80 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white">
+                <span className="inline-flex items-center gap-1 rounded bg-black/60 px-1.5 backdrop-blur py-0.5 text-[10px] font-semibold uppercase text-white">
                   <Bot className="h-3 w-3" /> IA
                 </span>
               )}
@@ -154,8 +154,8 @@ export function GerenciadorFotos({ fotos, onChange }: Props) {
         ))}
 
         {Array.from({ length: processando }).map((_, i) => (
-          <div key={`carregando-${i}`} className="grid aspect-[4/3] place-items-center rounded-lg border border-dashed border-zinc-300 bg-zinc-50">
-            <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
+          <div key={`carregando-${i}`} className="grid aspect-[4/3] place-items-center rounded-lg border border-dashed border-white/20 bg-white/5">
+            <Loader2 className="h-5 w-5 animate-spin text-white/35" />
           </div>
         ))}
 
@@ -174,7 +174,7 @@ export function GerenciadorFotos({ fotos, onChange }: Props) {
               if (e.dataTransfer.files.length) adicionarArquivos(e.dataTransfer.files);
             }}
             className={`flex aspect-[4/3] flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed text-sm transition ${
-              soltarSobre ? "border-marca-500 bg-marca-50 text-marca-700" : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:bg-zinc-50"
+              soltarSobre ? "border-marca-500/60 bg-marca-500/15 text-rose-300" : "border-white/20 text-white/50 hover:border-white/30 hover:bg-white/5"
             }`}
           >
             <ImagePlus className="h-6 w-6" />
@@ -196,8 +196,8 @@ export function GerenciadorFotos({ fotos, onChange }: Props) {
         }}
       />
 
-      {aviso && <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">{aviso}</p>}
-      <p className="text-xs text-zinc-500">
+      {aviso && <p className="rounded-lg bg-amber-500/15 px-3 py-2 text-sm text-amber-200">{aviso}</p>}
+      <p className="text-xs text-white/50">
         As fotos são reduzidas automaticamente (máx. 1280px, WebP) para economizar espaço. As marcadas com{" "}
         <Bot className="inline h-3 w-3" /> são enviadas pela IA no WhatsApp; as demais ficam no link do anúncio.
       </p>

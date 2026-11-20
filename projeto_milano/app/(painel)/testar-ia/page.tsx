@@ -132,10 +132,10 @@ export default function TestarIAPage() {
     <div className="mx-auto flex h-[calc(100dvh-8rem)] max-w-3xl flex-col gap-4 lg:h-[calc(100dvh-4rem)]">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-semibold text-zinc-900">
-            <Sparkles className="h-6 w-6 text-marca-600" /> Testar IA
+          <h1 className="flex items-center gap-2 text-2xl font-semibold text-white">
+            <Sparkles className="h-6 w-6 text-rose-400" /> Testar IA
           </h1>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-white/50">
             Escreva como se fosse um cliente. {modo === "local" ? "Modo demonstração: respostas simuladas." : "A IA responde de verdade com o estoque — nada é enviado pelo WhatsApp nem gravado."}
           </p>
         </div>
@@ -158,8 +158,8 @@ export default function TestarIAPage() {
         <section className="cartao space-y-3 p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h2 className="text-sm font-semibold text-zinc-900">Chaves de API para teste</h2>
-              <p className="text-xs text-zinc-500">
+              <h2 className="text-sm font-semibold text-white">Chaves de API para teste</h2>
+              <p className="text-xs text-white/50">
                 Ficam salvas só neste navegador e vão junto com cada pergunta de teste. O servidor usa a chave só naquela resposta e não guarda.
                 Para o WhatsApp de verdade, cadastre a chave no Supabase (Edge Functions → Secrets).
               </p>
@@ -177,7 +177,7 @@ export default function TestarIAPage() {
             <div key={qual}>
               <label className="rotulo flex items-center justify-between" htmlFor={`chave-${qual}`}>
                 <span>{rotulo}</span>
-                <span className="text-[11px] font-normal text-zinc-400">{onde}</span>
+                <span className="text-[11px] font-normal text-white/35">{onde}</span>
               </label>
               <div className="flex gap-2">
                 <input
@@ -199,25 +199,25 @@ export default function TestarIAPage() {
             </div>
           ))}
           {modo === "local" && (
-            <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">No modo demonstração (sem Supabase) as chaves não são usadas: as respostas são simuladas.</p>
+            <p className="rounded-lg bg-amber-500/15 px-3 py-2 text-xs text-amber-200">No modo demonstração (sem Supabase) as chaves não são usadas: as respostas são simuladas.</p>
           )}
         </section>
       )}
 
       {semChave && !painelChaves && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <div className="rounded-lg border border-amber-400/30 bg-amber-500/15 px-4 py-3 text-sm text-amber-100">
           Nenhuma chave de IA disponível. Clique em <strong>Chaves</strong> e cole a da Anthropic ou do Google para testar.
         </div>
       )}
 
-      <div className="cartao flex-1 space-y-3 overflow-y-auto bg-[#f0ebe4] p-4">
+      <div className="cartao flex-1 space-y-3 overflow-y-auto p-4">
         {falas.length === 0 && (
-          <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-zinc-500">
-            <Bot className="h-10 w-10 text-zinc-400" />
+          <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-white/50">
+            <Bot className="h-10 w-10 text-white/35" />
             <p>Comece com uma pergunta de cliente:</p>
             <div className="flex max-w-lg flex-wrap justify-center gap-2">
               {SUGESTOES.map((s) => (
-                <button key={s} onClick={() => enviar(s)} disabled={semChave} className="rounded-full bg-white px-3 py-1.5 text-xs text-zinc-700 shadow-sm hover:bg-zinc-50 disabled:opacity-50">
+                <button key={s} onClick={() => enviar(s)} disabled={semChave} className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs text-white/80 shadow-sm backdrop-blur-md hover:bg-white/20 disabled:opacity-50">
                   {s}
                 </button>
               ))}
@@ -226,14 +226,14 @@ export default function TestarIAPage() {
         )}
         {falas.map((f, i) =>
           f.autor === "erro" ? (
-            <div key={i} className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800">
+            <div key={i} className="rounded-lg border border-rose-400/30 bg-rose-500/15 px-3 py-2 text-sm text-rose-200">
               {f.texto}
-              {f.detalhe && <p className="mt-1 break-all font-mono text-[11px] text-rose-600">{f.detalhe}</p>}
+              {f.detalhe && <p className="mt-1 break-all font-mono text-[11px] text-rose-300">{f.detalhe}</p>}
             </div>
           ) : (
             <div key={i} className={`flex ${f.autor === "cliente" ? "justify-start" : "justify-end"}`}>
-              <div className={`max-w-[85%] rounded-lg px-3 py-2 text-sm shadow-sm ${f.autor === "cliente" ? "rounded-tl-none bg-white" : "rounded-tr-none bg-[#dcf8c6]"}`}>
-                <p className={`mb-0.5 flex items-center gap-1 text-[11px] font-semibold ${f.autor === "cliente" ? "text-zinc-500" : "text-emerald-800"}`}>
+              <div className={`max-w-[85%] rounded-lg px-3 py-2 text-sm shadow-sm ${f.autor === "cliente" ? "rounded-tl-none border border-white/10 bg-white/10 text-white" : "rounded-tr-none border border-emerald-400/20 bg-emerald-500/20 text-emerald-50"}`}>
+                <p className={`mb-0.5 flex items-center gap-1 text-[11px] font-semibold ${f.autor === "cliente" ? "text-white/50" : "text-emerald-200"}`}>
                   {f.autor === "cliente" ? <UserRound className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
                   {f.autor === "cliente" ? "Você (cliente)" : "Assistente IA"}
                 </p>
@@ -252,7 +252,7 @@ export default function TestarIAPage() {
         )}
         {pensando && (
           <div className="flex justify-end">
-            <div className="rounded-lg rounded-tr-none bg-[#dcf8c6] px-3 py-2 text-sm text-emerald-800 shadow-sm">digitando…</div>
+            <div className="rounded-lg rounded-tr-none border border-emerald-400/20 bg-emerald-500/20 px-3 py-2 text-sm text-emerald-100 shadow-sm">digitando…</div>
           </div>
         )}
         <div ref={fim} />

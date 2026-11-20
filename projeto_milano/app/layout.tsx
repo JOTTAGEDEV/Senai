@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cinzel, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -11,9 +11,14 @@ export const metadata: Metadata = {
   description: "Atendimento com IA no WhatsApp, estoque e leads da Milano Multimarcas",
 };
 
+export const viewport: Viewport = {
+  themeColor: "#07070b",
+  colorScheme: "dark",
+};
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className="dark">
       <body className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased`}>{children}</body>
     </html>
   );

@@ -79,7 +79,7 @@ export default function EstoquePage() {
 
   if (carregando) {
     return (
-      <div className="grid place-items-center py-24 text-zinc-400">
+      <div className="grid place-items-center py-24 text-white/35">
         <Loader2 className="h-6 w-6 animate-spin" />
       </div>
     );
@@ -89,8 +89,8 @@ export default function EstoquePage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">Estoque</h1>
-          <p className="text-sm text-zinc-500">A IA consulta esta lista para responder os clientes.</p>
+          <h1 className="text-2xl font-semibold text-white">Estoque</h1>
+          <p className="text-sm text-white/50">A IA consulta esta lista para responder os clientes.</p>
         </div>
         <Link href="/estoque/novo" className="botao-primario">
           <Plus className="h-4 w-4" /> Adicionar carro
@@ -112,15 +112,15 @@ export default function EstoquePage() {
           }}
         />
         <div className="cartao col-span-2 p-4 lg:col-span-1">
-          <p className="text-xs font-medium text-zinc-500">Valor em estoque</p>
-          <p className="mt-1 text-xl font-semibold text-zinc-900">{formatarPreco(resumo.valorTotal)}</p>
+          <p className="text-xs font-medium text-white/50">Valor em estoque</p>
+          <p className="mt-1 text-xl font-semibold text-white">{formatarPreco(resumo.valorTotal)}</p>
         </div>
       </div>
 
       {/* Filtros */}
       <div className="cartao flex flex-col gap-3 p-3 lg:flex-row lg:items-center">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
           <input
             className="campo pl-9"
             placeholder="Buscar por modelo, versão, cor, placa..."
@@ -153,8 +153,8 @@ export default function EstoquePage() {
 
       {filtrados.length === 0 ? (
         <div className="cartao flex flex-col items-center gap-3 px-6 py-16 text-center">
-          <Car className="h-10 w-10 text-zinc-300" />
-          <p className="font-medium text-zinc-900">
+          <Car className="h-10 w-10 text-white/25" />
+          <p className="font-medium text-white">
             {veiculos.length === 0 ? "Nenhum carro cadastrado ainda" : "Nenhum carro encontrado com esses filtros"}
           </p>
           <div className="flex flex-wrap justify-center gap-2">
@@ -173,7 +173,7 @@ export default function EstoquePage() {
           {/* Tabela (computador) */}
           <div className="cartao hidden md:block">
             <table className="w-full text-sm">
-              <thead className="border-b border-zinc-200 bg-zinc-50 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">
+              <thead className="border-b border-white/10 bg-white/5 text-left text-xs font-medium uppercase tracking-wide text-white/50">
                 <tr>
                   <th className="rounded-tl-xl px-4 py-3">Carro</th>
                   <th className="px-4 py-3">Preço</th>
@@ -183,35 +183,35 @@ export default function EstoquePage() {
                   <th className="rounded-tr-xl px-4 py-3"><span className="sr-only">Ações</span></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-white/10">
                 {filtrados.map((v) => {
                   const dias = diasDesde(v.dataEntrada);
                   const parado = dias >= DIAS_PARADO_ALERTA && v.status !== "vendido";
                   return (
-                    <tr key={v.id} className="hover:bg-zinc-50/60">
+                    <tr key={v.id} className="transition hover:bg-white/5">
                       <td className="px-4 py-3">
                         <Link href={`/estoque/${v.id}`} className="flex items-center gap-3">
                           <FotoCapa fotos={v.fotos} className="h-12 w-16 shrink-0 rounded-md" />
                           <div className="min-w-0">
-                            <p className="flex items-center gap-1.5 font-medium text-zinc-900">
+                            <p className="flex items-center gap-1.5 font-medium text-white">
                               {v.marca} {v.modelo}
                               {v.destaque && <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-label="Destaque" />}
                             </p>
-                            <p className="truncate text-xs text-zinc-500">
+                            <p className="truncate text-xs text-white/50">
                               {[v.versao, `${v.anoFabricacao}/${v.anoModelo}`, formatarKm(v.km), v.cambio].filter(Boolean).join(" · ")}
                             </p>
                           </div>
                         </Link>
                       </td>
                       <td className="px-4 py-3">
-                        <p className="font-medium text-zinc-900">{formatarPreco(v.preco)}</p>
+                        <p className="font-medium text-white">{formatarPreco(v.preco)}</p>
                         {v.fipe && v.preco < v.fipe && (
-                          <p className="text-xs text-emerald-600">abaixo da FIPE</p>
+                          <p className="text-xs text-emerald-300">abaixo da FIPE</p>
                         )}
                       </td>
                       <td className="px-4 py-3"><StatusBadge status={v.status} /></td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex items-center gap-1 ${parado ? "font-medium text-amber-700" : "text-zinc-600"}`}>
+                        <span className={`inline-flex items-center gap-1 ${parado ? "font-medium text-amber-300" : "text-white/60"}`}>
                           {parado && <AlertTriangle className="h-3.5 w-3.5" />}
                           {textoDias(dias)}
                         </span>
@@ -242,20 +242,20 @@ export default function EstoquePage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <Link href={`/estoque/${v.id}`} className="min-w-0">
-                        <p className="flex items-center gap-1.5 truncate font-medium text-zinc-900">
+                        <p className="flex items-center gap-1.5 truncate font-medium text-white">
                           {v.marca} {v.modelo}
                           {v.destaque && <Star className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-400" />}
                         </p>
-                        <p className="truncate text-xs text-zinc-500">
+                        <p className="truncate text-xs text-white/50">
                           {v.anoFabricacao}/{v.anoModelo} · {formatarKm(v.km)}
                         </p>
                       </Link>
                       <MenuAcoes veiculo={v} />
                     </div>
-                    <p className="mt-1 font-semibold text-zinc-900">{formatarPreco(v.preco)}</p>
+                    <p className="mt-1 font-semibold text-white">{formatarPreco(v.preco)}</p>
                     <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
                       <StatusBadge status={v.status} />
-                      <span className={parado ? "font-medium text-amber-700" : "text-zinc-500"}>{textoDias(dias)}</span>
+                      <span className={parado ? "font-medium text-amber-300" : "text-white/50"}>{textoDias(dias)}</span>
                       <Interessados n={v.interessados} />
                     </div>
                   </div>
@@ -263,7 +263,7 @@ export default function EstoquePage() {
               );
             })}
           </div>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-white/50">
             Mostrando {filtrados.length} de {veiculos.length} carros. Os dados ficam salvos neste navegador até o back-end ser ligado.
           </p>
         </>
@@ -289,23 +289,23 @@ function Resumo({
   return (
     <Tag
       onClick={onClick}
-      className={`cartao p-4 text-left ${alerta ? "border-amber-300 bg-amber-50" : ""} ${onClick ? "transition hover:shadow-md" : ""}`}
+      className={`cartao p-4 text-left ${alerta ? "border-amber-400/40 bg-amber-500/15" : ""} ${onClick ? "transition hover:shadow-md" : ""}`}
     >
-      <p className={`flex items-center gap-1.5 text-xs font-medium ${alerta ? "text-amber-800" : "text-zinc-500"}`}>
+      <p className={`flex items-center gap-1.5 text-xs font-medium ${alerta ? "text-amber-200" : "text-white/50"}`}>
         {ponto && <span className={`h-2 w-2 rounded-full ${ponto}`} />}
         {alerta && <AlertTriangle className="h-3.5 w-3.5" />}
         {rotulo}
       </p>
-      <p className={`mt-1 text-xl font-semibold ${alerta ? "text-amber-900" : "text-zinc-900"}`}>{valor}</p>
+      <p className={`mt-1 text-xl font-semibold ${alerta ? "text-amber-100" : "text-white"}`}>{valor}</p>
     </Tag>
   );
 }
 
 function Interessados({ n }: { n: number }) {
-  if (n === 0) return <span className="text-zinc-400">—</span>;
+  if (n === 0) return <span className="text-white/35">—</span>;
   const quente = n >= 5;
   return (
-    <span className={`inline-flex items-center gap-1 ${quente ? "font-medium text-marca-700" : "text-zinc-600"}`}>
+    <span className={`inline-flex items-center gap-1 ${quente ? "font-medium text-rose-300" : "text-white/60"}`}>
       <Users className="h-3.5 w-3.5" />
       {n} {quente && "🔥"}
     </span>

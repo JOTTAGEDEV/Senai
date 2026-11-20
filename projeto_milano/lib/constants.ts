@@ -70,31 +70,31 @@ export const STATUS: Record<
   disponivel: {
     rotulo: "Disponível",
     descricaoIA: "A IA oferece normalmente",
-    classe: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+    classe: "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30",
     ponto: "bg-emerald-500",
   },
   reservado: {
     rotulo: "Reservado",
     descricaoIA: "A IA avisa que está reservado e oferece parecidos",
-    classe: "bg-amber-50 text-amber-700 ring-amber-200",
+    classe: "bg-amber-500/15 text-amber-300 ring-amber-400/30",
     ponto: "bg-amber-500",
   },
   preparacao: {
     rotulo: "Em preparação",
     descricaoIA: "A IA avisa que chega em breve",
-    classe: "bg-sky-50 text-sky-700 ring-sky-200",
+    classe: "bg-sky-500/15 text-sky-300 ring-sky-400/30",
     ponto: "bg-sky-500",
   },
   vendido: {
     rotulo: "Vendido",
     descricaoIA: "A IA não oferece e sugere parecidos",
-    classe: "bg-rose-50 text-rose-700 ring-rose-200",
+    classe: "bg-rose-500/15 text-rose-300 ring-rose-400/30",
     ponto: "bg-rose-500",
   },
   oculto: {
     rotulo: "Oculto",
     descricaoIA: "Não aparece para a IA",
-    classe: "bg-zinc-100 text-zinc-600 ring-zinc-200",
+    classe: "bg-white/10 text-white/60 ring-white/15",
     ponto: "bg-zinc-400",
   },
 };

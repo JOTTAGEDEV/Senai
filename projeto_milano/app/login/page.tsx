@@ -36,64 +36,68 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="relative isolate min-h-dvh overflow-hidden bg-[#0b0b10] text-white">
-      {/* Fundo: luzes desfocadas (estilo iOS) */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -left-32 -top-32 h-[28rem] w-[28rem] rounded-full bg-[#ce2b37] opacity-40 blur-[120px]" />
-        <div className="absolute -bottom-40 -right-24 h-[32rem] w-[32rem] rounded-full bg-[#009246] opacity-30 blur-[130px]" />
-        <div className="absolute left-1/2 top-1/3 h-[22rem] w-[22rem] -translate-x-1/2 rounded-full bg-[#4f46e5] opacity-25 blur-[120px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.08),transparent_60%)]" />
+    <main className="relative isolate min-h-dvh overflow-x-hidden text-white">
+      {/* Fundo: foto real da loja + véu escuro para leitura + luzes da marca */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/fundo-login.webp" alt="" className="h-full w-full scale-105 object-cover object-[70%_center]" />
+        <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(6,6,10,0.92)_0%,rgba(6,6,10,0.72)_42%,rgba(6,6,10,0.35)_75%,rgba(6,6,10,0.55)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,10,0.25)_0%,transparent_30%,rgba(6,6,10,0.85)_100%)]" />
+        <div className="absolute -left-40 -top-40 h-[30rem] w-[30rem] rounded-full bg-[#ce2b37] opacity-30 blur-[140px]" />
+        <div className="absolute -bottom-48 right-0 h-[30rem] w-[30rem] rounded-full bg-[#009246] opacity-20 blur-[140px]" />
       </div>
 
-      <div className="mx-auto flex min-h-dvh max-w-6xl flex-col px-4 py-8 sm:px-8">
-        <header className="flex items-center justify-between">
-          <Logo claro className="h-12 sm:h-14" />
-          <span className="hidden rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-white/70 backdrop-blur-xl sm:inline-flex">
+      <div className="mx-auto flex min-h-dvh max-w-6xl flex-col px-4 py-5 sm:px-8 sm:py-8">
+        {/* Barra superior em pílula de vidro */}
+        <header className="vidro flex items-center justify-between rounded-full py-2 pl-5 pr-2">
+          <Logo claro className="h-9 sm:h-10" />
+          <span className="rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]">
             Painel da loja
           </span>
         </header>
 
-        <div className="grid flex-1 items-center gap-10 py-10 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid flex-1 items-center gap-10 py-10 lg:grid-cols-[1.1fr_0.9fr] lg:py-14">
           {/* Apresentação */}
           <section className="space-y-8">
             <div className="space-y-4">
-              <h1 className="text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
+              <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.07] px-3 py-1 text-xs font-medium text-white/75 backdrop-blur-xl">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_2px_rgba(52,211,153,0.6)]" />
+                {LOJA.nome} · {LOJA.cidade}/{LOJA.uf}
+              </p>
+              <h1 className="text-4xl font-semibold leading-[1.05] tracking-[-0.02em] sm:text-6xl">
                 Seu WhatsApp vendendo,
-                <span className="block bg-gradient-to-r from-white via-white/80 to-white/50 bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-white via-white/85 to-white/45 bg-clip-text text-transparent">
                   mesmo com a loja fechada.
                 </span>
               </h1>
-              <p className="max-w-md text-base text-white/60">
-                Atendimento com IA, leads, estoque e agenda da {LOJA.nome} num lugar só.
-              </p>
+              <p className="max-w-md text-base text-white/65 sm:text-lg">Atendimento com IA, leads, estoque e agenda num lugar só.</p>
             </div>
             <ul className="grid gap-3 sm:grid-cols-3">
               {RECURSOS.map(({ icone: Icone, titulo, texto }) => (
-                <li key={titulo} className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
-                  <Icone className="mb-3 h-5 w-5 text-white/80" />
-                  <p className="text-sm font-medium">{titulo}</p>
-                  <p className="mt-0.5 text-xs text-white/50">{texto}</p>
+                <li key={titulo} className="vidro p-4">
+                  <span className="mb-3 grid h-9 w-9 place-items-center rounded-xl border border-white/15 bg-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]">
+                    <Icone className="h-4.5 w-4.5 text-white" />
+                  </span>
+                  <p className="text-sm font-semibold">{titulo}</p>
+                  <p className="mt-0.5 text-xs text-white/55">{texto}</p>
                 </li>
               ))}
             </ul>
           </section>
 
-          {/* Cartão de vidro */}
+          {/* Cartão de login em vidro */}
           <section className="w-full max-w-md justify-self-center lg:justify-self-end">
-            <form
-              onSubmit={aoEnviar}
-              className="space-y-5 rounded-[28px] border border-white/15 bg-white/[0.08] p-7 shadow-[0_20px_80px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-2xl backdrop-saturate-150 sm:p-8"
-            >
+            <form onSubmit={aoEnviar} className="vidro space-y-5 rounded-[32px] p-7 sm:p-9">
               <div>
-                <h2 className="text-2xl font-semibold tracking-tight">Entrar</h2>
+                <h2 className="text-[28px] font-semibold tracking-tight">Entrar</h2>
                 <p className="mt-1 text-sm text-white/55">Use o e-mail cadastrado pela loja.</p>
               </div>
 
               <div className="space-y-3">
                 <label className="block">
                   <span className="sr-only">E-mail</span>
-                  <span className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 transition focus-within:border-white/40 focus-within:bg-black/30">
-                    <Mail className="h-4 w-4 shrink-0 text-white/40" />
+                  <span className="flex items-center gap-3 rounded-2xl border border-white/12 bg-black/25 px-4 py-3.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.35)] transition focus-within:border-white/40 focus-within:bg-black/35 focus-within:shadow-[0_0_0_3px_rgba(255,255,255,0.08)]">
+                    <Mail className="h-4 w-4 shrink-0 text-white/45" />
                     <input
                       id="email"
                       type="email"
@@ -102,14 +106,14 @@ export default function LoginPage() {
                       placeholder="voce@milano.com.br"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/30"
+                      className="w-full bg-transparent text-[15px] text-white outline-none placeholder:text-white/35"
                     />
                   </span>
                 </label>
                 <label className="block">
                   <span className="sr-only">Senha</span>
-                  <span className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 transition focus-within:border-white/40 focus-within:bg-black/30">
-                    <Lock className="h-4 w-4 shrink-0 text-white/40" />
+                  <span className="flex items-center gap-3 rounded-2xl border border-white/12 bg-black/25 px-4 py-3.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.35)] transition focus-within:border-white/40 focus-within:bg-black/35 focus-within:shadow-[0_0_0_3px_rgba(255,255,255,0.08)]">
+                    <Lock className="h-4 w-4 shrink-0 text-white/45" />
                     <input
                       id="senha"
                       type="password"
@@ -118,25 +122,25 @@ export default function LoginPage() {
                       placeholder="Senha"
                       value={senha}
                       onChange={(e) => setSenha(e.target.value)}
-                      className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/30"
+                      className="w-full bg-transparent text-[15px] text-white outline-none placeholder:text-white/35"
                     />
                   </span>
                 </label>
               </div>
 
-              {erro && <p className="rounded-xl border border-rose-400/30 bg-rose-500/15 px-3 py-2 text-sm text-rose-100">{erro}</p>}
+              {erro && <p className="rounded-2xl border border-rose-400/30 bg-rose-500/15 px-3.5 py-2.5 text-sm text-rose-100">{erro}</p>}
 
               <button
                 type="submit"
                 disabled={enviando}
-                className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-zinc-900 shadow-lg shadow-black/20 transition hover:bg-white/90 disabled:opacity-60"
+                className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3.5 text-[15px] font-semibold text-zinc-900 shadow-[0_12px_30px_-10px_rgba(255,255,255,0.45),inset_0_-1px_0_rgba(0,0,0,0.12)] transition hover:bg-white/90 active:scale-[0.99] disabled:opacity-60"
               >
                 {enviando ? "Entrando..." : "Entrar no painel"}
                 {!enviando && <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />}
               </button>
 
               {!SUPABASE_ATIVO && (
-                <p className="rounded-xl border border-amber-300/20 bg-amber-400/10 px-3 py-2 text-xs text-amber-100">
+                <p className="rounded-2xl border border-amber-300/25 bg-amber-400/10 px-3.5 py-2.5 text-xs text-amber-100">
                   Modo demonstração: qualquer e-mail e senha entram.
                 </p>
               )}
@@ -144,9 +148,10 @@ export default function LoginPage() {
           </section>
         </div>
 
-        <footer className="flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/40 sm:flex-row">
-          <p className="flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5" /> {ENDERECO_COMPLETO}
+        {/* Rodapé em pílula de vidro */}
+        <footer className="vidro flex flex-col items-center justify-between gap-2 rounded-3xl px-5 py-3 text-xs text-white/55 sm:flex-row sm:rounded-full">
+          <p className="flex items-center gap-1.5 text-center">
+            <MapPin className="h-3.5 w-3.5 shrink-0" /> {ENDERECO_COMPLETO}
           </p>
           <AssinaturaJL />
         </footer>

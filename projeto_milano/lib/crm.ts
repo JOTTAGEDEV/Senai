@@ -10,9 +10,9 @@ import type {
 import { LOJA } from "./loja";
 
 export const TEMPERATURAS: Record<Temperatura, { rotulo: string; emoji: string; classe: string }> = {
-  quente: { rotulo: "Quente", emoji: "🔥", classe: "bg-rose-50 text-rose-700 ring-rose-200" },
-  morno: { rotulo: "Morno", emoji: "🌤", classe: "bg-amber-50 text-amber-700 ring-amber-200" },
-  frio: { rotulo: "Frio", emoji: "❄️", classe: "bg-sky-50 text-sky-700 ring-sky-200" },
+  quente: { rotulo: "Quente", emoji: "🔥", classe: "bg-rose-500/15 text-rose-300 ring-rose-400/30" },
+  morno: { rotulo: "Morno", emoji: "🌤", classe: "bg-amber-500/15 text-amber-300 ring-amber-400/30" },
+  frio: { rotulo: "Frio", emoji: "❄️", classe: "bg-sky-500/15 text-sky-300 ring-sky-400/30" },
 };
 
 export const IMPORTANCIAS: Record<Importancia, string> = {
@@ -47,11 +47,11 @@ export const ETIQUETAS = [
 ];
 
 export const STATUS_AGENDAMENTO: Record<StatusAgendamento, { rotulo: string; classe: string }> = {
-  agendado: { rotulo: "Agendado", classe: "bg-sky-50 text-sky-700 ring-sky-200" },
-  confirmado: { rotulo: "Confirmado", classe: "bg-emerald-50 text-emerald-700 ring-emerald-200" },
-  realizado: { rotulo: "Realizado", classe: "bg-zinc-100 text-zinc-700 ring-zinc-200" },
-  faltou: { rotulo: "Faltou", classe: "bg-amber-50 text-amber-700 ring-amber-200" },
-  cancelado: { rotulo: "Cancelado", classe: "bg-rose-50 text-rose-700 ring-rose-200" },
+  agendado: { rotulo: "Agendado", classe: "bg-sky-500/15 text-sky-300 ring-sky-400/30" },
+  confirmado: { rotulo: "Confirmado", classe: "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" },
+  realizado: { rotulo: "Realizado", classe: "bg-white/10 text-white/70 ring-white/20" },
+  faltou: { rotulo: "Faltou", classe: "bg-amber-500/15 text-amber-300 ring-amber-400/30" },
+  cancelado: { rotulo: "Cancelado", classe: "bg-rose-500/15 text-rose-300 ring-rose-400/30" },
 };
 
 export const DIAS_SEMANA = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];

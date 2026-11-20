@@ -17,7 +17,7 @@ export default function EditarVeiculoPage() {
 
   if (carregando) {
     return (
-      <div className="grid place-items-center py-24 text-zinc-400">
+      <div className="grid place-items-center py-24 text-white/35">
         <Loader2 className="h-6 w-6 animate-spin" />
       </div>
     );
@@ -26,7 +26,7 @@ export default function EditarVeiculoPage() {
   if (!veiculo) {
     return (
       <div className="cartao p-8 text-center">
-        <p className="font-medium text-zinc-900">Carro não encontrado</p>
+        <p className="font-medium text-white">Carro não encontrado</p>
         <Link href="/estoque" className="botao-secundario mt-4">Voltar ao estoque</Link>
       </div>
     );
@@ -41,14 +41,14 @@ export default function EditarVeiculoPage() {
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/estoque" className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900">
+        <Link href="/estoque" className="inline-flex items-center gap-1 text-sm text-white/50 hover:text-white">
           <ChevronLeft className="h-4 w-4" /> Estoque
         </Link>
         <div className="mt-1 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold text-zinc-900">{nomeCompleto(veiculo)}</h1>
+          <h1 className="text-2xl font-semibold text-white">{nomeCompleto(veiculo)}</h1>
           <StatusBadge status={veiculo.status} />
         </div>
-        <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500">
+        <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/50">
           <span>{textoDias(diasDesde(veiculo.dataEntrada))} no estoque</span>
           <span className="inline-flex items-center gap-1">
             <Users className="h-3.5 w-3.5" /> {veiculo.interessados} interessado(s)

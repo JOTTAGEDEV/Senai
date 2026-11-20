@@ -14,8 +14,8 @@ export default function ConfiguracoesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Configurações</h1>
-        <p className="text-sm text-zinc-500">Dados da loja, regras da IA, vendedores e conexão com o WhatsApp.</p>
+        <h1 className="text-2xl font-semibold text-white">Configurações</h1>
+        <p className="text-sm text-white/50">Dados da loja, regras da IA, vendedores e conexão com o WhatsApp.</p>
       </div>
       <DadosLoja key={`loja-${config.id}`} config={config} />
       <ConfiguracaoIA key={`ia-${config.id}`} config={config} />
@@ -29,10 +29,10 @@ function Secao({ id, icone, titulo, descricao, children }: { id?: string; icone:
   return (
     <section id={id} className="cartao scroll-mt-6 p-5 sm:p-6">
       <div className="mb-5 flex items-center gap-3">
-        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-marca-50 text-marca-600">{icone}</div>
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-marca-500/15 text-rose-400">{icone}</div>
         <div>
-          <h2 className="text-base font-semibold text-zinc-900">{titulo}</h2>
-          <p className="text-sm text-zinc-500">{descricao}</p>
+          <h2 className="text-base font-semibold text-white">{titulo}</h2>
+          <p className="text-sm text-white/50">{descricao}</p>
         </div>
       </div>
       {children}
@@ -44,7 +44,7 @@ function BotaoSalvar({ salvo, alterado }: { salvo: boolean; alterado: boolean })
   return (
     <div className="mt-5 flex items-center justify-end gap-3">
       {salvo && !alterado && (
-        <span className="flex items-center gap-1 text-sm text-emerald-700">
+        <span className="flex items-center gap-1 text-sm text-emerald-300">
           <CheckCircle2 className="h-4 w-4" /> Salvo
         </span>
       )}
@@ -118,7 +118,7 @@ function DadosLoja({ config }: { config: ConfigLoja }) {
             </div>
           </div>
           <div className="space-y-3">
-            <div className="grid h-28 place-items-center rounded-lg bg-milano-fundo">
+            <div className="grid h-28 place-items-center rounded-2xl bg-black/40 ring-1 ring-inset ring-white/10 backdrop-blur-md">
               <Logo claro className="h-16" />
             </div>
             <a
@@ -139,7 +139,7 @@ function DadosLoja({ config }: { config: ConfigLoja }) {
 
 function Pendente() {
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] font-normal text-amber-700">
+    <span className="inline-flex items-center gap-1 text-[11px] font-normal text-amber-300">
       <CircleDashed className="h-3 w-3" /> a confirmar
     </span>
   );
@@ -183,24 +183,24 @@ function ConfiguracaoIA({ config }: { config: ConfigLoja }) {
                 type="button"
                 onClick={() => mudar({ modo: m.valor })}
                 aria-pressed={ia.modo === m.valor}
-                className={`rounded-lg border p-3 text-left transition ${ia.modo === m.valor ? "border-marca-500 bg-marca-50 ring-2 ring-marca-100" : "border-zinc-200 hover:bg-zinc-50"}`}
+                className={`rounded-lg border p-3 text-left transition ${ia.modo === m.valor ? "border-marca-500/60 bg-marca-500/15 ring-2 ring-marca-500/20" : "border-white/10 hover:bg-white/5"}`}
               >
-                <span className="block text-sm font-medium text-zinc-900">{m.rotulo}</span>
-                <span className="mt-1 block text-xs text-zinc-500">{m.descricao}</span>
+                <span className="block text-sm font-medium text-white">{m.rotulo}</span>
+                <span className="mt-1 block text-xs text-white/50">{m.descricao}</span>
               </button>
             ))}
           </div>
-          <p className={`mt-2 text-sm ${atendendoAgora ? "text-zinc-900" : "text-zinc-500"}`}>
+          <p className={`mt-2 text-sm ${atendendoAgora ? "text-white" : "text-white/50"}`}>
             Agora: {atendendoAgora ? "🤖 a IA está atendendo" : "👤 os vendedores estão atendendo"}
           </p>
         </div>
 
         <div>
           <p className="rotulo">Horário da loja</p>
-          <div className="overflow-hidden rounded-lg border border-zinc-200">
+          <div className="overflow-hidden rounded-lg border border-white/10">
             {ia.horarios.map((h, i) => (
-              <div key={DIAS_SEMANA[i]} className="flex flex-wrap items-center gap-3 border-b border-zinc-100 px-3 py-2 last:border-0">
-                <label className="flex w-32 items-center gap-2 text-sm text-zinc-700">
+              <div key={DIAS_SEMANA[i]} className="flex flex-wrap items-center gap-3 border-b border-white/10 px-3 py-2 last:border-0">
+                <label className="flex w-32 items-center gap-2 text-sm text-white/70">
                   <input
                     type="checkbox"
                     className="h-4 w-4 accent-marca-600"
@@ -212,11 +212,11 @@ function ConfiguracaoIA({ config }: { config: ConfigLoja }) {
                 {h.aberto ? (
                   <div className="flex items-center gap-2 text-sm">
                     <input type="time" className="campo w-28 py-1" value={h.abre} aria-label={`${DIAS_SEMANA[i]} abre`} onChange={(e) => mudar({ horarios: ia.horarios.map((x, j) => (j === i ? { ...x, abre: e.target.value } : x)) })} />
-                    <span className="text-zinc-400">até</span>
+                    <span className="text-white/35">até</span>
                     <input type="time" className="campo w-28 py-1" value={h.fecha} aria-label={`${DIAS_SEMANA[i]} fecha`} onChange={(e) => mudar({ horarios: ia.horarios.map((x, j) => (j === i ? { ...x, fecha: e.target.value } : x)) })} />
                   </div>
                 ) : (
-                  <span className="text-sm text-zinc-400">Fechado</span>
+                  <span className="text-sm text-white/35">Fechado</span>
                 )}
               </div>
             ))}
@@ -231,13 +231,13 @@ function ConfiguracaoIA({ config }: { config: ConfigLoja }) {
               ["enviaFotos", "Pode enviar fotos dos carros"],
             ] as const
           ).map(([chave, rotulo]) => (
-            <label key={chave} className={`flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 text-sm ${ia[chave] ? "border-marca-200 bg-marca-50" : "border-zinc-200"}`}>
+            <label key={chave} className={`flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 text-sm ${ia[chave] ? "border-marca-500/40 bg-marca-500/15" : "border-white/10"}`}>
               <input type="checkbox" className="h-4 w-4 accent-marca-600" checked={ia[chave]} onChange={() => mudar({ [chave]: !ia[chave] })} />
               {rotulo}
             </label>
           ))}
         </div>
-        <p className="-mt-3 text-xs text-zinc-500">A IA nunca dá desconto e nunca inventa carro ou preço: ela só usa o que está no estoque.</p>
+        <p className="-mt-3 text-xs text-white/50">A IA nunca dá desconto e nunca inventa carro ou preço: ela só usa o que está no estoque.</p>
 
         <div className="grid gap-4 lg:grid-cols-[200px_1fr]">
           <div>
@@ -272,19 +272,19 @@ function Vendedores() {
 
   return (
     <Secao icone={<Users className="h-5 w-5" />} titulo="Vendedores" descricao="Quem recebe os leads e os avisos de cliente quente.">
-      <ul className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
-        {vendedores.length === 0 && <li className="p-4 text-sm text-zinc-500">Nenhum vendedor cadastrado.</li>}
+      <ul className="divide-y divide-white/10 rounded-lg border border-white/10">
+        {vendedores.length === 0 && <li className="p-4 text-sm text-white/50">Nenhum vendedor cadastrado.</li>}
         {vendedores.map((v) => (
           <li key={v.id} className="flex flex-wrap items-center gap-3 px-3 py-2.5">
-            <span className={`flex-1 text-sm font-medium ${v.ativo ? "text-zinc-900" : "text-zinc-400 line-through"}`}>{v.nome}</span>
-            <span className="text-xs text-zinc-500">{v.telefone}</span>
-            <label className="flex items-center gap-1.5 text-xs text-zinc-600">
+            <span className={`flex-1 text-sm font-medium ${v.ativo ? "text-white" : "text-white/35 line-through"}`}>{v.nome}</span>
+            <span className="text-xs text-white/50">{v.telefone}</span>
+            <label className="flex items-center gap-1.5 text-xs text-white/60">
               <input type="checkbox" className="h-4 w-4 accent-marca-600" checked={v.ativo} onChange={() => atualizar<Vendedor>("vendedores", v.id, { ativo: !v.ativo })} />
               Ativo
             </label>
             <button
               onClick={() => confirm(`Remover ${v.nome}?`) && remover("vendedores", v.id)}
-              className="rounded-md p-1.5 text-zinc-400 hover:bg-rose-50 hover:text-rose-600"
+              className="rounded-md p-1.5 text-white/35 hover:bg-rose-500/15 hover:text-rose-300"
               aria-label={`Remover ${v.nome}`}
             >
               <Trash2 className="h-4 w-4" />
@@ -320,9 +320,9 @@ function Conexao() {
     <Secao icone={<Wifi className="h-5 w-5" />} titulo="Conexão" descricao="Banco de dados, WhatsApp oficial (Meta) e IA.">
       {modo === "local" ? (
         <div className="space-y-4 text-sm">
-          <p className="rounded-lg bg-amber-50 px-3 py-2 text-amber-900">
+          <p className="rounded-lg bg-amber-500/15 px-3 py-2 text-amber-100">
             <strong>Modo demonstração.</strong> Os dados ficam só neste navegador e as respostas da IA são simuladas. Para ligar o sistema de
-            verdade (Supabase + WhatsApp + IA), siga o guia <code className="rounded bg-white px-1">projeto_milano/BACKEND.md</code>.
+            verdade (Supabase + WhatsApp + IA), siga o guia <code className="rounded bg-white/10 px-1">projeto_milano/BACKEND.md</code>.
           </p>
           <button
             onClick={() => confirm("Apagar tudo o que foi feito na demonstração e voltar aos dados de exemplo?") && restaurarExemplos()}
@@ -345,8 +345,8 @@ function Conexao() {
 function Item({ ok, texto }: { ok?: boolean; texto: string }) {
   return (
     <li className="flex items-start gap-2">
-      {ok ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> : <CircleDashed className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />}
-      <span className="text-zinc-700">{texto}</span>
+      {ok ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" /> : <CircleDashed className="mt-0.5 h-4 w-4 shrink-0 text-white/35" />}
+      <span className="text-white/70">{texto}</span>
     </li>
   );
 }

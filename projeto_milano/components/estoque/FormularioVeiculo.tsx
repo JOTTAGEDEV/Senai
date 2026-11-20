@@ -111,7 +111,7 @@ export function FormularioVeiculo({ inicial, textoBotao, onSalvar }: Props) {
   return (
     <form onSubmit={enviar} className="space-y-6 pb-24" noValidate>
       {Object.keys(erros).length > 0 && (
-        <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+        <div className="rounded-lg border border-rose-400/30 bg-rose-500/15 px-4 py-3 text-sm text-rose-200">
           Corrija os campos destacados: {Object.values(erros).join(" · ")}
         </div>
       )}
@@ -121,14 +121,14 @@ export function FormularioVeiculo({ inicial, textoBotao, onSalvar }: Props) {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <label className="rotulo" htmlFor="marca">Marca *</label>
-            <select id="marca" className={`campo ${erros.marca ? "border-rose-400" : ""}`} value={v.marca} onChange={(e) => campo("marca", e.target.value)}>
+            <select id="marca" className={`campo ${erros.marca ? "border-rose-400/50" : ""}`} value={v.marca} onChange={(e) => campo("marca", e.target.value)}>
               <option value="">Selecione</option>
               {MARCAS.map((m) => <option key={m}>{m}</option>)}
             </select>
           </div>
           <div>
             <label className="rotulo" htmlFor="modelo">Modelo *</label>
-            <input id="modelo" className={`campo ${erros.modelo ? "border-rose-400" : ""}`} placeholder="Ex.: Onix" value={v.modelo} onChange={(e) => campo("modelo", e.target.value)} />
+            <input id="modelo" className={`campo ${erros.modelo ? "border-rose-400/50" : ""}`} placeholder="Ex.: Onix" value={v.modelo} onChange={(e) => campo("modelo", e.target.value)} />
           </div>
           <div>
             <label className="rotulo" htmlFor="versao">Versão</label>
@@ -137,11 +137,11 @@ export function FormularioVeiculo({ inicial, textoBotao, onSalvar }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="rotulo" htmlFor="anoFab">Ano fabricação</label>
-              <input id="anoFab" type="number" min={1950} max={anoAtual + 1} className={`campo ${erros.anos ? "border-rose-400" : ""}`} value={v.anoFabricacao} onChange={(e) => campo("anoFabricacao", numero(e.target.value))} />
+              <input id="anoFab" type="number" min={1950} max={anoAtual + 1} className={`campo ${erros.anos ? "border-rose-400/50" : ""}`} value={v.anoFabricacao} onChange={(e) => campo("anoFabricacao", numero(e.target.value))} />
             </div>
             <div>
               <label className="rotulo" htmlFor="anoMod">Ano modelo</label>
-              <input id="anoMod" type="number" min={1950} max={anoAtual + 2} className={`campo ${erros.anos ? "border-rose-400" : ""}`} value={v.anoModelo} onChange={(e) => campo("anoModelo", numero(e.target.value))} />
+              <input id="anoMod" type="number" min={1950} max={anoAtual + 2} className={`campo ${erros.anos ? "border-rose-400/50" : ""}`} value={v.anoModelo} onChange={(e) => campo("anoModelo", numero(e.target.value))} />
             </div>
           </div>
           <div>
@@ -240,7 +240,7 @@ export function FormularioVeiculo({ inicial, textoBotao, onSalvar }: Props) {
           ))}
         </div>
         {v.checklist.leilaoSinistro && (
-          <p className="mt-3 flex gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <p className="mt-3 flex gap-2 rounded-lg bg-amber-500/15 px-3 py-2 text-sm text-amber-200">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
             A IA vai informar com transparência que o carro tem passagem por leilão/sinistro, se o cliente perguntar.
           </p>
@@ -256,7 +256,7 @@ export function FormularioVeiculo({ inicial, textoBotao, onSalvar }: Props) {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label className="rotulo" htmlFor="preco">Preço anunciado (R$) *</label>
-            <input id="preco" type="number" min={0} step={100} inputMode="numeric" className={`campo ${erros.preco ? "border-rose-400" : ""}`} value={v.preco || ""} onChange={(e) => campo("preco", numero(e.target.value))} />
+            <input id="preco" type="number" min={0} step={100} inputMode="numeric" className={`campo ${erros.preco ? "border-rose-400/50" : ""}`} value={v.preco || ""} onChange={(e) => campo("preco", numero(e.target.value))} />
           </div>
           <div>
             <label className="rotulo" htmlFor="fipe">Valor FIPE (R$)</label>
@@ -278,12 +278,12 @@ export function FormularioVeiculo({ inicial, textoBotao, onSalvar }: Props) {
 
         <div className="mt-4 flex flex-wrap gap-2 text-sm">
           {abaixoFipe > 0 && (
-            <span className="rounded-full bg-emerald-50 px-3 py-1 font-medium text-emerald-700">
+            <span className="rounded-full bg-emerald-500/15 px-3 py-1 font-medium text-emerald-300">
               {formatarPreco(abaixoFipe)} abaixo da FIPE — a IA usa isso como argumento
             </span>
           )}
           {v.custoCompra && v.preco > 0 && (
-            <span className="rounded-full bg-zinc-100 px-3 py-1 text-zinc-700">
+            <span className="rounded-full bg-white/10 px-3 py-1 text-white/70">
               Margem: {formatarPreco(v.preco - v.custoCompra)} ({Math.round(((v.preco - v.custoCompra) / v.preco) * 100)}%)
             </span>
           )}
@@ -305,7 +305,7 @@ export function FormularioVeiculo({ inicial, textoBotao, onSalvar }: Props) {
           <div>
             <div className="mb-1 flex items-center justify-between gap-2">
               <label className="rotulo mb-0" htmlFor="descricao">Descrição pública</label>
-              <button type="button" onClick={gerarDescricao} className="botao-fantasma px-2 py-1 text-xs text-marca-700">
+              <button type="button" onClick={gerarDescricao} className="botao-fantasma px-2 py-1 text-xs text-rose-300">
                 <Sparkles className="h-3.5 w-3.5" /> Gerar descrição com IA
               </button>
             </div>
@@ -365,15 +365,15 @@ export function FormularioVeiculo({ inicial, textoBotao, onSalvar }: Props) {
               type="button"
               onClick={() => campo("status", s)}
               className={`rounded-lg border p-3 text-left transition ${
-                v.status === s ? "border-marca-500 bg-marca-50 ring-2 ring-marca-100" : "border-zinc-200 hover:bg-zinc-50"
+                v.status === s ? "border-marca-500/60 bg-marca-500/15 ring-2 ring-marca-500/20" : "border-white/10 hover:bg-white/5"
               }`}
             >
-              <span className="flex items-center gap-2 text-sm font-medium text-zinc-900">
+              <span className="flex items-center gap-2 text-sm font-medium text-white">
                 <span className={`h-2 w-2 rounded-full ${STATUS[s].ponto}`} />
                 {STATUS[s].rotulo}
-                {s === "oculto" && <EyeOff className="h-3.5 w-3.5 text-zinc-400" />}
+                {s === "oculto" && <EyeOff className="h-3.5 w-3.5 text-white/35" />}
               </span>
-              <span className="mt-1 block text-xs text-zinc-500">{STATUS[s].descricaoIA}</span>
+              <span className="mt-1 block text-xs text-white/50">{STATUS[s].descricaoIA}</span>
             </button>
           ))}
         </div>
@@ -391,7 +391,7 @@ export function FormularioVeiculo({ inicial, textoBotao, onSalvar }: Props) {
       </Secao>
 
       {/* BARRA FIXA */}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-zinc-200 bg-white/95 backdrop-blur lg:left-60">
+      <div className="vidro-forte fixed bottom-3 left-3 right-3 z-20 rounded-2xl lg:left-64">
         <div className="mx-auto flex max-w-7xl items-center justify-end gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <Link href="/estoque" className="botao-secundario">Cancelar</Link>
           <button type="submit" className="botao-primario">{textoBotao}</button>
@@ -407,8 +407,8 @@ function Secao({ titulo, descricao, children }: { titulo: string; descricao?: st
   return (
     <section className="cartao p-5 sm:p-6">
       <div className="mb-5">
-        <h2 className="text-base font-semibold text-zinc-900">{titulo}</h2>
-        {descricao && <p className="mt-0.5 text-sm text-zinc-500">{descricao}</p>}
+        <h2 className="text-base font-semibold text-white">{titulo}</h2>
+        {descricao && <p className="mt-0.5 text-sm text-white/50">{descricao}</p>}
       </div>
       {children}
     </section>
@@ -417,7 +417,7 @@ function Secao({ titulo, descricao, children }: { titulo: string; descricao?: st
 
 function Interno() {
   return (
-    <span title="A IA não vê este campo" className="inline-flex items-center gap-1 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-zinc-500">
+    <span title="A IA não vê este campo" className="inline-flex items-center gap-1 rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white/50">
       <Lock className="h-2.5 w-2.5" /> interno
     </span>
   );
@@ -439,9 +439,9 @@ function Caixa({
       className={`flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 text-sm transition ${
         marcado
           ? alerta
-            ? "border-amber-300 bg-amber-50 text-amber-900"
-            : "border-marca-200 bg-marca-50 text-zinc-900"
-          : "border-zinc-200 text-zinc-700 hover:bg-zinc-50"
+            ? "border-amber-400/40 bg-amber-500/15 text-amber-100"
+            : "border-marca-500/40 bg-marca-500/15 text-white"
+          : "border-white/10 text-white/70 hover:bg-white/5"
       }`}
     >
       <input type="checkbox" checked={marcado} onChange={onChange} className="h-4 w-4 accent-marca-600" />
@@ -460,7 +460,7 @@ function Segmentado<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="inline-flex flex-wrap gap-1 rounded-lg bg-zinc-100 p-1">
+    <div className="inline-flex flex-wrap gap-1 rounded-lg bg-white/10 p-1">
       {opcoes.map((o) => (
         <button
           key={o.valor}
@@ -468,7 +468,7 @@ function Segmentado<T extends string>({
           onClick={() => onChange(o.valor)}
           aria-pressed={valor === o.valor}
           className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
-            valor === o.valor ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-600 hover:text-zinc-900"
+            valor === o.valor ? "bg-white/20 text-white shadow-sm ring-1 ring-white/20" : "text-white/60 hover:text-white"
           }`}
         >
           {o.rotulo}

@@ -6,7 +6,7 @@ export function FotoCapa({ fotos, className = "" }: { fotos: Foto[]; className?:
   const capa = fotos[0];
   if (!capa) {
     return (
-      <div className={`grid place-items-center bg-zinc-100 text-zinc-400 ${className}`}>
+      <div className={`grid place-items-center bg-white/10 text-white/35 ${className}`}>
         <Car className="h-1/2 w-1/2 max-h-8 max-w-8" />
       </div>
     );

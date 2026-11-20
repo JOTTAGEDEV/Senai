@@ -75,12 +75,12 @@ function Conversas() {
   const iaAgora = iaDeveAtender(config.ia);
 
   return (
-    <div className="-mx-4 -my-6 flex h-[calc(100dvh-57px)] overflow-hidden border-zinc-200 bg-white sm:-mx-6 lg:-mx-8 lg:-my-8 lg:h-dvh">
+    <div className="vidro flex h-[calc(100dvh-7.5rem)] min-h-[28rem] overflow-hidden rounded-3xl lg:h-[calc(100dvh-3rem)]">
       {/* LISTA */}
-      <aside className={`flex w-full shrink-0 flex-col border-r border-zinc-200 md:w-80 ${selecionado ? "hidden md:flex" : "flex"}`}>
-        <div className="space-y-3 border-b border-zinc-200 p-3">
+      <aside className={`flex w-full min-w-0 shrink-0 flex-col border-r border-white/10 md:w-80 ${selecionado ? "hidden md:flex" : "flex"}`}>
+        <div className="space-y-3 border-b border-white/10 p-3">
           <div className="flex items-center justify-between">
-            <h1 className="text-lg font-semibold text-zinc-900">Conversas</h1>
+            <h1 className="text-lg font-semibold text-white">Conversas</h1>
             {modo === "local" && (
               <button onClick={() => setNovaConversa(true)} className="botao-fantasma px-2 py-1 text-xs" title="Simular um cliente novo chamando no WhatsApp">
                 <MessageCirclePlus className="h-4 w-4" /> Simular cliente
@@ -89,7 +89,7 @@ function Conversas() {
           </div>
           <div
             className={`flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs ${
-              config.ia.modo === "desligado" ? "bg-zinc-100 text-zinc-600" : iaAgora ? "bg-zinc-900 text-white" : "bg-emerald-50 text-emerald-800"
+              config.ia.modo === "desligado" ? "border border-white/10 bg-white/5 text-white/60" : iaAgora ? "border border-white/15 bg-white/15 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]" : "border border-emerald-400/20 bg-emerald-500/15 text-emerald-200"
             }`}
           >
             <Bot className="h-3.5 w-3.5 shrink-0" />
@@ -103,7 +103,7 @@ function Conversas() {
             </Link>
           </div>
           <div className="relative">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
             <input className="campo py-1.5 pl-8" placeholder="Buscar nome ou telefone" value={busca} onChange={(e) => setBusca(e.target.value)} aria-label="Buscar conversa" />
           </div>
           <div className="flex gap-1 overflow-x-auto">
@@ -112,7 +112,7 @@ function Conversas() {
                 key={f.valor}
                 onClick={() => setFiltro(f.valor)}
                 className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${
-                  filtro === f.valor ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                  filtro === f.valor ? "border border-white/25 bg-white/20 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]" : "border border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
                 }`}
               >
                 {f.rotulo}
@@ -121,35 +121,35 @@ function Conversas() {
           </div>
         </div>
         <ul className="flex-1 overflow-y-auto">
-          {lista.length === 0 && <li className="p-6 text-center text-sm text-zinc-500">Nenhuma conversa.</li>}
+          {lista.length === 0 && <li className="p-6 text-center text-sm text-white/50">Nenhuma conversa.</li>}
           {lista.map((l) => {
             const ultima = ultimaPorLead.get(l.id);
             return (
               <li key={l.id}>
                 <button
                   onClick={() => abrir(l.id)}
-                  className={`flex w-full gap-3 border-b border-zinc-100 px-3 py-3 text-left transition ${
-                    l.id === selecionadoId ? "bg-zinc-100" : "hover:bg-zinc-50"
+                  className={`flex w-full gap-3 border-b border-white/5 px-3 py-3 text-left transition ${
+                    l.id === selecionadoId ? "bg-white/10" : "hover:bg-white/5"
                   }`}
                 >
                   <Avatar nome={l.nome} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
-                      <p className={`truncate text-sm ${l.naoLidas ? "font-semibold text-zinc-900" : "font-medium text-zinc-800"}`}>{l.nome}</p>
-                      <span className={`shrink-0 text-[11px] ${l.naoLidas ? "font-semibold text-milano-verde" : "text-zinc-400"}`}>
+                      <p className={`truncate text-sm ${l.naoLidas ? "font-semibold text-white" : "font-medium text-white/85"}`}>{l.nome}</p>
+                      <span className={`shrink-0 text-[11px] ${l.naoLidas ? "font-semibold text-emerald-300" : "text-white/35"}`}>
                         {tempoRelativo(l.ultimaMensagemEm)}
                       </span>
                     </div>
-                    <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-zinc-500">
+                    <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-white/50">
                       {ultima?.autor === "ia" && <Bot className="h-3 w-3 shrink-0" />}
                       {ultima?.autor === "vendedor" && <UserRound className="h-3 w-3 shrink-0" />}
                       <span className="truncate">{ultima?.texto ?? "—"}</span>
                     </p>
                     <div className="mt-1.5 flex items-center gap-1.5">
                       <TemperaturaBadge t={l.temperatura} />
-                      {l.atendente === "humano" && <span className="text-[11px] text-emerald-700">vendedor</span>}
+                      {l.atendente === "humano" && <span className="text-[11px] text-emerald-300">vendedor</span>}
                       {l.naoLidas > 0 && (
-                        <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-milano-verde px-1 text-[11px] font-semibold text-white">
+                        <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-emerald-500 px-1 text-[11px] font-semibold text-white shadow-[0_0_12px_rgba(16,185,129,0.5)]">
                           {l.naoLidas}
                         </span>
                       )}
@@ -167,9 +167,9 @@ function Conversas() {
         {selecionado ? (
           <Chat lead={selecionado} voltar={() => abrir(null)} abrirDetalhes={() => setDetalhesAbertos(true)} />
         ) : (
-          <div className="grid flex-1 place-items-center bg-zinc-50 p-8 text-center text-sm text-zinc-500">
+          <div className="grid flex-1 place-items-center bg-white/[0.02] p-8 text-center text-sm text-white/50">
             <div>
-              <MessageCirclePlus className="mx-auto mb-3 h-10 w-10 text-zinc-300" />
+              <MessageCirclePlus className="mx-auto mb-3 h-10 w-10 text-white/25" />
               Escolha uma conversa ao lado.
             </div>
           </div>
@@ -179,16 +179,16 @@ function Conversas() {
       {/* DETALHES */}
       {selecionado && (
         <>
-          <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-zinc-200 p-4 xl:block">
+          <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-white/10 p-4 xl:block">
             <PainelLead lead={selecionado} />
           </aside>
           {detalhesAbertos && (
             <div className="fixed inset-0 z-40 xl:hidden">
-              <div className="absolute inset-0 bg-black/40" onClick={() => setDetalhesAbertos(false)} />
-              <aside className="absolute inset-y-0 right-0 w-[min(22rem,100%)] overflow-y-auto bg-white p-4 shadow-xl">
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setDetalhesAbertos(false)} />
+              <aside className="vidro-forte absolute inset-y-2 right-2 w-[min(22rem,calc(100%-1rem))] overflow-y-auto rounded-3xl p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <p className="font-semibold text-zinc-900">{selecionado.nome}</p>
-                  <button onClick={() => setDetalhesAbertos(false)} className="rounded-md p-1 hover:bg-zinc-100" aria-label="Fechar detalhes">
+                  <p className="font-semibold text-white">{selecionado.nome}</p>
+                  <button onClick={() => setDetalhesAbertos(false)} className="rounded-full p-1 text-white/70 hover:bg-white/10" aria-label="Fechar detalhes">
                     <X className="h-5 w-5" />
                   </button>
                 </div>
@@ -233,14 +233,14 @@ function Chat({ lead, voltar, abrirDetalhes }: { lead: Lead; voltar: () => void;
 
   return (
     <>
-      <header className="flex items-center gap-3 border-b border-zinc-200 px-3 py-2.5 sm:px-4">
-        <button onClick={voltar} className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 md:hidden" aria-label="Voltar">
+      <header className="flex items-center gap-3 border-b border-white/10 bg-white/[0.03] px-3 py-2.5 sm:px-4">
+        <button onClick={voltar} className="rounded-full p-1 text-white/60 hover:bg-white/10 md:hidden" aria-label="Voltar">
           <ArrowLeft className="h-5 w-5" />
         </button>
         <Avatar nome={lead.nome} tamanho="h-9 w-9 text-xs" />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-zinc-900">{lead.nome}</p>
-          <p className="truncate text-xs text-zinc-500">{formatarTelefone(lead.telefone)}</p>
+          <p className="truncate text-sm font-semibold text-white">{lead.nome}</p>
+          <p className="truncate text-xs text-white/50">{formatarTelefone(lead.telefone)}</p>
         </div>
         <span className="hidden sm:block">
           <AtendenteBadge a={lead.atendente} />
@@ -254,12 +254,12 @@ function Chat({ lead, voltar, abrirDetalhes }: { lead: Lead; voltar: () => void;
             <Bot className="h-3.5 w-3.5" /> Devolver para IA
           </button>
         )}
-        <button onClick={abrirDetalhes} className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 xl:hidden" aria-label="Detalhes do lead">
+        <button onClick={abrirDetalhes} className="rounded-full p-1.5 text-white/60 hover:bg-white/10 xl:hidden" aria-label="Detalhes do lead">
           <Info className="h-5 w-5" />
         </button>
       </header>
 
-      <div className="flex-1 space-y-2 overflow-y-auto bg-[#f0ebe4] px-3 py-4 sm:px-6">
+      <div className="flex-1 space-y-2 overflow-y-auto bg-black/10 px-3 py-4 sm:px-6">
         {doLead.map((m, i) => {
           const dia = new Date(m.criadaEm).toLocaleDateString("pt-BR");
           const diaAnterior = i > 0 ? new Date(doLead[i - 1].criadaEm).toLocaleDateString("pt-BR") : null;
@@ -267,7 +267,7 @@ function Chat({ lead, voltar, abrirDetalhes }: { lead: Lead; voltar: () => void;
             <div key={m.id}>
               {dia !== diaAnterior && (
                 <p className="my-3 text-center">
-                  <span className="rounded-md bg-white/80 px-2 py-0.5 text-[11px] text-zinc-500 shadow-sm">{dia}</span>
+                  <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-0.5 text-[11px] text-white/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-md">{dia}</span>
                 </p>
               )}
               <Bolha m={m} />
@@ -277,13 +277,13 @@ function Chat({ lead, voltar, abrirDetalhes }: { lead: Lead; voltar: () => void;
         <div ref={fim} />
       </div>
 
-      <form onSubmit={enviar} className="border-t border-zinc-200 bg-white p-3">
+      <form onSubmit={enviar} className="border-t border-white/10 bg-white/[0.03] p-3">
         {modo === "local" && (
           <div className="mb-2 flex gap-1 text-xs">
-            <button type="button" onClick={() => setComoCliente(false)} className={`rounded-full px-2.5 py-1 ${!comoCliente ? "bg-emerald-600 text-white" : "bg-zinc-100 text-zinc-600"}`}>
+            <button type="button" onClick={() => setComoCliente(false)} className={`rounded-full px-2.5 py-1 ${!comoCliente ? "border border-emerald-400/30 bg-emerald-500/25 text-emerald-100" : "border border-white/10 bg-white/5 text-white/60"}`}>
               Responder como vendedor
             </button>
-            <button type="button" onClick={() => setComoCliente(true)} className={`rounded-full px-2.5 py-1 ${comoCliente ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600"}`}>
+            <button type="button" onClick={() => setComoCliente(true)} className={`rounded-full px-2.5 py-1 ${comoCliente ? "border border-white/25 bg-white/20 text-white" : "border border-white/10 bg-white/5 text-white/60"}`}>
               Simular mensagem do cliente
             </button>
           </div>
@@ -308,10 +308,10 @@ function Chat({ lead, voltar, abrirDetalhes }: { lead: Lead; voltar: () => void;
           </button>
         </div>
         {!comoCliente && lead.atendente === "ia" && (
-          <p className="mt-1.5 text-[11px] text-zinc-500">Ao responder, você assume a conversa e a IA para de responder este cliente.</p>
+          <p className="mt-1.5 text-[11px] text-white/50">Ao responder, você assume a conversa e a IA para de responder este cliente.</p>
         )}
         {comoCliente && (
-          <p className="mt-1.5 text-[11px] text-zinc-500">Demonstração: simula o cliente escrevendo no WhatsApp para ver a IA responder.</p>
+          <p className="mt-1.5 text-[11px] text-white/50">Demonstração: simula o cliente escrevendo no WhatsApp para ver a IA responder.</p>
         )}
       </form>
     </>
@@ -321,18 +321,18 @@ function Chat({ lead, voltar, abrirDetalhes }: { lead: Lead; voltar: () => void;
 function Bolha({ m }: { m: Mensagem }) {
   const hora = new Date(m.criadaEm).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
   if (m.autor === "sistema") {
-    return <p className="text-center text-[11px] text-zinc-500">{m.texto}</p>;
+    return <p className="text-center"><span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[11px] text-white/60">{m.texto}</span></p>;
   }
   const doCliente = m.autor === "cliente";
   return (
     <div className={`flex ${doCliente ? "justify-start" : "justify-end"}`}>
       <div
-        className={`max-w-[85%] rounded-lg px-3 py-1.5 text-sm shadow-sm sm:max-w-[70%] ${
-          doCliente ? "rounded-tl-none bg-white text-zinc-900" : m.autor === "ia" ? "rounded-tr-none bg-[#dcf8c6] text-zinc-900" : "rounded-tr-none bg-[#d1e7ff] text-zinc-900"
+        className={`max-w-[85%] rounded-2xl border px-3 py-1.5 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-md sm:max-w-[70%] ${
+          doCliente ? "rounded-tl-md border-white/10 bg-white/10 text-white" : m.autor === "ia" ? "rounded-tr-md border-emerald-400/20 bg-emerald-500/20 text-emerald-50" : "rounded-tr-md border-sky-400/20 bg-sky-500/20 text-sky-50"
         }`}
       >
         {!doCliente && (
-          <p className={`mb-0.5 flex items-center gap-1 text-[11px] font-semibold ${m.autor === "ia" ? "text-emerald-800" : "text-sky-800"}`}>
+          <p className={`mb-0.5 flex items-center gap-1 text-[11px] font-semibold ${m.autor === "ia" ? "text-emerald-200" : "text-sky-200"}`}>
             {m.autor === "ia" ? <Bot className="h-3 w-3" /> : <UserRound className="h-3 w-3" />}
             {m.autorNome || (m.autor === "ia" ? "Assistente IA" : "Vendedor")}
           </p>
@@ -342,7 +342,7 @@ function Bolha({ m }: { m: Mensagem }) {
           <img src={m.midiaUrl} alt="" className="mb-1 max-h-56 rounded" />
         )}
         <p className="whitespace-pre-wrap break-words">{m.texto}</p>
-        <p className="mt-0.5 text-right text-[10px] text-zinc-500">{hora}</p>
+        <p className="mt-0.5 text-right text-[10px] text-white/45">{hora}</p>
       </div>
     </div>
   );
@@ -385,11 +385,11 @@ function NovaConversa({ fechar, abrir }: { fechar: () => void; abrir: (id: strin
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={fechar}>
-      <form onSubmit={criar} onClick={(e) => e.stopPropagation()} className="cartao w-full max-w-md space-y-4 p-5">
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 backdrop-blur-sm" onClick={fechar}>
+      <form onSubmit={criar} onClick={(e) => e.stopPropagation()} className="vidro-forte w-full max-w-md space-y-4 rounded-3xl p-5">
         <div>
-          <h2 className="text-base font-semibold text-zinc-900">Simular cliente novo</h2>
-          <p className="text-sm text-zinc-500">
+          <h2 className="text-base font-semibold text-white">Simular cliente novo</h2>
+          <p className="text-sm text-white/60">
             {modo === "local"
               ? "Cria uma conversa como se um cliente tivesse chamado no WhatsApp, para ver a IA atendendo."
               : "No modo real, as conversas chegam sozinhas pelo WhatsApp. Use isto só para testes."}

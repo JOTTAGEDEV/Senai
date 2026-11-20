@@ -28,23 +28,23 @@ export function MenuAcoes({ veiculo }: { veiculo: Veiculo }) {
     };
   }, [aberto]);
 
-  const item = "flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-zinc-50";
+  const item = "flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-white/5";
 
   return (
     <div ref={ref} className="relative">
       <button
         type="button"
         onClick={() => setAberto((a) => !a)}
-        className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
+        className="rounded-md p-1.5 text-white/50 hover:bg-white/10 hover:text-white"
         aria-label="Ações"
         aria-expanded={aberto}
       >
         <MoreVertical className="h-4 w-4" />
       </button>
       {aberto && (
-        <div className="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-lg border border-zinc-200 bg-white py-1 shadow-lg">
+        <div className="vidro-forte absolute right-0 z-30 mt-1 w-52 overflow-hidden rounded-xl py-1 text-white/80">
           <Link href={`/estoque/${veiculo.id}`} className={item}>
-            <Pencil className="h-4 w-4 text-zinc-400" /> Editar
+            <Pencil className="h-4 w-4 text-white/35" /> Editar
           </Link>
           <button
             type="button"
@@ -54,16 +54,16 @@ export function MenuAcoes({ veiculo }: { veiculo: Veiculo }) {
               setAberto(false);
             }}
           >
-            <Copy className="h-4 w-4 text-zinc-400" /> Duplicar
+            <Copy className="h-4 w-4 text-white/35" /> Duplicar
           </button>
-          <div className="my-1 border-t border-zinc-100" />
-          <p className="px-3 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-400">Mudar status</p>
+          <div className="my-1 border-t border-white/10" />
+          <p className="px-3 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-wide text-white/35">Mudar status</p>
           {(Object.keys(STATUS) as StatusVeiculo[]).map((s) => (
             <button
               key={s}
               type="button"
               disabled={veiculo.status === s}
-              className={`${item} disabled:font-medium disabled:text-zinc-900`}
+              className={`${item} disabled:font-medium disabled:text-white`}
               onClick={() => {
                 mudarStatus(veiculo.id, s);
                 setAberto(false);
@@ -71,13 +71,13 @@ export function MenuAcoes({ veiculo }: { veiculo: Veiculo }) {
             >
               <span className={`h-2 w-2 rounded-full ${STATUS[s].ponto}`} />
               {STATUS[s].rotulo}
-              {veiculo.status === s && <span className="ml-auto text-xs text-zinc-400">atual</span>}
+              {veiculo.status === s && <span className="ml-auto text-xs text-white/35">atual</span>}
             </button>
           ))}
-          <div className="my-1 border-t border-zinc-100" />
+          <div className="my-1 border-t border-white/10" />
           <button
             type="button"
-            className={`${item} text-rose-600 hover:bg-rose-50`}
+            className={`${item} text-rose-300 hover:bg-rose-500/15`}
             onClick={() => {
               if (confirm(`Excluir ${veiculo.marca} ${veiculo.modelo} do estoque?`)) remover(veiculo.id);
               setAberto(false);

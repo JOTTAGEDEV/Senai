@@ -14,10 +14,10 @@ export default function NovoVeiculoPage() {
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/estoque" className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900">
+        <Link href="/estoque" className="inline-flex items-center gap-1 text-sm text-white/50 hover:text-white">
           <ChevronLeft className="h-4 w-4" /> Estoque
         </Link>
-        <h1 className="mt-1 text-2xl font-semibold text-zinc-900">Adicionar carro</h1>
+        <h1 className="mt-1 text-2xl font-semibold text-white">Adicionar carro</h1>
       </div>
       <FormularioVeiculo
         inicial={veiculoVazio()}
