@@ -10,7 +10,7 @@ import type { StatusVeiculo, Veiculo, VeiculoInput } from "./types";
  * Estoque guardado no próprio navegador (IndexedDB) enquanto não existe back-end.
  * Quando ligarmos o Supabase, só esta camada muda; as telas continuam iguais.
  */
-const CHAVE = "milano:veiculos:v1";
+const CHAVE = "milano:veiculos:v2";
 
 interface EstoqueContexto {
   veiculos: Veiculo[];

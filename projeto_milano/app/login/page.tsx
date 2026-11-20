@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Bot, CalendarCheck, MessageCircle } from "lucide-react";
+import { Bot, CalendarCheck, MapPin, MessageCircle } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { ENDERECO_COMPLETO, LOJA } from "@/lib/loja";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,7 +37,13 @@ export default function LoginPage() {
             </li>
           </ul>
         </div>
-        <p className="text-xs text-zinc-500">© {new Date().getFullYear()} Milano Multimarcas</p>
+        <div className="flex items-start gap-2 text-xs text-zinc-500">
+          <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <p>
+            {LOJA.nome} · {ENDERECO_COMPLETO}
+            <br />© {new Date().getFullYear()} {LOJA.nome}
+          </p>
+        </div>
       </section>
 
       <section className="flex items-center justify-center px-4 py-12">
@@ -46,7 +53,9 @@ export default function LoginPage() {
           </div>
           <div>
             <h2 className="text-2xl font-semibold text-zinc-900">Entrar no painel</h2>
-            <p className="mt-1 text-sm text-zinc-500">Use o e-mail cadastrado pela loja.</p>
+            <p className="mt-1 text-sm text-zinc-500">
+              {LOJA.nome} · {LOJA.cidade}/{LOJA.uf}
+            </p>
           </div>
           <div className="space-y-4">
             <div>

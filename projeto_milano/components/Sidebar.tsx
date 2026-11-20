@@ -8,12 +8,14 @@ import {
   Car,
   LayoutDashboard,
   LogOut,
+  MapPin,
   Menu,
   MessageCircle,
   Settings,
   Users,
   X,
 } from "lucide-react";
+import { LOJA } from "@/lib/loja";
 import { Logo } from "./Logo";
 
 const ITENS = [
@@ -87,8 +89,11 @@ export function Sidebar() {
 
       {/* Menu lateral fixo no computador */}
       <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col gap-6 bg-zinc-950 p-4 lg:flex">
-        <div className="px-1 pt-1">
+        <div className="space-y-2 px-1 pt-1">
           <Logo claro />
+          <p className="flex items-center gap-1 text-xs text-zinc-500">
+            <MapPin className="h-3 w-3" /> {LOJA.cidade} · {LOJA.uf}
+          </p>
         </div>
         <Navegacao />
         <Rodape />
