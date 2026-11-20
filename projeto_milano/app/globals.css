@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-marca-50: #fef2f2;
+  --color-marca-100: #fee2e2;
+  --color-marca-200: #fecaca;
+  --color-marca-500: #dc2626;
+  --color-marca-600: #b91c1c;
+  --color-marca-700: #991b1b;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: #f4f4f5;
+  color: #18181b;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Campos de formulário padrão do painel */
+@layer components {
+  .campo {
+    @apply w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-marca-500 focus:ring-2 focus:ring-marca-100 disabled:bg-zinc-100;
+  }
+  .rotulo {
+    @apply mb-1 block text-sm font-medium text-zinc-700;
+  }
+  .cartao {
+    @apply rounded-xl border border-zinc-200 bg-white shadow-sm;
+  }
+  .botao-primario,
+  .botao-secundario,
+  .botao-fantasma {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marca-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .botao-primario {
+    @apply bg-marca-600 text-white hover:bg-marca-700;
+  }
+  .botao-secundario {
+    @apply border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50;
+  }
+  .botao-fantasma {
+    @apply text-zinc-600 hover:bg-zinc-100;
+  }
+}
