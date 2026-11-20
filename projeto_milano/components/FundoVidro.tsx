@@ -1,39 +1,14 @@
 /**
- * Fundo das telas (referência "AE Glass"): quase preto com objetos 3D coloridos
- * flutuando atrás do vidro — cristal roxo, anel de cobre, esfera roxa metálica,
- * cruz de cápsulas azuis e pentágono dourado com brilho. Só decoração (aria-hidden).
+ * Fundo das telas (referência "AE Glass"): quase preto com a logo de vidro da JL Devs
+ * no centro e objetos 3D coloridos flutuando atrás do vidro — anel de cobre, esfera roxa
+ * metálica, cruz de cápsulas azuis e pentágono dourado com brilho. Só decoração (aria-hidden).
  */
+"use client";
+
+import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
 
 type Estilo = CSSProperties & { "--tempo"?: string; "--giro"?: string };
-
-function Cristal({ tamanho }: { tamanho: string }) {
-  return (
-    <svg viewBox="0 0 100 120" style={{ width: tamanho, height: "auto" }}>
-      <defs>
-        <linearGradient id="cr-a" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#d8b4fe" />
-          <stop offset="1" stopColor="#9333ea" />
-        </linearGradient>
-        <linearGradient id="cr-b" x1="1" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#a855f7" />
-          <stop offset="1" stopColor="#581c87" />
-        </linearGradient>
-        <linearGradient id="cr-c" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#7e22ce" />
-          <stop offset="1" stopColor="#2e1065" />
-        </linearGradient>
-      </defs>
-      {/* metade de cima */}
-      <polygon points="50,0 8,58 46,66" fill="url(#cr-a)" />
-      <polygon points="50,0 46,66 92,56" fill="url(#cr-b)" />
-      {/* metade de baixo */}
-      <polygon points="8,58 46,66 50,120" fill="url(#cr-c)" />
-      <polygon points="46,66 92,56 50,120" fill="#3b0764" />
-      <polygon points="50,0 30,30 46,66" fill="#fff" opacity="0.18" />
-    </svg>
-  );
-}
 
 function Anel({ tamanho }: { tamanho: string }) {
   return (
@@ -87,6 +62,27 @@ function Cruz({ tamanho }: { tamanho: string }) {
   );
 }
 
+/** Logo da JL Devs (letras de vidro verde, recortadas do arquivo original) como peça principal do fundo. */
+function LogoJL({ destaque }: { destaque: boolean }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/jl-logo.webp"
+      alt=""
+      draggable={false}
+      style={{
+        width: destaque ? "min(50vw, 700px)" : "min(38vw, 540px)",
+        maxWidth: "none",
+        height: "auto",
+        opacity: destaque ? 1 : 0.55,
+        filter: destaque
+          ? "drop-shadow(0 30px 60px rgba(132,204,22,0.35)) drop-shadow(0 0 40px rgba(163,230,53,0.18))"
+          : "brightness(0.8) saturate(0.9) drop-shadow(0 30px 60px rgba(132,204,22,0.25))",
+      }}
+    />
+  );
+}
+
 function Pentagono({ tamanho }: { tamanho: string }) {
   return (
     <svg viewBox="0 0 120 120" style={{ width: tamanho, height: tamanho, filter: "drop-shadow(0 0 10px rgba(251,191,36,0.55)) drop-shadow(0 0 24px rgba(245,158,11,0.35))" }}>
@@ -104,18 +100,25 @@ function Pentagono({ tamanho }: { tamanho: string }) {
 }
 
 const OBJETOS: { el: React.ReactNode; estilo: Estilo }[] = [
-  { el: <Cristal tamanho="min(15vw, 190px)" />, estilo: { top: "6%", left: "34%", "--tempo": "13s", "--giro": "-8deg" } },
   { el: <Anel tamanho="min(16vw, 200px)" />, estilo: { top: "4%", right: "10%", "--tempo": "15s", "--giro": "18deg" } },
   { el: <Esfera tamanho="min(20vw, 260px)" />, estilo: { bottom: "4%", left: "30%", "--tempo": "17s" } },
   { el: <Cruz tamanho="min(15vw, 190px)" />, estilo: { bottom: "14%", right: "6%", "--tempo": "14s", "--giro": "10deg" } },
   { el: <Pentagono tamanho="min(13vw, 160px)" />, estilo: { top: "38%", left: "3%", "--tempo": "16s", "--giro": "-12deg" } },
-  { el: <Esfera tamanho="min(7vw, 90px)" />, estilo: { top: "52%", right: "34%", opacity: 0.75, "--tempo": "11s" } },
   { el: <Anel tamanho="min(8vw, 100px)" />, estilo: { bottom: "6%", left: "4%", opacity: 0.8, "--tempo": "12s", "--giro": "-25deg" } },
 ];
 
 export function FundoVidro() {
+  // No login a logo fica atrás do cartão "Entrar" (lado direito), como na referência;
+  // nas telas do painel fica no centro, mais suave, para não atrapalhar a leitura.
+  const login = usePathname()?.startsWith("/login") ?? false;
+  const posicaoLogo: Estilo = login
+    ? { top: "50%", left: "71%", translate: "-50% -50%", "--tempo": "18s", "--giro": "-3deg" }
+    : { top: "55%", left: "58%", translate: "-50% -50%", "--tempo": "18s", "--giro": "-3deg" };
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <div className="flutuar absolute" style={posicaoLogo}>
+        <LogoJL destaque={login} />
+      </div>
       {OBJETOS.map((o, i) => (
         <div key={i} className="flutuar absolute" style={o.estilo}>
           {o.el}

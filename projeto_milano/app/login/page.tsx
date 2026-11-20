@@ -74,10 +74,10 @@ export default function LoginPage() {
 
           {/* Cartão de login em vidro */}
           <section className="w-full max-w-md justify-self-center lg:justify-self-end">
-            <form onSubmit={aoEnviar} className="vidro space-y-5 rounded-[32px] p-7 sm:p-9">
+            <form onSubmit={aoEnviar} className="vidro space-y-5 rounded-[32px] bg-black/45 p-7 sm:p-9">
               <div>
                 <h2 className="texto-metal text-3xl font-extrabold italic tracking-tight">Entrar</h2>
-                <p className="mt-1 text-sm text-white/55">Use o e-mail cadastrado pela loja.</p>
+                <p className="mt-1 text-sm text-white/75">Use o e-mail cadastrado pela loja.</p>
               </div>
 
               <div className="space-y-3">
