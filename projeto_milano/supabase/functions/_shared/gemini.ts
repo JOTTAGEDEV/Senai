@@ -28,12 +28,20 @@ export class ErroGemini extends Error {
   }
 }
 
+// Raciocínio "low": o padrão do Gemini 3 é "high", que gasta muitos tokens de saída (os mais caros)
+// e deixa a resposta no WhatsApp mais lenta. Atendimento de loja não precisa de mais que isso.
+const NIVEL_RACIOCINIO = Deno.env.get("GEMINI_RACIOCINIO") ?? "low";
+
 export async function gerarGemini(corpo: Record<string, unknown>, chaveInformada?: string): Promise<RespostaGemini> {
   const chave = chaveInformada || Deno.env.get("GEMINI_API_KEY") || "";
+  const config = (corpo.generationConfig ?? {}) as Record<string, unknown>;
   const r = await fetch(`${API}/${GEMINI_MODELO}:generateContent`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": chave },
-    body: JSON.stringify(corpo),
+    body: JSON.stringify({
+      ...corpo,
+      generationConfig: { thinkingConfig: { thinkingLevel: NIVEL_RACIOCINIO }, ...config },
+    }),
   });
   const texto = await r.text();
   if (!r.ok) throw new ErroGemini(r.status, texto);
