@@ -326,3 +326,66 @@ Deno.test("Gemini: chama ferramenta, devolve thought signature e responde (modo 
     Deno.env.delete("GEMINI_API_KEY");
   }
 });
+
+Deno.test("webhook: ignora reações e mensagens de sistema", () => {
+  const payload = {
+    entry: [{ changes: [{ value: {
+      metadata: { phone_number_id: "123" },
+      contacts: [{ wa_id: "5548999990001", profile: { name: "João" } }],
+      messages: [
+        { id: "wamid.r", from: "5548999990001", timestamp: "1763500000", type: "reaction" },
+        { id: "wamid.u", from: "5548999990001", timestamp: "1763500001", type: "unsupported" },
+        { id: "wamid.t", from: "5548999990001", timestamp: "1763500002", type: "text", text: { body: "oi" } },
+      ],
+    } }] }],
+  };
+  const lidas = lerWebhook(payload);
+  assertEquals(lidas.map((m) => m.waId), ["wamid.t"]);
+});
+
+function fetchComRoteiro(roteiro: unknown[]) {
+  return (async (_e: RequestInfo | URL, init?: RequestInit) => {
+    const corpo = JSON.parse(String(init?.body ?? "{}"));
+    const passo = roteiro.shift() as Record<string, unknown>;
+    const resposta = "candidates" in passo || "promptFeedback" in passo
+      ? passo
+      : { id: "m", type: "message", role: "assistant", model: corpo.model, stop_sequence: null, usage: { input_tokens: 10, output_tokens: 5 }, ...passo };
+    return new Response(JSON.stringify(resposta), { headers: { "content-type": "application/json" } });
+  }) as typeof fetch;
+}
+
+const leadTeste = { id: "teste", empresa_id: "emp1", nome: "", telefone: "", etapa: "atendimento", atendente: "ia", vendedor_id: null, veiculo_id: null, etiquetas: [], dados: {} } as unknown as Lead;
+const msgCliente: Mensagem[] = [{ id: "m1", lead_id: "teste", autor: "cliente", autor_nome: "", texto: "oi", midia_url: null, wa_message_id: null, criada_em: "" }];
+
+Deno.test("IA: resposta vazia do Claude vira 'passar para vendedor'", async () => {
+  const fetchOriginal = globalThis.fetch;
+  globalThis.fetch = fetchComRoteiro([{ stop_reason: "end_turn", content: [] }]);
+  try {
+    const dados: Record<string, Linha[]> = { leads: [{ ...leadTeste, id: "lead9" } as unknown as Linha], mensagens: [], agendamentos: [], vendedores: [], veiculos: [] };
+    const r = await responderCliente(
+      { db: bancoFalso(dados), empresa, lead: { ...leadTeste, id: "lead9" }, whatsapp: { empresa_id: "emp1", phone_number_id: "1", access_token: "t" }, veiculos: [], provedor: "anthropic" },
+      msgCliente,
+    );
+    assertEquals(r.texto, null);
+    assertEquals(dados.leads[0].atendente, "humano");
+  } finally {
+    globalThis.fetch = fetchOriginal;
+  }
+});
+
+Deno.test("Gemini: término diferente de STOP vira 'passar para vendedor' (modo teste)", async () => {
+  Deno.env.set("GEMINI_API_KEY", "teste-gemini");
+  const fetchOriginal = globalThis.fetch;
+  globalThis.fetch = fetchComRoteiro([{ candidates: [{ finishReason: "MALFORMED_FUNCTION_CALL", content: { role: "model", parts: [] } }] }]);
+  try {
+    const dados: Record<string, Linha[]> = { leads: [], mensagens: [], agendamentos: [], vendedores: [], veiculos: [] };
+    const r = await responderCliente(
+      { db: bancoFalso(dados), empresa, lead: leadTeste, whatsapp: { empresa_id: "emp1", phone_number_id: "", access_token: "" }, veiculos: [], teste: true, provedor: "gemini" },
+      msgCliente,
+    );
+    assertStringIncludes(r.texto ?? "", "passaria para um vendedor");
+  } finally {
+    globalThis.fetch = fetchOriginal;
+    Deno.env.delete("GEMINI_API_KEY");
+  }
+});

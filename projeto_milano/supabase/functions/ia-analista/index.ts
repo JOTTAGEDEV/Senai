@@ -51,21 +51,12 @@ interface Analise {
 
 Deno.serve(async (req) => {
   const segredo = Deno.env.get("CRON_SECRET");
-  if (!segredo || req.headers.get("x-cron-secret") !== segredo) return json({ erro: "Não autorizado" }, 401);
+  if (!segredo || !iguais(req.headers.get("x-cron-secret") ?? "", segredo)) return json({ erro: "Não autorizado" }, 401);
   if (!escolherProvedor()) return json({ erro: "Nenhuma chave de IA configurada" }, 503);
 
   const db = admin();
-  const limite = new Date(Date.now() - PARADA_MIN * 60_000).toISOString();
-  const candidatos = ok(
-    await db
-      .from("leads")
-      .select("*")
-      .lt("ultima_mensagem_em", limite)
-      .not("etapa", "in", "(vendido,perdido)")
-      .order("ultima_mensagem_em", { ascending: false })
-      .limit(LOTE * 3),
-  ) as Lead[];
-  const pendentes = candidatos.filter((l) => !l.analisado_em || l.analisado_em < l.ultima_mensagem_em).slice(0, LOTE);
+  // Filtro feito no banco: só leads com mensagem nova desde a última análise
+  const pendentes = ok(await db.rpc("leads_para_analisar", { p_limite: LOTE, p_parada_min: PARADA_MIN })) as Lead[];
 
   let analisados = 0;
   for (const lead of pendentes) {
@@ -78,6 +69,19 @@ Deno.serve(async (req) => {
   }
   return json({ analisados, pendentes: pendentes.length });
 });
+
+/** Comparação em tempo constante (não revela o segredo pelo tempo de resposta). */
+function iguais(a: string, b: string): boolean {
+  const x = new TextEncoder().encode(a);
+  const y = new TextEncoder().encode(b);
+  let diferenca = x.length ^ y.length;
+  for (let i = 0; i < Math.max(x.length, y.length); i++) diferenca |= (x[i] ?? 0) ^ (y[i] ?? 0);
+  return diferenca === 0;
+}
+
+async function marcarAnalisado(db: ReturnType<typeof admin>, leadId: string) {
+  await db.from("leads").update({ analisado_em: new Date().toISOString() }).eq("id", leadId);
+}
 
 async function analisar(db: ReturnType<typeof admin>, lead: Lead) {
   const mensagens = (
@@ -135,11 +139,15 @@ async function analisar(db: ReturnType<typeof admin>, lead: Lead) {
     }
   }
   await registrarUso(db, lead.empresa_id, "analista", uso);
-  if (!json) {
-    await db.from("leads").update({ analisado_em: new Date().toISOString() }).eq("id", lead.id);
-    return;
+  if (!json) return marcarAnalisado(db, lead.id);
+  let a: Analise;
+  try {
+    a = JSON.parse(json) as Analise;
+  } catch {
+    // Resposta inválida: marca como analisado para não gastar tokens em loop
+    console.error("JSON inválido do analista", lead.id);
+    return marcarAnalisado(db, lead.id);
   }
-  const a = JSON.parse(json) as Analise;
 
   // A etapa só anda para frente sozinha (ou vira "perdido"); voltar é decisão do vendedor
   const atual = ORDEM_ETAPAS.indexOf(lead.etapa);

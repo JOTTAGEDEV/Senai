@@ -472,7 +472,9 @@ async function gerarComAnthropic(ctx: Contexto, historico: Mensagem[]): Promise<
       .map((b) => b.text)
       .join("\n")
       .trim();
-    return { texto: texto || null, uso };
+    // Sem texto (ou cortada por limite): não deixa o cliente sem resposta
+    if (!texto || resposta.stop_reason === "max_tokens") return { texto: null, uso, esgotou: true };
+    return { texto, uso };
   }
   return { texto: null, uso, esgotou: true };
 }
@@ -507,9 +509,9 @@ async function gerarComGemini(ctx: Contexto, historico: Mensagem[]): Promise<Ger
     uso.cache += resposta.usageMetadata?.cachedContentTokenCount ?? 0;
 
     const candidato = resposta.candidates?.[0];
-    if (!candidato?.content || resposta.promptFeedback?.blockReason || candidato.finishReason === "SAFETY") {
-      return { texto: null, uso, recusou: true };
-    }
+    if (resposta.promptFeedback?.blockReason || candidato?.finishReason === "SAFETY") return { texto: null, uso, recusou: true };
+    // Qualquer término que não seja STOP (MAX_TOKENS, MALFORMED_FUNCTION_CALL...) ou sem conteúdo: passa para o vendedor
+    if (!candidato?.content || (candidato.finishReason && candidato.finishReason !== "STOP")) return { texto: null, uso, esgotou: true };
 
     const chamadas = (candidato.content.parts ?? []).filter((p) => p.functionCall);
     if (chamadas.length) {
@@ -518,12 +520,15 @@ async function gerarComGemini(ctx: Contexto, historico: Mensagem[]): Promise<Ger
       const respostas = [];
       for (const p of chamadas) {
         const { resultado } = await rodarFerramenta(ctx, p.functionCall!.name, p.functionCall!.args ?? {});
-        respostas.push({ functionResponse: { name: p.functionCall!.name, response: { resultado } } });
+        respostas.push({
+          functionResponse: { ...(p.functionCall!.id ? { id: p.functionCall!.id } : {}), name: p.functionCall!.name, response: { resultado } },
+        });
       }
       contents.push({ role: "user", parts: respostas });
       continue;
     }
-    return { texto: textoGemini(candidato.content) || null, uso };
+    const texto = textoGemini(candidato.content);
+    return texto ? { texto, uso } : { texto: null, uso, esgotou: true };
   }
   return { texto: null, uso, esgotou: true };
 }

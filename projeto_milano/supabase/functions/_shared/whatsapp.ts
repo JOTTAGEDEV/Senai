@@ -70,7 +70,9 @@ interface ValorWebhook {
   }[];
 }
 
-/** Extrai as mensagens de clientes de um POST do webhook (ignora status de entrega). */
+const IGNORAR = new Set(["reaction", "unsupported", "system", "ephemeral", "request_welcome"]);
+
+/** Extrai as mensagens de clientes de um POST do webhook (ignora status de entrega e reações). */
 export function lerWebhook(payload: unknown): MensagemRecebida[] {
   const saida: MensagemRecebida[] = [];
   const entradas = (payload as { entry?: { changes?: { value?: ValorWebhook }[] }[] })?.entry ?? [];
@@ -80,6 +82,7 @@ export function lerWebhook(payload: unknown): MensagemRecebida[] {
       const phoneNumberId = v?.metadata?.phone_number_id;
       if (!v || !phoneNumberId) continue;
       for (const m of v.messages ?? []) {
+        if (IGNORAR.has(m.type)) continue; // reações, avisos do sistema etc. não são conversa
         const contato = v.contacts?.find((c) => c.wa_id === m.from) ?? v.contacts?.[0];
         saida.push({
           phoneNumberId,

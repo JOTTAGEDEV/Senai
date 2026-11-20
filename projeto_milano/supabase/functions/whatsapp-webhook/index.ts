@@ -41,11 +41,13 @@ Deno.serve(async (req) => {
 
   const recebidas = lerWebhook(payload);
   const tarefas: Promise<unknown>[] = [];
+  let falhou = false;
   for (const m of recebidas) {
     try {
       const salvo = await salvarMensagem(m);
       if (salvo) tarefas.push(responderDepois(salvo.leadId, salvo.mensagemId));
     } catch (e) {
+      falhou = true;
       console.error("Erro ao salvar mensagem", m.waId, e);
     }
   }
@@ -54,6 +56,9 @@ Deno.serve(async (req) => {
   const segundoPlano = Promise.allSettled(tarefas);
   if (typeof EdgeRuntime !== "undefined") EdgeRuntime.waitUntil(segundoPlano);
   else await segundoPlano;
+  // Se alguma mensagem não foi salva, devolve erro para a Meta reenviar
+  // (as que já foram salvas não duplicam: wa_message_id é único).
+  if (falhou) return new Response("Erro ao salvar", { status: 500 });
   return new Response("ok");
 });
 
@@ -94,14 +99,8 @@ async function salvarMensagem(m: MensagemRecebida): Promise<{ leadId: string; me
     throw new Error(inserida.error.message);
   }
 
-  await db
-    .from("leads")
-    .update({
-      ultima_mensagem_em: m.quando,
-      nao_lidas: (lead!.nao_lidas ?? 0) + 1,
-      ...(!lead!.nome && m.nome ? { nome: m.nome } : {}),
-    })
-    .eq("id", lead!.id);
+  // Incremento atômico de não lidas (mensagens simultâneas não perdem contagem)
+  ok(await db.rpc("registrar_mensagem_cliente", { p_lead: lead!.id, p_quando: m.quando, p_nome: m.nome ?? "" }));
 
   return { leadId: lead!.id, mensagemId: inserida.data.id as string };
 }
@@ -112,7 +111,7 @@ async function responderDepois(leadId: string, mensagemId: string) {
 
   // Só responde se esta ainda for a última mensagem do cliente (senão, a mais nova cuida disso)
   const ultima = (
-    await db.from("mensagens").select("id").eq("lead_id", leadId).eq("autor", "cliente").order("criada_em", { ascending: false }).limit(1).single()
+    await db.from("mensagens").select("id").eq("lead_id", leadId).eq("autor", "cliente").order("criada_em", { ascending: false }).order("id", { ascending: false }).limit(1).single()
   ).data;
   if (ultima?.id !== mensagemId) return;
 

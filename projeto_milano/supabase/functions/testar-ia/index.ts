@@ -6,6 +6,9 @@ import { escolherProvedor, provedoresDisponiveis, registrarUso, responderCliente
 import { admin, comoUsuario, CORS, json, ok } from "../_shared/supabase.ts";
 import type { Empresa, Lead, Mensagem, Veiculo } from "../_shared/tipos.ts";
 
+const LIMITE_CARACTERES = 4000;
+const LIMITE_POR_HORA = 60;
+
 interface Pedido {
   conversa?: { autor: "cliente" | "ia"; texto: string }[];
   /** "anthropic" ou "gemini" (opcional) */
@@ -25,8 +28,9 @@ Deno.serve(async (req) => {
   const usuario = comoUsuario(authorization);
   const { data: auth } = await usuario.auth.getUser();
   if (!auth.user) return json({ erro: "Sessão inválida" }, 401);
-  const membro = (await usuario.from("membros").select("empresa_id").eq("user_id", auth.user.id).maybeSingle()).data;
+  const membro = (await usuario.from("membros").select("empresa_id,papel").eq("user_id", auth.user.id).maybeSingle()).data;
   if (!membro) return json({ erro: "Usuário sem loja" }, 403);
+  if (membro.papel !== "dono") return json({ erro: "Só o dono da loja pode usar o Testar IA." }, 403);
 
   const { conversa = [], provedor: pedido, status, chaves: brutas } = (await req.json().catch(() => ({}))) as Pedido;
   if (status) return json({ disponiveis: provedoresDisponiveis(), padrao: escolherProvedor() });
@@ -37,10 +41,32 @@ Deno.serve(async (req) => {
   if (!provedor) {
     return json({ erro: "Nenhuma chave de IA configurada. Coloque ANTHROPIC_API_KEY ou GEMINI_API_KEY em Supabase → Edge Functions → Secrets." }, 503);
   }
-  const ultimas = conversa.filter((m) => m.texto?.trim()).slice(-30);
+  // Só mensagens válidas, e no máximo LIMITE_CARACTERES no total (corta as mais antigas)
+  const validas = (Array.isArray(conversa) ? conversa : []).filter(
+    (m) => m && (m.autor === "cliente" || m.autor === "ia") && typeof m.texto === "string" && m.texto.trim(),
+  );
+  const ultimas: typeof validas = [];
+  let total = 0;
+  for (const m of validas.slice(-30).reverse()) {
+    total += m.texto.length;
+    if (total > LIMITE_CARACTERES && ultimas.length) break;
+    ultimas.unshift({ autor: m.autor, texto: m.texto.slice(0, LIMITE_CARACTERES) });
+  }
   if (!ultimas.length || ultimas.at(-1)!.autor !== "cliente") return json({ erro: "Envie uma mensagem de cliente" }, 400);
 
   const db = admin();
+
+  // Limite de uso: no máximo LIMITE_POR_HORA testes por hora por loja
+  const umaHora = new Date(Date.now() - 3_600_000).toISOString();
+  const { count } = await db
+    .from("uso_ia")
+    .select("id", { count: "exact", head: true })
+    .eq("empresa_id", membro.empresa_id)
+    .eq("tipo", "teste")
+    .gte("criado_em", umaHora);
+  if ((count ?? 0) >= LIMITE_POR_HORA) {
+    return json({ erro: `Limite de ${LIMITE_POR_HORA} testes por hora atingido. Tente de novo mais tarde.` }, 429);
+  }
   const empresa = ok(await db.from("empresas").select("*").eq("id", membro.empresa_id).single()) as Empresa;
   const veiculos = ok(
     await db.from("veiculos").select("*").eq("empresa_id", empresa.id).in("status", ["disponivel", "reservado", "preparacao"]),
