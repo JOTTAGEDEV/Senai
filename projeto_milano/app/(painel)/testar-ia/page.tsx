@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Bot, Eye, EyeOff, KeyRound, RotateCcw, Send, Sparkles, Trash2, UserRound } from "lucide-react";
+import { Bot, CalendarCheck, Eye,EyeOff, KeyRound, RotateCcw, Send, Sparkles, Trash2, UserRound } from "lucide-react";
 import { useDados } from "@/lib/dados";
 import { responderSimulado } from "@/lib/ia-simulada";
 import { supabase } from "@/lib/supabase";
@@ -57,6 +57,7 @@ export default function TestarIAPage() {
   const [chaves, setChaves] = useState<Chaves>(SEM_CHAVES);
   const [mostrarChaves, setMostrarChaves] = useState(false);
   const [painelChaves, setPainelChaves] = useState(false);
+  const [gravarAgenda, setGravarAgenda] = useState(true);
   const fim = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -110,6 +111,7 @@ export default function TestarIAPage() {
           conversa: conversa.map((f) => ({ autor: f.autor, texto: f.texto })),
           provedor: provedor || undefined,
           chaves: { anthropic: chaves.anthropic || undefined, gemini: chaves.gemini || undefined, deepseek: chaves.deepseek || undefined },
+          gravarAgenda,
         },
       });
       if (error) {
@@ -135,10 +137,16 @@ export default function TestarIAPage() {
             <Sparkles className="h-6 w-6 text-rose-400" /> Testar IA
           </h1>
           <p className="text-sm text-white/50">
-            Escreva como se fosse um cliente. {modo === "local" ? "Modo demonstração: respostas simuladas." : "A IA responde de verdade com o estoque — nada é enviado pelo WhatsApp nem gravado."}
+            Escreva como se fosse um cliente. {modo === "local" ? "Modo demonstração: respostas simuladas." : "A IA responde de verdade com o estoque — nada é enviado pelo WhatsApp."}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {modo === "supabase" && (
+            <label className="flex cursor-pointer items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs text-white/80" title="Os agendamentos feitos no teste aparecem na Agenda marcados como [TESTE]">
+              <input type="checkbox" className="accent-emerald-400" checked={gravarAgenda} onChange={(e) => setGravarAgenda(e.target.checked)} />
+              <CalendarCheck className="h-3.5 w-3.5" /> Gravar na Agenda
+            </label>
+          )}
           {modo === "supabase" && opcoes.length > 0 && (
             <select className="campo w-48 py-1.5" value={provedor || opcoes[0]} onChange={(e) => setProvedor(e.target.value as Provedor)} aria-label="Qual IA">
               {opcoes.map((p) => <option key={p} value={p}>{NOMES[p]}</option>)}

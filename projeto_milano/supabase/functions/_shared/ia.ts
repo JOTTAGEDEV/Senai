@@ -215,6 +215,8 @@ export interface Contexto {
   teste?: boolean;
   /** No modo teste, as fotos que a IA "enviaria" ficam aqui para o painel mostrar. */
   fotosTeste?: string[];
+  /** No modo teste, grava os agendamentos na Agenda (marcados como [TESTE]) para conferir no painel. */
+  gravarAgendaTeste?: boolean;
   /** Forçar uma IA (usado pelo Testar IA); senão segue IA_PROVEDOR / chave disponível. */
   provedor?: string | null;
   /** Chaves vindas do Testar IA (só para aquela resposta). */
@@ -280,13 +282,14 @@ async function executarFerramenta(ctx: Contexto, nome: string, entrada: Record<s
       const livres = await calcularLivres(ctx, data);
       if (!livres.includes(hora)) return `Horário indisponível. Livres em ${data}: ${livres.join(", ") || "nenhum"}.`;
 
-      if (ctx.teste) return `(Teste: nada foi gravado) Agendado: ${entrada.tipo} em ${data} às ${hora}. Endereço: ${empresa.endereco}, ${empresa.cidade}/${empresa.uf}. Confirme para o cliente.`;
+      if (ctx.teste && !ctx.gravarAgendaTeste) return `(Teste: nada foi gravado) Agendado: ${entrada.tipo} em ${data} às ${hora}. Endereço: ${empresa.endereco}, ${empresa.cidade}/${empresa.uf}. Confirme para o cliente.`;
       const vendedorId = lead.vendedor_id ?? (await vendedorComMenosVisitas(ctx));
       const nomeCliente = (entrada.nome_cliente as string | null) || lead.nome || "Cliente";
       const veiculoId = (entrada.veiculo_id as string | null) && ctx.veiculos.some((v) => v.id === entrada.veiculo_id) ? String(entrada.veiculo_id) : lead.veiculo_id;
+      const observacao = String(entrada.observacao ?? "");
       ok(await db.from("agendamentos").insert({
         empresa_id: empresa.id,
-        lead_id: lead.id,
+        lead_id: ctx.teste ? null : lead.id,
         cliente_nome: nomeCliente,
         telefone: lead.telefone,
         veiculo_id: veiculoId,
@@ -295,8 +298,9 @@ async function executarFerramenta(ctx: Contexto, nome: string, entrada: Record<s
         vendedor_id: vendedorId,
         status: "agendado",
         origem: "ia",
-        observacao: String(entrada.observacao ?? ""),
+        observacao: ctx.teste ? `[TESTE do painel] ${observacao}`.trim() : observacao,
       }));
+      if (ctx.teste) return `Agendado: ${entrada.tipo} em ${data} às ${hora}. Endereço: ${empresa.endereco}, ${empresa.cidade}/${empresa.uf}. Confirme para o cliente.`;
       const avancar = ORDEM_ETAPAS.indexOf(lead.etapa) < ORDEM_ETAPAS.indexOf("visita");
       await db
         .from("leads")

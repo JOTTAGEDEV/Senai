@@ -1,5 +1,5 @@
 // "Testar IA" do painel: conversa com a IA de verdade usando o estoque da loja,
-// sem mandar nada pelo WhatsApp e sem gravar agendamentos (modo teste).
+// sem mandar nada pelo WhatsApp. Agendamentos só são gravados se o painel pedir (marcados como [TESTE]).
 import Anthropic from "npm:@anthropic-ai/sdk@1.6.0";
 import { ErroDeepSeek } from "../_shared/deepseek.ts";
 import { ErroGemini } from "../_shared/gemini.ts";
@@ -18,6 +18,8 @@ interface Pedido {
   status?: boolean;
   /** Chaves coladas no painel (opcional). Usadas só nesta resposta; nada é guardado. */
   chaves?: { anthropic?: string; gemini?: string; deepseek?: string };
+  /** Gravar na Agenda os agendamentos feitos no teste (marcados como [TESTE]) */
+  gravarAgenda?: boolean;
 }
 
 Deno.serve(async (req) => {
@@ -33,7 +35,7 @@ Deno.serve(async (req) => {
   if (!membro) return json({ erro: "Usuário sem loja" }, 403);
   if (membro.papel !== "dono") return json({ erro: "Só o dono da loja pode usar o Testar IA." }, 403);
 
-  const { conversa = [], provedor: pedido, status, chaves: brutas } = (await req.json().catch(() => ({}))) as Pedido;
+  const { conversa = [], provedor: pedido, status, chaves: brutas, gravarAgenda } = (await req.json().catch(() => ({}))) as Pedido;
   if (status) return json({ disponiveis: provedoresDisponiveis(), padrao: escolherProvedor() });
 
   const limpa = (c?: string) => (typeof c === "string" && c.trim().length > 10 && c.trim().length < 300 ? c.trim() : undefined);
@@ -107,7 +109,7 @@ Deno.serve(async (req) => {
   const fotos: string[] = [];
   try {
     const { texto, uso } = await responderCliente(
-      { db, empresa, lead, whatsapp: { empresa_id: empresa.id, phone_number_id: "", access_token: "" }, veiculos, teste: true, fotosTeste: fotos, provedor, chaves },
+      { db, empresa, lead, whatsapp: { empresa_id: empresa.id, phone_number_id: "", access_token: "" }, veiculos, teste: true, fotosTeste: fotos, gravarAgendaTeste: gravarAgenda === true, provedor, chaves },
       historico,
     );
     await registrarUso(db, empresa.id, "teste", uso);

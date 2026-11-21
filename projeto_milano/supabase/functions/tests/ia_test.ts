@@ -368,6 +368,30 @@ Deno.test("DeepSeek: chama ferramenta, devolve o raciocínio e responde (modo te
   }
 });
 
+Deno.test("Testar IA com 'Gravar na Agenda': grava o agendamento marcado como [TESTE], sem mexer em lead nem WhatsApp", async () => {
+  const fetchOriginal = globalThis.fetch;
+  globalThis.fetch = fetchComRoteiro([
+    { stop_reason: "tool_use", content: [{ type: "tool_use", id: "t1", name: "agendar_visita", input: { data: "2026-11-25", hora: "10:30", tipo: "test-drive", veiculo_id: "v-taos", nome_cliente: "Ana", observacao: "" } }] },
+    { stop_reason: "end_turn", content: [{ type: "text", text: "Marcado, Ana!" }] },
+  ]);
+  try {
+    const dados: Record<string, Linha[]> = { leads: [], mensagens: [], agendamentos: [], vendedores: [{ id: "vend1", nome: "Carlos", ativo: true, empresa_id: "emp1" }], veiculos: [] };
+    const r = await responderCliente(
+      { db: bancoFalso(dados), empresa, lead: leadTeste, whatsapp: { empresa_id: "emp1", phone_number_id: "", access_token: "" }, veiculos: [taos], teste: true, gravarAgendaTeste: true, provedor: "anthropic", agora: new Date("2026-11-24T12:00:00Z") },
+      msgCliente,
+    );
+    assertEquals(r.texto, "Marcado, Ana!");
+    assertEquals(dados.agendamentos.length, 1);
+    assertEquals(dados.agendamentos[0].lead_id, null);
+    assertEquals(dados.agendamentos[0].cliente_nome, "Ana");
+    assertEquals(dados.agendamentos[0].vendedor_id, "vend1");
+    assertStringIncludes(String(dados.agendamentos[0].observacao), "[TESTE");
+    assertEquals(dados.mensagens.length, 0);
+  } finally {
+    globalThis.fetch = fetchOriginal;
+  }
+});
+
 Deno.test("webhook: ignora reações e mensagens de sistema", () => {
   const payload = {
     entry: [{ changes: [{ value: {
