@@ -1,0 +1,170 @@
+[
+ {
+  "n": 1,
+  "texto": "Vende carro? Então me responde: quantos clientes te chamaram ontem à noite, e ficaram sem resposta?",
+  "inicio": 0.35,
+  "dur": 6.28,
+  "frases": [
+   [
+    0.0,
+    0.75
+   ],
+   [
+    0.97,
+    1.05
+   ],
+   [
+    1.23,
+    4.71
+   ],
+   [
+    4.93,
+    6.22
+   ]
+  ]
+ },
+ {
+  "n": 2,
+  "texto": "Dez da noite. O cliente pergunta do carro, e ninguém responde. De manhã, ele já comprou no concorrente.",
+  "inicio": 7.18,
+  "dur": 6.21,
+  "frases": [
+   [
+    0.0,
+    0.8
+   ],
+   [
+    1.0,
+    3.67
+   ],
+   [
+    3.9,
+    6.15
+   ]
+  ]
+ },
+ {
+  "n": 3,
+  "texto": "Por isso a JL Devs criou uma inteligência artificial que atende o WhatsApp da sua loja.",
+  "inicio": 14.29,
+  "dur": 5.65,
+  "frases": [
+   [
+    0.01,
+    5.59
+   ]
+  ]
+ },
+ {
+  "n": 4,
+  "texto": "Ela conhece o seu estoque de verdade: responde preço, quilometragem, manda as fotos.",
+  "inicio": 20.44,
+  "dur": 6.17,
+  "frases": [
+   [
+    0.01,
+    3.42
+   ],
+   [
+    3.66,
+    6.13
+   ]
+  ]
+ },
+ {
+  "n": 5,
+  "texto": "E já marca a visita e o test-drive direto na agenda.",
+  "inicio": 26.86,
+  "dur": 3.59,
+  "frases": [
+   [
+    0.01,
+    1.29
+   ],
+   [
+    1.52,
+    3.54
+   ]
+  ]
+ },
+ {
+  "n": 6,
+  "texto": "Pediu desconto? Ela chama o vendedor na hora certa. E nunca inventa preço.",
+  "inicio": 31.0,
+  "dur": 5.19,
+  "frases": [
+   [
+    0.01,
+    0.89
+   ],
+   [
+    1.12,
+    3.08
+   ],
+   [
+    3.29,
+    3.39
+   ],
+   [
+    3.57,
+    5.16
+   ]
+  ]
+ },
+ {
+  "n": 7,
+  "texto": "No painel, cada cliente chega organizado: quente, morno ou frio, com o resumo da conversa.",
+  "inicio": 36.79,
+  "dur": 7.49,
+  "frases": [
+   [
+    0.01,
+    0.66
+   ],
+   [
+    0.85,
+    2.67
+   ],
+   [
+    2.89,
+    3.4
+   ],
+   [
+    3.64,
+    7.44
+   ]
+  ]
+ },
+ {
+  "n": 8,
+  "texto": "Sua loja vendendo vinte e quatro horas. Inclusive quando está fechada.",
+  "inicio": 44.93,
+  "dur": 4.48,
+  "frases": [
+   [
+    0.0,
+    1.39
+   ],
+   [
+    1.59,
+    2.75
+   ],
+   [
+    2.97,
+    4.42
+   ]
+  ]
+ },
+ {
+  "n": 9,
+  "texto": "Tem uma loja de carros? Chama a JL Devs no direct!",
+  "inicio": 50.01,
+  "dur": 4.71,
+  "frases": [
+   [
+    0.01,
+    4.7
+   ]
+  ]
+ }
+]

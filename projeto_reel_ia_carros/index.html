@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Reel IA para lojas de carros</title>
+<meta name="viewport" content="width=1080">
+<style>
+:root{
+  --verde:#8BF23C; --verde2:#3FD15F; --verde-esc:#1E7A3A;
+  --fundo:#050807; --vidro:rgba(255,255,255,.07); --borda:rgba(255,255,255,.18);
+  --texto:#F3F7F2; --suave:rgba(243,247,242,.68); --quente:#FF8A3D; --morno:#F5C542; --frio:#5CC8FF; --perigo:#FF5A5F;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;overflow:hidden;background:var(--fundo)}
+body{font-family:Inter,system-ui,sans-serif;color:var(--texto);-webkit-font-smoothing:antialiased}
+#palco{position:relative;width:1080px;height:1920px;overflow:hidden;
+  background:radial-gradient(1200px 900px at 50% 38%,#0d1d13 0%,#050807 70%)}
+
+/* fundo: orbes de vidro verdes e grade sutil */
+.orbe{position:absolute;border-radius:50%;filter:blur(60px);opacity:.32;
+  background:radial-gradient(circle at 32% 28%,rgba(220,255,190,.9),rgba(139,242,60,.55) 35%,rgba(30,122,58,.25) 70%,transparent 72%)}
+.grade{position:absolute;inset:0;opacity:.08;
+  background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);
+  background-size:90px 90px;mask-image:radial-gradient(circle at 50% 45%,#000 30%,transparent 75%)}
+.vinheta{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 55%,rgba(0,0,0,.65) 100%);pointer-events:none}
+
+/* marca pequena no topo */
+#marca{position:absolute;top:150px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;
+  padding:12px 24px 12px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--borda);backdrop-filter:blur(14px)}
+#marca img{height:44px}
+#marca span{font-weight:700;font-size:28px;letter-spacing:.5px}
+
+.cena{position:absolute;inset:0;opacity:0;will-change:opacity,transform}
+
+/* textos */
+.titulo{position:absolute;left:0;right:0;text-align:center;font-weight:900;letter-spacing:-2px;line-height:1.02}
+.metal{background:linear-gradient(180deg,#ffffff 0%,#e9f5e4 45%,#9fb79b 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.destaque{background:linear-gradient(180deg,#d9ff9e 0%,#8BF23C 55%,#3FD15F 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{position:absolute;left:80px;right:80px;text-align:center;font-weight:600;font-size:52px;line-height:1.2;color:var(--suave)}
+
+/* vidro */
+.vidro{background:linear-gradient(160deg,rgba(255,255,255,.13),rgba(255,255,255,.04));border:1.5px solid var(--borda);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 30px 80px rgba(0,0,0,.45);backdrop-filter:blur(22px) saturate(140%)}
+
+/* notificações */
+.notif{position:absolute;left:110px;right:110px;height:150px;border-radius:36px;display:flex;align-items:center;gap:26px;padding:0 34px}
+.notif .ic{width:78px;height:78px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(160deg,#36d36a,#1a8f43);flex:none}
+.notif b{font-size:30px;display:block}
+.notif p{font-size:30px;color:var(--suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.notif .hora{margin-left:auto;font-size:26px;color:var(--suave);align-self:flex-start;margin-top:30px}
+.tag{display:inline-flex;align-items:center;gap:10px;padding:10px 22px;border-radius:999px;font-weight:800;font-size:28px}
+.tag.ruim{background:rgba(255,90,95,.18);color:#ff8d90;border:1.5px solid rgba(255,90,95,.45)}
+.tag.boa{background:rgba(139,242,60,.16);color:#c6ff8f;border:1.5px solid rgba(139,242,60,.45)}
+
+/* celular */
+.cel{position:absolute;left:50%;top:330px;width:700px;height:1210px;margin-left:-350px;border-radius:72px;padding:18px;
+  background:linear-gradient(160deg,#2a3a30,#0c130f);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 0 2px rgba(255,255,255,.12)}
+.tela{position:relative;width:100%;height:100%;border-radius:56px;overflow:hidden;background:#07100b}
+.status{height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 46px;font-weight:700;font-size:28px}
+.topo{height:118px;display:flex;align-items:center;gap:22px;padding:0 30px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.av{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:30px;flex:none}
+.topo b{font-size:32px;display:block}
+.topo small{font-size:24px;color:var(--suave)}
+.chat{position:absolute;top:188px;left:0;right:0;bottom:0;padding:30px 28px;display:flex;flex-direction:column;justify-content:flex-end;gap:22px;overflow:hidden;
+  background-image:radial-gradient(rgba(139,242,60,.06) 2px,transparent 2px);background-size:46px 46px}
+.bolha{max-width:84%;padding:22px 28px 16px;border-radius:34px;font-size:31px;line-height:1.32;position:relative}
+.bolha .h{display:block;text-align:right;font-size:21px;color:rgba(255,255,255,.55);margin-top:6px}
+.cli{align-self:flex-start;background:#1c2822;border-top-left-radius:10px}
+.loja{align-self:flex-end;background:linear-gradient(160deg,#1f6b3a,#165a2f);border-top-right-radius:10px}
+.loja .ia{display:inline-flex;align-items:center;gap:8px;font-size:21px;font-weight:800;color:#c6ff8f;margin-bottom:6px}
+.digitando{align-self:flex-end;background:#165a2f;border-radius:34px;padding:22px 30px;display:flex;gap:10px}
+.digitando i{width:14px;height:14px;border-radius:50%;background:#c6ff8f;display:block;animation:pulo 1s infinite}
+.digitando i:nth-child(2){animation-delay:.15s}.digitando i:nth-child(3){animation-delay:.3s}
+.fotos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:6px}
+.fotos div{height:150px;border-radius:18px;overflow:hidden}
+
+/* cartões soltos */
+.cartao{position:absolute;border-radius:40px;padding:34px 40px}
+.selo{position:absolute;left:50%;transform:translateX(-50%) rotate(-8deg);border:6px solid var(--perigo);color:var(--perigo);
+  font-weight:900;font-size:64px;padding:12px 34px;border-radius:24px;letter-spacing:2px;background:rgba(255,90,95,.08)}
+
+/* painel de leads */
+.painel{position:absolute;left:70px;right:70px;top:360px;border-radius:48px;padding:40px}
+.painel h3{font-size:40px;font-weight:800;margin-bottom:26px;display:flex;align-items:center;gap:16px}
+.linha{display:flex;align-items:center;gap:24px;padding:24px 26px;border-radius:28px;background:rgba(255,255,255,.05);margin-bottom:18px}
+.linha b{font-size:32px;display:block}
+.linha small{font-size:26px;color:var(--suave)}
+.chip{margin-left:auto;display:inline-flex;align-items:center;gap:10px;padding:12px 24px;border-radius:999px;font-weight:800;font-size:28px}
+.chip.q{background:rgba(255,138,61,.18);color:#ffb27f;border:1.5px solid rgba(255,138,61,.5)}
+.chip.m{background:rgba(245,197,66,.16);color:#ffdc7a;border:1.5px solid rgba(245,197,66,.5)}
+.chip.f{background:rgba(92,200,255,.16);color:#9fe0ff;border:1.5px solid rgba(92,200,255,.5)}
+
+/* logo grande */
+.logo{position:absolute;left:50%;width:720px;height:448px;margin-left:-360px}
+.logo img{position:absolute}
+
+/* botão CTA */
+.cta{position:absolute;left:110px;right:110px;height:150px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:20px;
+  font-size:46px;font-weight:900;color:#06200f;background:linear-gradient(180deg,#d9ff9e,#8BF23C 55%,#3FD15F);
+  box-shadow:0 0 0 2px rgba(255,255,255,.35) inset,0 20px 70px rgba(139,242,60,.45)}
+
+/* ---------- animações (posicionadas no tempo por --d) ---------- */
+.a{animation-duration:.6s;animation-delay:var(--d,0s);animation-fill-mode:both;animation-timing-function:cubic-bezier(.2,.9,.25,1.15)}
+.pop{animation-name:pop}.sobe{animation-name:sobe}.esq{animation-name:esq}.dir{animation-name:dir}
+.carimbo{animation-name:carimbo;animation-duration:.45s}.aparece{animation-name:aparece;animation-timing-function:ease-out}
+.cai{animation-name:cai;animation-duration:.95s;animation-timing-function:linear}
+.brilha{animation:brilho 2.4s var(--d,0s) infinite ease-in-out both}
+@keyframes pop{0%{opacity:0;transform:scale(.55)}100%{opacity:1;transform:scale(1)}}
+@keyframes sobe{0%{opacity:0;transform:translateY(60px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes esq{0%{opacity:0;transform:translateX(-80px) scale(.92)}100%{opacity:1;transform:none}}
+@keyframes dir{0%{opacity:0;transform:translateX(80px) scale(.92)}100%{opacity:1;transform:none}}
+@keyframes aparece{0%{opacity:0}100%{opacity:1}}
+@keyframes carimbo{0%{opacity:0;transform:translateX(-50%) rotate(-8deg) scale(2.4)}100%{opacity:1;transform:translateX(-50%) rotate(-8deg) scale(1)}}
+@keyframes cai{0%{opacity:0;transform:translateY(-700px)}40%{opacity:1}50%{transform:translateY(0)}65%{transform:translateY(-60px)}80%{transform:translateY(0)}90%{transform:translateY(-14px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes pulo{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-10px);opacity:1}}
+@keyframes brilho{0%,100%{box-shadow:0 0 0 2px rgba(255,255,255,.35) inset,0 20px 60px rgba(139,242,60,.35)}50%{box-shadow:0 0 0 2px rgba(255,255,255,.5) inset,0 20px 110px rgba(139,242,60,.75)}}
+</style>
+</head>
+<body>
+<div id="palco">
+  <div class="grade"></div>
+  <div id="orbes"></div>
+
+  <!-- marca pequena (some nas cenas do logo grande) -->
+  <div id="marca"><img src="assets/jl-logo.png" alt=""><span>JL Devs</span></div>
+
+  <!-- 1 · gancho -->
+  <section class="cena" data-ini="0" data-fim="6.95">
+    <div class="titulo a pop" style="--d:.35s;top:330px;font-size:150px"><span class="metal">Vende </span><span class="destaque">carro?</span></div>
+    <div class="sub a sobe" style="--d:1.6s;top:540px">Quantos clientes te chamaram</div>
+    <div class="sub a sobe" style="--d:2.1s;top:606px;color:#fff;font-weight:800">ontem à noite…</div>
+    <div class="notif vidro a esq" style="--d:2.5s;top:790px"><div class="ic">%%CHAT%%</div><div><b>Cliente</b><p>Oi, o SUV ainda está disponível?</p></div><span class="hora">22:07</span></div>
+    <div class="notif vidro a esq" style="--d:2.85s;top:965px"><div class="ic">%%CHAT%%</div><div><b>Cliente</b><p>Aceita meu carro na troca?</p></div><span class="hora">22:31</span></div>
+    <div class="notif vidro a esq" style="--d:3.2s;top:1140px"><div class="ic">%%CHAT%%</div><div><b>Cliente</b><p>Qual o valor à vista?</p></div><span class="hora">23:12</span></div>
+    <div class="sub a pop" style="--d:4.95s;top:1360px;color:#ff8d90;font-weight:800;font-size:58px">…e ficaram sem resposta?</div>
+  </section>
+
+  <!-- 2 · problema -->
+  <section class="cena" data-ini="6.95" data-fim="14.1">
+    <div class="cel a sobe" style="--d:7.0s"><div class="tela">
+      <div class="status"><span id="relogio">22:07</span><span>%%SINAL%%</span></div>
+      <div class="topo"><div class="av" style="background:#33453b">C</div><div><b>Cliente</b><small>visto por último às 22:07</small></div></div>
+      <div class="chat">
+        <div class="bolha cli a esq" style="--d:7.5s">Oi! O SUV do anúncio ainda está disponível?<span class="h">22:07 ✓</span></div>
+        <div class="tag ruim a pop" style="--d:9.0s;align-self:center;margin-top:20px">%%RELOGIO%% Sem resposta…</div>
+        <div class="bolha cli a esq" style="--d:11.65s;margin-top:60px">Deixa, já fechei em outra loja.<span class="h">08:40</span></div>
+      </div>
+    </div></div>
+    <div class="cartao vidro a pop" id="manha" style="--d:10.25s;top:190px;left:50%;margin-left:-330px;width:660px;padding:26px 40px;text-align:center;font-size:40px;font-weight:800">%%SOL%% Na manhã seguinte</div>
+    <div class="selo a carimbo" style="--d:12.4s;top:1590px">VENDA PERDIDA</div>
+  </section>
+
+  <!-- 3 · solução -->
+  <section class="cena" data-ini="14.1" data-fim="20.3">
+    <div class="logo" style="top:420px">
+      <img class="a cai" style="--d:14.3s" data-parte="j" src="assets/jl-j.png" alt="">
+      <img class="a cai" style="--d:14.5s" data-parte="l" src="assets/jl-l.png" alt="">
+      <img class="a cai" style="--d:14.85s" data-parte="dot" src="assets/jl-dot.png" alt="">
+    </div>
+    <div class="titulo a sobe" style="--d:15.5s;top:960px;font-size:84px;letter-spacing:-1px"><span class="metal">Uma </span><span class="destaque">IA</span><span class="metal"> que atende</span></div>
+    <div class="titulo a sobe" style="--d:15.85s;top:1055px;font-size:84px;letter-spacing:-1px"><span class="metal">o WhatsApp da sua loja</span></div>
+    <div class="a pop" style="--d:17.1s;position:absolute;top:1230px;left:0;right:0;text-align:center"><span class="tag boa">%%RAIO%% Responde em segundos</span></div>
+    <div class="a pop" style="--d:17.55s;position:absolute;top:1320px;left:0;right:0;text-align:center"><span class="tag boa">%%CARRO%% Usa o seu estoque real</span></div>
+    <div class="a pop" style="--d:18.0s;position:absolute;top:1410px;left:0;right:0;text-align:center"><span class="tag boa">%%LUA%% Funciona 24 horas</span></div>
+  </section>
+
+  <!-- 4 · demonstração (estoque, fotos, agenda) -->
+  <section class="cena" data-ini="20.3" data-fim="30.75">
+    <div class="cel a sobe" style="--d:20.3s;top:290px;height:1110px"><div class="tela">
+      <div class="status"><span>22:41</span><span>%%SINAL%%</span></div>
+      <div class="topo"><div class="av" style="background:linear-gradient(160deg,#8BF23C,#3FD15F);color:#06200f">%%ROBO%%</div><div><b>Sua loja</b><small style="color:#c6ff8f">IA atendendo agora</small></div></div>
+      <div class="chat">
+        <div class="bolha cli a esq" style="--d:20.6s">Boa noite! Tem SUV automático até 100 mil?<span class="h">22:41</span></div>
+        <div class="digitando a aparece" id="dig1" style="--d:21.2s;animation-duration:.2s"><i></i><i></i><i></i></div>
+        <div class="bolha loja a dir" id="r1" style="--d:22.05s"><span class="ia">%%ROBO_P%% IA</span><br>Temos sim! SUV 2019, automático, <b>68 mil km</b>, por <b>R$ 94.900</b>. Quer ver as fotos?<span class="h">22:41 ✓✓</span></div>
+        <div class="bolha loja a dir" style="--d:24.05s;padding:14px 14px 10px"><div class="fotos"><div>%%CARRO_FOTO_A%%</div><div>%%CARRO_FOTO_B%%</div><div>%%CARRO_FOTO_C%%</div></div><span class="h">22:41 ✓✓</span></div>
+        <div class="bolha cli a esq" style="--d:25.35s">Show! Dá pra ir sábado às 10h?<span class="h">22:42</span></div>
+        <div class="bolha loja a dir" style="--d:26.9s"><span class="ia">%%ROBO_P%% IA</span><br>Fechado! Test-drive agendado: <b>sábado, 10h</b>. Te espero!<span class="h">22:42 ✓✓</span></div>
+      </div>
+    </div></div>
+    <div class="cartao vidro a pop" style="--d:28.35s;top:1425px;left:150px;right:150px;display:flex;align-items:center;gap:28px">
+      <div style="width:96px;height:96px;border-radius:26px;background:linear-gradient(160deg,#8BF23C,#3FD15F);display:grid;place-items:center;flex:none">%%AGENDA%%</div>
+      <div><div style="font-size:26px;color:var(--suave);font-weight:700">AGENDA</div><div style="font-size:38px;font-weight:900">Sábado · 10:00</div><div style="font-size:28px;color:var(--suave)">Test-drive · SUV 2019</div></div>
+      <div style="margin-left:auto">%%CHECK%%</div>
+    </div>
+  </section>
+
+  <!-- 5 · desconto → vendedor -->
+  <section class="cena" data-ini="30.75" data-fim="36.6">
+    <div class="cel a sobe" style="--d:30.75s;top:420px;height:900px"><div class="tela">
+      <div class="status"><span>22:44</span><span>%%SINAL%%</span></div>
+      <div class="topo"><div class="av" style="background:linear-gradient(160deg,#8BF23C,#3FD15F);color:#06200f">%%ROBO%%</div><div><b>Sua loja</b><small style="color:#c6ff8f">IA atendendo agora</small></div></div>
+      <div class="chat">
+        <div class="bolha cli a esq" style="--d:31.0s">Faz um desconto à vista?<span class="h">22:44</span></div>
+        <div class="bolha loja a dir" style="--d:32.05s"><span class="ia">%%ROBO_P%% IA</span><br>Vou chamar um vendedor pra conversar com você agora mesmo!<span class="h">22:44 ✓✓</span></div>
+      </div>
+    </div></div>
+    <div class="notif vidro a sobe" style="--d:32.7s;top:250px;left:90px;right:90px"><div class="ic" style="background:linear-gradient(160deg,#FF8A3D,#e0602a)">%%SINO%%</div><div><b>Vendedor chamado</b><p>Cliente quer desconto à vista</p></div><span class="hora">agora</span></div>
+    <div class="a pop" style="--d:34.5s;position:absolute;top:1390px;left:0;right:0;text-align:center"><span class="tag boa" style="font-size:40px;padding:18px 36px">%%ESCUDO%% Nunca inventa preço</span></div>
+  </section>
+
+  <!-- 6 · painel de leads -->
+  <section class="cena" data-ini="36.6" data-fim="44.7">
+    <div class="painel vidro a sobe" style="--d:36.7s">
+      <h3>%%PESSOAS%% Leads de hoje</h3>
+      <div class="linha a esq" style="--d:37.75s"><div class="av" style="background:#4a3a2a">R</div><div><b>Rafael S.</b><small>SUV 2019 · test-drive sábado</small></div><span class="chip q a pop" style="--d:39.65s">%%FOGO%% Quente</span></div>
+      <div class="linha a esq" style="--d:38.05s"><div class="av" style="background:#3a3f2a">A</div><div><b>Ana P.</b><small>Sedã automático · financiamento</small></div><span class="chip m a pop" style="--d:40.4s">%%SOL_P%% Morno</span></div>
+      <div class="linha a esq" style="--d:38.35s"><div class="av" style="background:#2a3a45">M</div><div><b>Marcos L.</b><small>Só pesquisando preços</small></div><span class="chip f a pop" style="--d:40.95s">%%FLOCO%% Frio</span></div>
+    </div>
+    <div class="cartao vidro a sobe" style="--d:41.9s;top:1150px;left:70px;right:70px">
+      <div style="display:flex;align-items:center;gap:14px;font-size:28px;font-weight:800;color:#c6ff8f;margin-bottom:14px">%%ESTRELA%% RESUMO DA IA</div>
+      <div style="font-size:34px;line-height:1.35">Quer SUV automático até R$ 100 mil, paga à vista e tem carro na troca. Test-drive sábado, 10h.</div>
+      <div style="margin-top:22px;display:flex;gap:14px;flex-wrap:wrap"><span class="tag boa" style="font-size:24px">À vista</span><span class="tag boa" style="font-size:24px">Tem carro na troca</span><span class="tag boa" style="font-size:24px">Quer test-drive</span></div>
+    </div>
+  </section>
+
+  <!-- 7 · 24 horas -->
+  <section class="cena" data-ini="44.7" data-fim="49.8">
+    <div class="titulo a pop" style="--d:44.85s;top:380px;font-size:300px;letter-spacing:-12px"><span class="destaque" id="contador">24h</span></div>
+    <div class="sub a sobe" style="--d:45.4s;top:720px;color:#fff;font-weight:800;font-size:60px">Sua loja vendendo o dia todo</div>
+    <div class="cartao vidro a pop" style="--d:47.75s;top:880px;left:200px;right:200px;text-align:center">
+      <div style="display:flex;justify-content:center">%%LOJA%%</div>
+      <div style="display:inline-block;margin-top:10px;padding:10px 30px;border-radius:14px;background:rgba(255,90,95,.18);border:2px solid rgba(255,90,95,.55);color:#ff9ea1;font-weight:900;font-size:40px;letter-spacing:3px">FECHADO</div>
+    </div>
+    <div class="a dir" style="--d:48.25s;position:absolute;top:1340px;left:0;right:0;text-align:center"><span class="tag boa" style="font-size:36px;padding:16px 32px">%%RAIO%% Respondido em 3 segundos</span></div>
+  </section>
+
+  <!-- 8 · chamada final -->
+  <section class="cena" data-ini="49.8" data-fim="99">
+    <div class="titulo a sobe" style="--d:50.05s;top:300px;font-size:92px;letter-spacing:-2px"><span class="metal">Tem uma loja</span></div>
+    <div class="titulo a sobe" style="--d:50.3s;top:400px;font-size:92px;letter-spacing:-2px"><span class="metal">de </span><span class="destaque">carros?</span></div>
+    <div class="logo" style="top:590px">
+      <img class="a cai" style="--d:50.55s" data-parte="j" src="assets/jl-j.png" alt="">
+      <img class="a cai" style="--d:50.75s" data-parte="l" src="assets/jl-l.png" alt="">
+      <img class="a cai" style="--d:51.1s" data-parte="dot" src="assets/jl-dot.png" alt="">
+    </div>
+    <div class="cta a pop brilha" style="--d:52.0s;top:1120px">%%DIRECT%% Chama no direct</div>
+    <div class="titulo a sobe" style="--d:52.6s;top:1310px;font-size:56px;font-weight:800;letter-spacing:0"><span class="destaque">@jl.devs</span></div>
+    <div class="sub a aparece" style="--d:53.4s;top:1400px;font-size:36px">Atendimento com IA · Leads · Agenda</div>
+  </section>
+
+  <div class="vinheta"></div>
+</div>
+
+<script>
+// ---------- ícones (SVG simples, sem emoji) ----------
+const ic = (d, s = 44, c = '#fff', w = 3) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="${w * 24 / s * 1.4}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const carro = (cor1, cor2, ceu) => `<svg viewBox="0 0 200 150" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+  <defs><linearGradient id="g${cor1.slice(1)}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${cor1}"/><stop offset="1" stop-color="${cor2}"/></linearGradient></defs>
+  <rect width="200" height="150" fill="${ceu}"/><rect y="108" width="200" height="42" fill="#1b211d"/>
+  <path d="M22 100 L34 74 Q40 62 56 60 L92 56 Q104 55 114 62 L138 78 L170 84 Q182 87 182 98 L182 106 L22 106 Z" fill="url(#g${cor1.slice(1)})"/>
+  <path d="M62 64 L90 61 Q100 61 108 67 L122 78 L56 79 Z" fill="#cfe6f5" opacity=".75"/>
+  <circle cx="58" cy="106" r="15" fill="#101412"/><circle cx="58" cy="106" r="6" fill="#9aa39d"/>
+  <circle cx="148" cy="106" r="15" fill="#101412"/><circle cx="148" cy="106" r="6" fill="#9aa39d"/></svg>`;
+const ICONES = {
+  CHAT: ic('<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>', 44),
+  SINAL: ic('<path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/>', 30, '#fff', 3),
+  RELOGIO: ic('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', 30, '#ff8d90'),
+  SOL: ic('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>', 44, '#ffd36b'),
+  SOL_P: ic('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>', 28, '#ffdc7a'),
+  RAIO: ic('<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>', 30, '#c6ff8f'),
+  CARRO: ic('<path d="M5 17h14M3 13l2-5a2 2 0 0 1 2-1h10a2 2 0 0 1 2 1l2 5v4H3z"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/>', 30, '#c6ff8f'),
+  LUA: ic('<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>', 30, '#c6ff8f'),
+  ROBO: ic('<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M9 17h6"/>', 40, '#06200f'),
+  ROBO_P: ic('<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01"/>', 22, '#c6ff8f'),
+  AGENDA: ic('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M9 15l2 2 4-4"/>', 52, '#06200f'),
+  CHECK: ic('<circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/>', 64, '#8BF23C'),
+  SINO: ic('<path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21a2 2 0 0 0 4 0"/>', 44),
+  ESCUDO: ic('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>', 40, '#c6ff8f'),
+  PESSOAS: ic('<circle cx="9" cy="8" r="4"/><path d="M2 21v-1a7 7 0 0 1 14 0v1M16 3.5a4 4 0 0 1 0 8M22 21v-1a7 7 0 0 0-4-6.3"/>', 44, '#c6ff8f'),
+  FOGO: ic('<path d="M12 22c4 0 7-3 7-7 0-5-5-7-5-12-3 2-4 5-4 7-1-1-2-2-2-4-2 2-3 5-3 9 0 4 3 7 7 7z"/>', 28, '#ffb27f'),
+  FLOCO: ic('<path d="M12 2v20M4 6l16 12M20 6 4 18"/>', 28, '#9fe0ff'),
+  ESTRELA: ic('<path d="m12 3 2.7 5.5 6 .9-4.4 4.2 1 6L12 16.8 6.7 19.6l1-6L3.3 9.4l6-.9z"/>', 32, '#c6ff8f'),
+  LOJA: ic('<path d="M3 9l1.5-5h15L21 9M4 9v11h16V9M3 9h18M9 20v-6h6v6"/>', 150, '#e9f5e4', 4),
+  DIRECT: ic('<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>', 52, '#06200f'),
+  CARRO_FOTO_A: carro('#e9edf0', '#9aa3ab', '#2a3f52'),
+  CARRO_FOTO_B: carro('#3d6fd8', '#1d3c86', '#3b2f4a'),
+  CARRO_FOTO_C: carro('#d84a3d', '#7f2219', '#24413a'),
+};
+document.body.innerHTML = document.body.innerHTML.replace(/%%([A-Z_]+)%%/g, (_, k) => ICONES[k] ?? '');
+
+// ---------- logo em partes (posições do recorte original) ----------
+const PARTES = { j: { x: 0, y: 0, w: 486, h: 637 }, l: { x: 511, y: 0, w: 403, h: 633 }, dot: { x: 926, y: 527, w: 97, h: 102 }, full: { w: 1023, h: 637 } };
+const ESC = 720 / PARTES.full.w;
+document.querySelectorAll('.logo img').forEach((img) => {
+  const p = PARTES[img.dataset.parte];
+  Object.assign(img.style, { left: p.x * ESC + 'px', top: p.y * ESC + 'px', width: p.w * ESC + 'px', height: p.h * ESC + 'px' });
+});
+
+// ---------- orbes do fundo (movimento determinístico) ----------
+const ORBES = [[180, 260, 300, .9], [880, 520, 220, 1.3], [140, 1350, 260, 1.1], [930, 1500, 340, .7], [560, 980, 160, 1.6]];
+const caixa = document.getElementById('orbes');
+const orbes = ORBES.map(([x, y, r]) => {
+  const o = document.createElement('div'); o.className = 'orbe';
+  Object.assign(o.style, { width: r * 2 + 'px', height: r * 2 + 'px', left: x - r + 'px', top: y - r + 'px' });
+  caixa.appendChild(o); return o;
+});
+
+// ---------- linha do tempo ----------
+const cenas = [...document.querySelectorAll('.cena')].map((el) => ({ el, a: +el.dataset.ini, b: +el.dataset.fim }));
+const marca = document.getElementById('marca');
+const relogio = document.getElementById('relogio');
+const contador = document.getElementById('contador');
+const dig1 = document.getElementById('dig1');
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const suave = (x) => x * x * (3 - 2 * x);
+
+const bolhas = [...document.querySelectorAll('.chat > *')].map((el) => ({ el, d: parseFloat(el.style.getPropertyValue('--d')) || 0 }));
+
+function seek(t) {
+  // mensagens que ainda não chegaram não ocupam espaço (a conversa "rola" como num celular de verdade)
+  for (const b of bolhas) if (b.el !== dig1) b.el.style.display = t < b.d ? 'none' : '';
+  dig1.style.display = t >= 21.2 && t < 22.05 ? 'flex' : 'none';
+  void document.body.offsetHeight;
+  document.getAnimations().forEach((an) => { an.pause(); an.currentTime = t * 1000; });
+  for (const c of cenas) {
+    const entra = suave(clamp((t - c.a) / .4)), sai = suave(clamp((c.b - t) / .35));
+    const v = Math.min(entra, sai);
+    c.el.style.opacity = v;
+    c.el.style.visibility = v <= 0.001 ? 'hidden' : 'visible';
+    c.el.style.transform = `scale(${1.04 - .04 * entra}) translateY(${(1 - sai) * -40}px)`;
+  }
+  // marca pequena escondida quando o logo grande aparece
+  const noLogo = (t > 10.0 && t < 20.4) || t > 49.6;
+  marca.style.opacity = noLogo ? 0 : clamp((t - .2) / .5);
+  orbes.forEach((o, i) => {
+    const [, , , vel] = ORBES[i];
+    o.style.transform = `translate(${Math.sin(t * .35 * vel + i) * 40}px, ${Math.cos(t * .28 * vel + i * 2) * 50}px) scale(${1 + .06 * Math.sin(t * .5 + i)})`;
+  });
+  // relógio da cena 2: 22:07 → avança a noite → 08:40
+  if (t < 10.3) relogio.textContent = '22:07';
+  else if (t < 11.4) {
+    const min = Math.round((22 * 60 + 7) + suave(clamp((t - 10.3) / 1.1)) * (10 * 60 + 33));
+    relogio.textContent = `${String(Math.floor(min / 60) % 24).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;
+  } else relogio.textContent = '08:40';
+  // contador 0 → 24h
+  contador.textContent = Math.round(suave(clamp((t - 44.9) / 1.2)) * 24) + 'h';
+}
+
+window.DURATION = 57.5;
+window.seek = seek;
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map((i) => i.complete ? 0 : new Promise((r) => { i.onload = i.onerror = r; })));
+  seek(0);
+})();
+if (!location.search.includes('render')) {
+  const inicio = +(new URLSearchParams(location.search).get('t') || 0);
+  window.ready.then(() => {
+    const t0 = performance.now();
+    (function loop() { seek((inicio + (performance.now() - t0) / 1000) % window.DURATION); requestAnimationFrame(loop); })();
+  });
+}
+</script>
+</body>
+</html>
