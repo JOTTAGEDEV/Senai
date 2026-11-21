@@ -411,6 +411,32 @@ Deno.test("webhook: lê falhas de entrega (status failed) e ignora os outros sta
   assertEquals(lerWebhook(payload).length, 0);
 });
 
+Deno.test("IA: se a Meta recusar o envio, a resposta fica no painel com o motivo e a IA continua", async () => {
+  const fetchOriginal = globalThis.fetch;
+  globalThis.fetch = (async (entrada: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(entrada instanceof Request ? entrada.url : entrada);
+    if (url.includes("graph.facebook.com")) {
+      return new Response(JSON.stringify({ error: { code: 131030, message: "(#131030) Recipient phone number not in allowed list" } }), { status: 400 });
+    }
+    const corpo = JSON.parse(String(init?.body ?? "{}"));
+    return new Response(JSON.stringify({ id: "m", type: "message", role: "assistant", model: corpo.model, stop_sequence: null, stop_reason: "end_turn", usage: { input_tokens: 10, output_tokens: 5 }, content: [{ type: "text", text: "Oi! Temos picapes sim." }] }), { headers: { "content-type": "application/json" } });
+  }) as typeof fetch;
+  try {
+    const lead = { ...leadTeste, id: "lead7", telefone: "56984370073" };
+    const dados: Record<string, Linha[]> = { leads: [lead as unknown as Linha], mensagens: [], agendamentos: [], vendedores: [], veiculos: [] };
+    const r = await responderCliente(
+      { db: bancoFalso(dados), empresa, lead, whatsapp: { empresa_id: "emp1", phone_number_id: "1", access_token: "t" }, veiculos: [], provedor: "anthropic" },
+      msgCliente,
+    );
+    assertEquals(r.texto, "Oi! Temos picapes sim.");
+    assertEquals(dados.mensagens.map((m) => m.autor), ["ia", "sistema"]);
+    assertStringIncludes(String(dados.mensagens[1].texto), "lista de permissão");
+    assertEquals(dados.leads[0].atendente, "ia");
+  } finally {
+    globalThis.fetch = fetchOriginal;
+  }
+});
+
 Deno.test("webhook: ignora reações e mensagens de sistema", () => {
   const payload = {
     entry: [{ changes: [{ value: {

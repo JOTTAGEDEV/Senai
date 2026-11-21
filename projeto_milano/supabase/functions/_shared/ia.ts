@@ -4,7 +4,7 @@ import { horariosLivres, momentoLocal, paraISO } from "./horario.ts";
 import { ok } from "./supabase.ts";
 import type { Agendamento, CredenciaisWhatsApp, Empresa, Lead, Mensagem, Veiculo, Vendedor } from "./tipos.ts";
 import { ORDEM_ETAPAS } from "./tipos.ts";
-import { enviarImagem, enviarTexto } from "./whatsapp.ts";
+import { enviarImagem, enviarTexto, ErroWhatsApp, explicarErroWhatsApp } from "./whatsapp.ts";
 import { type ConteudoGemini, esquemaParaGemini, GEMINI_MODELO, gerarGemini, textoGemini } from "./gemini.ts";
 import { DEEPSEEK_MODELO, gerarDeepSeek, type MensagemOA, usoDeepSeek } from "./deepseek.ts";
 
@@ -614,7 +614,17 @@ export async function responderCliente(ctx: Contexto, historico: Mensagem[]): Pr
   if (!texto) return { texto: null, uso: r.uso, provedor };
   if (ctx.teste) return { texto, uso: r.uso, provedor };
 
-  const waId = await enviarTexto(ctx.whatsapp.phone_number_id, ctx.whatsapp.access_token, ctx.lead.telefone, texto);
+  // Se a Meta recusar o envio, a resposta fica registrada no painel com o motivo
+  // (e a conversa continua com a IA: o problema é de configuração, não do cliente).
+  let waId: string | null = null;
+  let falhaEnvio: string | null = null;
+  try {
+    waId = await enviarTexto(ctx.whatsapp.phone_number_id, ctx.whatsapp.access_token, ctx.lead.telefone, texto);
+  } catch (e) {
+    if (!(e instanceof ErroWhatsApp)) throw e;
+    console.error("WhatsApp recusou a resposta da IA", ctx.lead.id, e.codigo, e.mensagemMeta);
+    falhaEnvio = explicarErroWhatsApp(e.codigo, e.mensagemMeta);
+  }
   ok(await ctx.db.from("mensagens").insert({
     empresa_id: ctx.empresa.id,
     lead_id: ctx.lead.id,
@@ -623,6 +633,9 @@ export async function responderCliente(ctx: Contexto, historico: Mensagem[]): Pr
     texto,
     wa_message_id: waId,
   }));
+  if (falhaEnvio) {
+    await ctx.db.from("mensagens").insert({ empresa_id: ctx.empresa.id, lead_id: ctx.lead.id, autor: "sistema", texto: falhaEnvio });
+  }
   await ctx.db
     .from("leads")
     .update({

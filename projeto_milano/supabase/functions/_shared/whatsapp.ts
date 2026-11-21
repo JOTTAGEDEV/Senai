@@ -7,6 +7,31 @@ export class ErroWhatsApp extends Error {
   constructor(public status: number, public detalhe: unknown) {
     super(`WhatsApp respondeu ${status}: ${JSON.stringify(detalhe)}`);
   }
+  get codigo(): number | null {
+    return (this.detalhe as { error?: { code?: number } })?.error?.code ?? null;
+  }
+  get mensagemMeta(): string {
+    const e = (this.detalhe as { error?: { message?: string; error_data?: { details?: string } } })?.error;
+    return e?.error_data?.details ?? e?.message ?? "";
+  }
+}
+
+/** Explica em português, para o painel, por que a Meta não entregou uma mensagem. */
+export function explicarErroWhatsApp(codigo: number | null, mensagem = ""): string {
+  switch (codigo) {
+    case 131030:
+      return "A Meta não entregou: o número do cliente não está na lista de permissão do número de teste (Meta → WhatsApp → Etapa 1 → Para).";
+    case 130497:
+      return "A Meta não entregou: este número da loja não pode enviar para clientes deste país (número de fora do Brasil enviando para o Brasil). Use um número de WhatsApp brasileiro.";
+    case 131047:
+      return "A Meta não entregou: já passaram 24h desde a última mensagem do cliente. Fora dessa janela, só com mensagem modelo (template) aprovada.";
+    case 190:
+      return "O token do WhatsApp expirou ou é inválido. Gere um novo token permanente e atualize no sistema.";
+    case 131026:
+      return "A Meta não entregou: o número do cliente não pode receber a mensagem (sem WhatsApp, versão antiga ou bloqueou a loja).";
+    default:
+      return `A Meta não entregou a mensagem${codigo ? ` (erro ${codigo})` : ""}${mensagem ? `: ${mensagem}` : "."}`;
+  }
 }
 
 async function enviar(phoneNumberId: string, token: string, corpo: Record<string, unknown>): Promise<string | null> {

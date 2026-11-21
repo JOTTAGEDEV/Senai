@@ -2,7 +2,7 @@
 // Chamado pelo navegador com o login do usuário (Authorization: Bearer <jwt>).
 import { admin, comoUsuario, CORS, json, ok } from "../_shared/supabase.ts";
 import type { CredenciaisWhatsApp, Lead } from "../_shared/tipos.ts";
-import { enviarTexto, ErroWhatsApp } from "../_shared/whatsapp.ts";
+import { enviarTexto, ErroWhatsApp, explicarErroWhatsApp } from "../_shared/whatsapp.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
@@ -43,12 +43,7 @@ Deno.serve(async (req) => {
     return json({ ok: true });
   } catch (e) {
     if (e instanceof ErroWhatsApp) {
-      // 131047: passou de 24h desde a última mensagem do cliente → só com template aprovado
-      const codigo = (e.detalhe as { error?: { code?: number } })?.error?.code;
-      const erro = codigo === 131047
-        ? "Já passaram 24h desde a última mensagem do cliente. A Meta só permite mensagem modelo (template) aprovada."
-        : "O WhatsApp recusou a mensagem.";
-      return json({ erro, detalhe: e.detalhe }, 502);
+      return json({ erro: explicarErroWhatsApp(e.codigo, e.mensagemMeta), codigo: e.codigo }, 502);
     }
     console.error(e);
     return json({ erro: "Falha ao enviar" }, 500);

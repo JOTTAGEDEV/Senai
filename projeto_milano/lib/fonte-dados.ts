@@ -229,7 +229,12 @@ function criarFonteSupabase(): FonteDados {
     },
     async enviarMensagem(leadId, texto) {
       const { error } = await sb.functions.invoke("enviar-mensagem", { body: { leadId, texto } });
-      if (error) throw error;
+      if (error) {
+        // Mostra o motivo que o servidor explicou (em vez de "non-2xx status code")
+        const contexto = (error as { context?: Response }).context;
+        const corpo = contexto && typeof contexto.json === "function" ? await contexto.json().catch(() => null) : null;
+        throw new Error(corpo?.erro ?? error.message);
+      }
     },
     async restaurarExemplos() {
       throw new Error("No modo Supabase os dados de exemplo não são usados.");

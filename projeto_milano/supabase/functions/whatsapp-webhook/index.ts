@@ -9,7 +9,7 @@ import { iaDeveAtender } from "../_shared/horario.ts";
 import { registrarUso, responderCliente } from "../_shared/ia.ts";
 import { admin, ok } from "../_shared/supabase.ts";
 import type { CredenciaisWhatsApp, Empresa, Lead, Mensagem, Veiculo } from "../_shared/tipos.ts";
-import { assinaturaValida, type FalhaEntrega, lerFalhas, lerWebhook, type MensagemRecebida } from "../_shared/whatsapp.ts";
+import { assinaturaValida, explicarErroWhatsApp, type FalhaEntrega, lerFalhas, lerWebhook, type MensagemRecebida } from "../_shared/whatsapp.ts";
 
 declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void } | undefined;
 
@@ -120,7 +120,7 @@ async function registrarFalha(f: FalhaEntrega) {
     empresa_id: enviada.empresa_id,
     lead_id: enviada.lead_id,
     autor: "sistema",
-    texto: `O WhatsApp não entregou a última mensagem${f.codigo ? ` (erro ${f.codigo})` : ""}: ${f.erro}`,
+    texto: explicarErroWhatsApp(f.codigo, f.erro),
   });
 }
 
