@@ -3,7 +3,8 @@
 // GET  → verificação do webhook pela Meta (hub.challenge)
 // POST → mensagens novas: salva no banco, atualiza o lead e agenda a resposta da IA
 //
-// Secrets necessários: WHATSAPP_VERIFY_TOKEN, WHATSAPP_APP_SECRET, ANTHROPIC_API_KEY
+// Secrets necessários: WHATSAPP_VERIFY_TOKEN, WHATSAPP_APP_SECRET e a chave de uma IA
+// (DEEPSEEK_API_KEY, GEMINI_API_KEY ou ANTHROPIC_API_KEY; IA_PROVEDOR escolhe se houver mais de uma)
 import { iaDeveAtender } from "../_shared/horario.ts";
 import { registrarUso, responderCliente } from "../_shared/ia.ts";
 import { admin, ok } from "../_shared/supabase.ts";
