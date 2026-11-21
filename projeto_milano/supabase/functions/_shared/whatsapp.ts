@@ -68,6 +68,40 @@ interface ValorWebhook {
     interactive?: { button_reply?: { title?: string }; list_reply?: { title?: string } };
     location?: { latitude?: number; longitude?: number; name?: string };
   }[];
+  statuses?: {
+    id: string;
+    status: string;
+    recipient_id?: string;
+    errors?: { code?: number; title?: string; message?: string; error_data?: { details?: string } }[];
+  }[];
+}
+
+export interface FalhaEntrega {
+  waId: string; // id da mensagem que não foi entregue
+  para: string;
+  codigo: number | null;
+  erro: string;
+}
+
+/** Mensagens que a loja enviou e a Meta não conseguiu entregar (status "failed"). */
+export function lerFalhas(payload: unknown): FalhaEntrega[] {
+  const saida: FalhaEntrega[] = [];
+  const entradas = (payload as { entry?: { changes?: { value?: ValorWebhook }[] }[] })?.entry ?? [];
+  for (const entrada of entradas) {
+    for (const mudanca of entrada.changes ?? []) {
+      for (const s of mudanca.value?.statuses ?? []) {
+        if (s.status !== "failed") continue;
+        const e = s.errors?.[0];
+        saida.push({
+          waId: s.id,
+          para: (s.recipient_id ?? "").replace(/\D/g, ""),
+          codigo: e?.code ?? null,
+          erro: [e?.title, e?.error_data?.details ?? e?.message].filter(Boolean).join(" — ") || "erro desconhecido",
+        });
+      }
+    }
+  }
+  return saida;
 }
 
 const IGNORAR = new Set(["reaction", "unsupported", "system", "ephemeral", "request_welcome"]);

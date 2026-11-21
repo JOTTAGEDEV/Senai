@@ -9,7 +9,7 @@ import { iaDeveAtender } from "../_shared/horario.ts";
 import { registrarUso, responderCliente } from "../_shared/ia.ts";
 import { admin, ok } from "../_shared/supabase.ts";
 import type { CredenciaisWhatsApp, Empresa, Lead, Mensagem, Veiculo } from "../_shared/tipos.ts";
-import { assinaturaValida, lerWebhook, type MensagemRecebida } from "../_shared/whatsapp.ts";
+import { assinaturaValida, type FalhaEntrega, lerFalhas, lerWebhook, type MensagemRecebida } from "../_shared/whatsapp.ts";
 
 declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void } | undefined;
 
@@ -38,6 +38,12 @@ Deno.serve(async (req) => {
     payload = JSON.parse(corpo);
   } catch {
     return new Response("JSON inválido", { status: 400 });
+  }
+
+  // Mensagens nossas que a Meta não conseguiu entregar: registra para aparecer no painel
+  for (const falha of lerFalhas(payload)) {
+    console.error("Falha de entrega no WhatsApp", JSON.stringify(falha));
+    await registrarFalha(falha).catch((e) => console.error("Erro ao registrar falha", e));
   }
 
   const recebidas = lerWebhook(payload);
@@ -104,6 +110,18 @@ async function salvarMensagem(m: MensagemRecebida): Promise<{ leadId: string; me
   ok(await db.rpc("registrar_mensagem_cliente", { p_lead: lead!.id, p_quando: m.quando, p_nome: m.nome ?? "" }));
 
   return { leadId: lead!.id, mensagemId: inserida.data.id as string };
+}
+
+async function registrarFalha(f: FalhaEntrega) {
+  const db = admin();
+  const enviada = (await db.from("mensagens").select("lead_id,empresa_id").eq("wa_message_id", f.waId).maybeSingle()).data;
+  if (!enviada) return;
+  await db.from("mensagens").insert({
+    empresa_id: enviada.empresa_id,
+    lead_id: enviada.lead_id,
+    autor: "sistema",
+    texto: `O WhatsApp não entregou a última mensagem${f.codigo ? ` (erro ${f.codigo})` : ""}: ${f.erro}`,
+  });
 }
 
 async function responderDepois(leadId: string, mensagemId: string) {

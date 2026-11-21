@@ -392,6 +392,25 @@ Deno.test("Testar IA com 'Gravar na Agenda': grava o agendamento marcado como [T
   }
 });
 
+Deno.test("webhook: lê falhas de entrega (status failed) e ignora os outros status", async () => {
+  const { lerFalhas } = await import("../_shared/whatsapp.ts");
+  const payload = {
+    entry: [{ changes: [{ value: {
+      metadata: { phone_number_id: "123" },
+      statuses: [
+        { id: "wamid.ok", status: "delivered", recipient_id: "554899990001" },
+        { id: "wamid.x", status: "failed", recipient_id: "554899990001", errors: [{ code: 131030, title: "Recipient phone number not in allowed list" }] },
+      ],
+    } }] }],
+  };
+  const falhas = lerFalhas(payload);
+  assertEquals(falhas.length, 1);
+  assertEquals(falhas[0].waId, "wamid.x");
+  assertEquals(falhas[0].codigo, 131030);
+  assertStringIncludes(falhas[0].erro, "allowed list");
+  assertEquals(lerWebhook(payload).length, 0);
+});
+
 Deno.test("webhook: ignora reações e mensagens de sistema", () => {
   const payload = {
     entry: [{ changes: [{ value: {
