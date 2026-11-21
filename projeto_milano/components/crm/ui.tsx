@@ -1,4 +1,4 @@
-import { Bot, UserRound } from "lucide-react";
+import { Bot, CloudSun, Flame, Snowflake, UserRound } from "lucide-react";
 import { ROTULO_ETAPA, TEMPERATURAS, iniciais } from "@/lib/crm";
 import type { Atendente, Etapa, Temperatura } from "@/lib/types";
 
@@ -8,11 +8,19 @@ const CORES_TEMPERATURA: Record<Temperatura, string> = {
   frio: "bg-sky-500/15 text-sky-300 ring-sky-400/30",
 };
 
+const ICONES_TEMPERATURA = { quente: Flame, morno: CloudSun, frio: Snowflake } satisfies Record<Temperatura, unknown>;
+
+/** Ícone SVG da temperatura do lead (no lugar dos antigos emojis 🔥 🌤 ❄️). */
+export function IconeTemperatura({ t, className = "h-3.5 w-3.5" }: { t: Temperatura; className?: string }) {
+  const Icone = ICONES_TEMPERATURA[t];
+  return <Icone aria-hidden className={`shrink-0 ${className}`} />;
+}
+
 export function TemperaturaBadge({ t }: { t: Temperatura }) {
   const info = TEMPERATURAS[t];
   return (
     <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${CORES_TEMPERATURA[t]}`}>
-      <span aria-hidden>{info.emoji}</span>
+      <IconeTemperatura t={t} className="h-3 w-3" />
       {info.rotulo}
     </span>
   );

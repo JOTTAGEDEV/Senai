@@ -55,11 +55,12 @@ export default function DashboardPage() {
     for (const l of leads) for (const e of l.etiquetas) contagemEtiquetas.set(e, (contagemEtiquetas.get(e) ?? 0) + 1);
     const assuntos = [...contagemEtiquetas.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([rotulo, valor]) => ({ rotulo, valor }));
 
-    const alertas: { texto: string; href: string; tipo: "lead" | "carro" }[] = [];
+    const alertas: { texto: string; href: string; tipo: "lead" | "carro"; quente?: { nome: string; resto: string } }[] = [];
     for (const l of quentes) {
       const ultima = ultimaPorLead.get(l.id);
       if (ultima?.autor === "cliente" && Date.now() - new Date(ultima.criadaEm).getTime() > 2 * HORA) {
-        alertas.push({ texto: `${l.nome} (🔥 quente) está sem resposta há ${tempoRelativo(ultima.criadaEm)}`, href: `/conversas?lead=${l.id}`, tipo: "lead" });
+        const resto = `está sem resposta há ${tempoRelativo(ultima.criadaEm)}`;
+        alertas.push({ texto: `${l.nome} (quente) ${resto}`, href: `/conversas?lead=${l.id}`, tipo: "lead", quente: { nome: l.nome, resto } });
       } else if (!l.vendedorId) {
         alertas.push({ texto: `${l.nome} está quente e ainda não tem vendedor`, href: `/conversas?lead=${l.id}`, tipo: "lead" });
       }
@@ -128,7 +129,13 @@ export default function DashboardPage() {
               <li key={a.texto}>
                 <Link href={a.href} className="flex items-center gap-2 text-sm text-amber-100/90 hover:text-white hover:underline">
                   {a.tipo === "lead" ? <UserRound className="h-3.5 w-3.5 shrink-0" /> : <Car className="h-3.5 w-3.5 shrink-0" />}
-                  {a.texto}
+                  {a.quente ? (
+                    <span>
+                      {a.quente.nome} (<Flame aria-hidden className="inline h-3.5 w-3.5 align-[-2px]" /> quente) {a.quente.resto}
+                    </span>
+                  ) : (
+                    a.texto
+                  )}
                 </Link>
               </li>
             ))}
