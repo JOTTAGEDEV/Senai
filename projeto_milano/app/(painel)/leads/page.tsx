@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { MessageCircle, Search, X } from "lucide-react";
+import { Car, MessageCircle, Search, X } from "lucide-react";
 import { PainelLead } from "@/components/crm/PainelLead";
-import { AtendenteBadge, Avatar, Carregando, EtapaBadge, TemperaturaBadge } from "@/components/crm/ui";
+import { AtendenteBadge, Avatar, Carregando, EtapaBadge, IconeTemperatura, TemperaturaBadge } from "@/components/crm/ui";
 import { ETAPAS, ETIQUETAS, TEMPERATURAS, formatarTelefone, tempoRelativo } from "@/lib/crm";
 import { useDados } from "@/lib/dados";
 import type { Etapa, Temperatura } from "@/lib/types";
@@ -70,8 +70,8 @@ export default function LeadsPage() {
             aria-pressed={temperatura === t}
             className={`cartao p-4 text-left transition hover:bg-white/10 ${temperatura === t ? "ring-2 ring-white/50" : ""}`}
           >
-            <p className="text-xs font-medium text-white/50">
-              {TEMPERATURAS[t].emoji} {TEMPERATURAS[t].rotulo}s
+            <p className="flex items-center gap-1 text-xs font-medium text-white/50">
+              <IconeTemperatura t={t} /> {TEMPERATURAS[t].rotulo}s
             </p>
             <p className="mt-1 text-2xl font-semibold text-white">{contagem[t]}</p>
             <p className="text-[11px] text-white/35">em aberto</p>
@@ -127,7 +127,7 @@ export default function LeadsPage() {
               <div className="min-w-0 flex-1">
                 <p className="line-clamp-2 text-sm text-white/70">{l.resumo || <span className="text-white/35">Sem resumo ainda</span>}</p>
                 <div className="mt-1 flex flex-wrap gap-1">
-                  {nomeVeiculo(l.veiculoId) && <span className="rounded bg-white/10 px-1.5 py-0.5 text-[11px] text-white/80">🚗 {nomeVeiculo(l.veiculoId)}</span>}
+                  {nomeVeiculo(l.veiculoId) && <span className="inline-flex items-center gap-1 rounded bg-white/10 px-1.5 py-0.5 text-[11px] text-white/80"><Car aria-hidden className="h-3 w-3 shrink-0" /> {nomeVeiculo(l.veiculoId)}</span>}
                   {l.etiquetas.map((e) => (
                     <span key={e} className="rounded bg-rose-500/15 px-1.5 py-0.5 text-[11px] text-rose-200">{e}</span>
                   ))}

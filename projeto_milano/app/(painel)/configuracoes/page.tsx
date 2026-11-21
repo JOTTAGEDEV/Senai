@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bot, CheckCircle2, CircleDashed, MapPin, Plus, RotateCcw, Save, Store, Trash2, Users, Wifi } from "lucide-react";
+import { Bot, CheckCircle2, CircleDashed, MapPin, Plus, RotateCcw, Save, Store, Trash2, UserRound, Users, Wifi } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Carregando } from "@/components/crm/ui";
 import { DIAS_SEMANA, iaDeveAtender } from "@/lib/crm";
@@ -190,8 +190,17 @@ function ConfiguracaoIA({ config }: { config: ConfigLoja }) {
               </button>
             ))}
           </div>
-          <p className={`mt-2 text-sm ${atendendoAgora ? "text-white" : "text-white/50"}`}>
-            Agora: {atendendoAgora ? "🤖 a IA está atendendo" : "👤 os vendedores estão atendendo"}
+          <p className={`mt-2 flex items-center gap-1.5 text-sm ${atendendoAgora ? "text-white" : "text-white/50"}`}>
+            Agora:{" "}
+            {atendendoAgora ? (
+              <>
+                <Bot aria-hidden className="h-4 w-4 shrink-0" /> a IA está atendendo
+              </>
+            ) : (
+              <>
+                <UserRound aria-hidden className="h-4 w-4 shrink-0" /> os vendedores estão atendendo
+              </>
+            )}
           </p>
         </div>
 

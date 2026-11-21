@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Bot, Info, MessageCirclePlus, Search, Send, UserRound, X } from "lucide-react";
+import { ArrowLeft, Bot, Flame, Info, MessageCirclePlus, Search, Send, UserRound, X } from "lucide-react";
 import { PainelLead } from "@/components/crm/PainelLead";
 import { AtendenteBadge, Avatar, Carregando, TemperaturaBadge } from "@/components/crm/ui";
 import { formatarTelefone, iaDeveAtender, tempoRelativo } from "@/lib/crm";
@@ -15,7 +15,7 @@ type Filtro = "todas" | "nao-lidas" | "ia" | "humano" | "quentes";
 const FILTROS: { valor: Filtro; rotulo: string }[] = [
   { valor: "todas", rotulo: "Todas" },
   { valor: "nao-lidas", rotulo: "Não lidas" },
-  { valor: "quentes", rotulo: "🔥 Quentes" },
+  { valor: "quentes", rotulo: "Quentes" },
   { valor: "ia", rotulo: "IA" },
   { valor: "humano", rotulo: "Vendedor" },
 ];
@@ -111,10 +111,11 @@ function Conversas() {
               <button
                 key={f.valor}
                 onClick={() => setFiltro(f.valor)}
-                className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${
+                className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${
                   filtro === f.valor ? "border border-white/25 bg-white/20 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]" : "border border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
                 }`}
               >
+                {f.valor === "quentes" && <Flame aria-hidden className="h-3 w-3 shrink-0" />}
                 {f.rotulo}
               </button>
             ))}

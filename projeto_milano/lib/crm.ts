@@ -9,10 +9,10 @@ import type {
 } from "./types";
 import { LOJA } from "./loja";
 
-export const TEMPERATURAS: Record<Temperatura, { rotulo: string; emoji: string; classe: string }> = {
-  quente: { rotulo: "Quente", emoji: "🔥", classe: "bg-rose-500/15 text-rose-300 ring-rose-400/30" },
-  morno: { rotulo: "Morno", emoji: "🌤", classe: "bg-amber-500/15 text-amber-300 ring-amber-400/30" },
-  frio: { rotulo: "Frio", emoji: "❄️", classe: "bg-sky-500/15 text-sky-300 ring-sky-400/30" },
+export const TEMPERATURAS: Record<Temperatura, { rotulo: string; classe: string }> = {
+  quente: { rotulo: "Quente", classe: "bg-rose-500/15 text-rose-300 ring-rose-400/30" },
+  morno: { rotulo: "Morno", classe: "bg-amber-500/15 text-amber-300 ring-amber-400/30" },
+  frio: { rotulo: "Frio", classe: "bg-sky-500/15 text-sky-300 ring-sky-400/30" },
 };
 
 export const IMPORTANCIAS: Record<Importancia, string> = {

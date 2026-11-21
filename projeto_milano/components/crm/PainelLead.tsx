@@ -7,7 +7,7 @@ import { ETAPAS, ETIQUETAS, IMPORTANCIAS, TEMPERATURAS, formatarTelefone, tempoR
 import { useDados } from "@/lib/dados";
 import { formatarPreco } from "@/lib/format";
 import type { DadosLead, Etapa, Importancia, Lead, Temperatura } from "@/lib/types";
-import { Chip } from "./ui";
+import { Chip, IconeTemperatura } from "./ui";
 
 const CAMPOS_DADOS: { chave: keyof DadosLead; rotulo: string }[] = [
   { chave: "orcamento", rotulo: "Orçamento" },
@@ -58,11 +58,11 @@ export function PainelLead({ lead, mostrarLinkConversa = false }: { lead: Lead; 
               type="button"
               onClick={() => salvar({ temperatura: t })}
               aria-pressed={lead.temperatura === t}
-              className={`rounded-lg border px-2 py-1.5 text-xs font-medium transition ${
+              className={`inline-flex items-center justify-center gap-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition ${
                 lead.temperatura === t ? "border-white/30 bg-white/20 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]" : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
               }`}
             >
-              {TEMPERATURAS[t].emoji} {TEMPERATURAS[t].rotulo}
+              <IconeTemperatura t={t} /> {TEMPERATURAS[t].rotulo}
             </button>
           ))}
         </div>

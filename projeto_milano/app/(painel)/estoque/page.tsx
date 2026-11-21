@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { AlertTriangle, Car, Loader2, Plus, RotateCcw, Search, Star, Users } from "lucide-react";
+import { AlertTriangle, Car, Flame, Loader2, Plus, RotateCcw, Search, Star, Users } from "lucide-react";
 import { FotoCapa } from "@/components/estoque/FotoCapa";
 import { MenuAcoes } from "@/components/estoque/MenuAcoes";
 import { StatusBadge } from "@/components/estoque/StatusBadge";
@@ -307,7 +307,7 @@ function Interessados({ n }: { n: number }) {
   return (
     <span className={`inline-flex items-center gap-1 ${quente ? "font-medium text-rose-300" : "text-white/60"}`}>
       <Users className="h-3.5 w-3.5" />
-      {n} {quente && "🔥"}
+      {n} {quente && <Flame aria-hidden className="h-3.5 w-3.5" />}
     </span>
   );
 }
