@@ -3,6 +3,7 @@
 //
 // Roda a cada 5 minutos pelo pg_cron (ver BACKEND.md). Protegida pelo cabeçalho x-cron-secret.
 import type Anthropic from "npm:@anthropic-ai/sdk@1.6.0";
+import { DEEPSEEK_MODELO, gerarDeepSeek, usoDeepSeek } from "../_shared/deepseek.ts";
 import { esquemaParaGemini, GEMINI_MODELO, gerarGemini, textoGemini } from "../_shared/gemini.ts";
 import { anthropic, escolherProvedor, MODELO, registrarUso, type Uso } from "../_shared/ia.ts";
 import { admin, json, ok } from "../_shared/supabase.ts";
@@ -111,7 +112,21 @@ async function analisar(db: ReturnType<typeof admin>, lead: Lead) {
 
   let json: string | null = null;
   let uso: Uso;
-  if (escolherProvedor() === "gemini") {
+  const provedor = escolherProvedor();
+  if (provedor === "deepseek") {
+    // Modo JSON da API compatível com a OpenAI: o formato vai descrito no próprio pedido
+    const resposta = await gerarDeepSeek({
+      messages: [
+        { role: "system", content: `${sistema}\nResponda só com um objeto JSON que siga este JSON Schema:\n${JSON.stringify(ESQUEMA)}` },
+        { role: "user", content: pedido },
+      ],
+      response_format: { type: "json_object" },
+      max_tokens: 3000,
+    });
+    uso = { ...usoDeepSeek(resposta), modelo: DEEPSEEK_MODELO };
+    const escolha = resposta.choices?.[0];
+    if (escolha?.finish_reason === "stop") json = escolha.message?.content?.trim() || null;
+  } else if (provedor === "gemini") {
     const resposta = await gerarGemini({
       systemInstruction: { parts: [{ text: sistema }] },
       contents: [{ role: "user", parts: [{ text: pedido }] }],

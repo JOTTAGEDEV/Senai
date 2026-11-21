@@ -7,7 +7,7 @@ import { responderSimulado } from "@/lib/ia-simulada";
 import { supabase } from "@/lib/supabase";
 import type { Lead } from "@/lib/types";
 
-type Provedor = "anthropic" | "gemini";
+type Provedor = "anthropic" | "gemini" | "deepseek";
 interface Fala {
   autor: "cliente" | "ia" | "erro";
   texto: string;
@@ -15,20 +15,19 @@ interface Fala {
   detalhe?: string;
 }
 
-const NOMES: Record<Provedor, string> = { anthropic: "Claude (Anthropic)", gemini: "Gemini (Google)" };
+const PROVEDORES: Provedor[] = ["anthropic", "gemini", "deepseek"];
+const NOMES: Record<Provedor, string> = { anthropic: "Claude (Anthropic)", gemini: "Gemini (Google)", deepseek: "DeepSeek" };
 const CHAVE_LOCAL = "milano:chaves-teste";
 
-interface Chaves {
-  anthropic: string;
-  gemini: string;
-}
+type Chaves = Record<Provedor, string>;
+const SEM_CHAVES: Chaves = { anthropic: "", gemini: "", deepseek: "" };
 
 function lerChaves(): Chaves {
   try {
     const salvo = JSON.parse(localStorage.getItem(CHAVE_LOCAL) ?? "{}");
-    return { anthropic: salvo.anthropic ?? "", gemini: salvo.gemini ?? "" };
+    return { anthropic: salvo.anthropic ?? "", gemini: salvo.gemini ?? "", deepseek: salvo.deepseek ?? "" };
   } catch {
-    return { anthropic: "", gemini: "" };
+    return { ...SEM_CHAVES };
   }
 }
 const SUGESTOES = ["Oi, tem SUV automático até 150 mil?", "Quanto está o Taos?", "Manda foto da Ranger", "Aceita meu carro na troca?", "Faz um desconto à vista?", "Posso ir amanhã às 10h?"];
@@ -55,7 +54,7 @@ export default function TestarIAPage() {
   const [pensando, setPensando] = useState(false);
   const [disponiveis, setDisponiveis] = useState<Provedor[] | null>(null);
   const [provedor, setProvedor] = useState<Provedor | "">("");
-  const [chaves, setChaves] = useState<Chaves>({ anthropic: "", gemini: "" });
+  const [chaves, setChaves] = useState<Chaves>(SEM_CHAVES);
   const [mostrarChaves, setMostrarChaves] = useState(false);
   const [painelChaves, setPainelChaves] = useState(false);
   const fim = useRef<HTMLDivElement>(null);
@@ -63,7 +62,7 @@ export default function TestarIAPage() {
   useEffect(() => {
     const salvas = lerChaves();
     setChaves(salvas);
-    if (!salvas.anthropic && !salvas.gemini) setPainelChaves(true);
+    if (!PROVEDORES.some((p) => salvas[p])) setPainelChaves(true);
   }, []);
 
   function mudarChave(qual: Provedor, valor: string) {
@@ -110,7 +109,7 @@ export default function TestarIAPage() {
         body: {
           conversa: conversa.map((f) => ({ autor: f.autor, texto: f.texto })),
           provedor: provedor || undefined,
-          chaves: { anthropic: chaves.anthropic || undefined, gemini: chaves.gemini || undefined },
+          chaves: { anthropic: chaves.anthropic || undefined, gemini: chaves.gemini || undefined, deepseek: chaves.deepseek || undefined },
         },
       });
       if (error) {
@@ -125,7 +124,7 @@ export default function TestarIAPage() {
   }
 
   // IAs que dá para usar: as configuradas no servidor + as chaves coladas aqui
-  const opcoes = Array.from(new Set<Provedor>([...(disponiveis ?? []), ...(chaves.anthropic ? ["anthropic" as const] : []), ...(chaves.gemini ? ["gemini" as const] : [])]));
+  const opcoes = PROVEDORES.filter((p) => disponiveis?.includes(p) || chaves[p]);
   const semChave = modo === "supabase" && disponiveis !== null && opcoes.length === 0;
 
   return (
@@ -172,6 +171,7 @@ export default function TestarIAPage() {
             [
               ["anthropic", "Anthropic (Claude)", "sk-ant-...", "console.anthropic.com → API Keys"],
               ["gemini", "Google (Gemini)", "AIza...", "aistudio.google.com → Get API key"],
+              ["deepseek", "DeepSeek", "sk-...", "platform.deepseek.com → API keys"],
             ] as const
           ).map(([qual, rotulo, exemplo, onde]) => (
             <div key={qual}>
@@ -206,7 +206,7 @@ export default function TestarIAPage() {
 
       {semChave && !painelChaves && (
         <div className="rounded-lg border border-amber-400/30 bg-amber-500/15 px-4 py-3 text-sm text-amber-100">
-          Nenhuma chave de IA disponível. Clique em <strong>Chaves</strong> e cole a da Anthropic ou do Google para testar.
+          Nenhuma chave de IA disponível. Clique em <strong>Chaves</strong> e cole a da Anthropic, do Google ou do DeepSeek para testar.
         </div>
       )}
 

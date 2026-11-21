@@ -327,6 +327,47 @@ Deno.test("Gemini: chama ferramenta, devolve thought signature e responde (modo 
   }
 });
 
+Deno.test("DeepSeek: chama ferramenta, devolve o raciocínio e responde (modo teste, chave do painel)", async () => {
+  const lead = { id: "teste", empresa_id: "emp1", nome: "", telefone: "", etapa: "atendimento", atendente: "ia", vendedor_id: null, veiculo_id: null, etiquetas: [], dados: {} } as unknown as Lead;
+  const pedidos: Record<string, unknown>[] = [];
+  const roteiro = [
+    {
+      choices: [{ finish_reason: "tool_calls", message: { role: "assistant", content: null, reasoning_content: "vou buscar", tool_calls: [{ id: "c1", type: "function", function: { name: "buscar_veiculos", arguments: '{"texto":"taos","carroceria":null,"preco_maximo":null,"cambio":null}' } }] } }],
+      usage: { prompt_tokens: 800, completion_tokens: 20, prompt_cache_hit_tokens: 600 },
+    },
+    { choices: [{ finish_reason: "stop", message: { role: "assistant", content: "Temos o Taos 2024 por R$ 154.900!" } }], usage: { prompt_tokens: 900, completion_tokens: 25 } },
+  ];
+  const fetchOriginal = globalThis.fetch;
+  globalThis.fetch = (async (entrada: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(entrada instanceof Request ? entrada.url : entrada);
+    assertEquals(url, "https://api.deepseek.com/chat/completions");
+    assertEquals(new Headers(init?.headers).get("authorization"), "Bearer chave-do-painel");
+    pedidos.push(JSON.parse(String(init?.body)));
+    return new Response(JSON.stringify(roteiro.shift()), { headers: { "content-type": "application/json" } });
+  }) as typeof fetch;
+  try {
+    const dados: Record<string, Linha[]> = { leads: [], mensagens: [], agendamentos: [], vendedores: [], veiculos: [] };
+    const r = await responderCliente(
+      { db: bancoFalso(dados), empresa, lead, whatsapp: { empresa_id: "emp1", phone_number_id: "", access_token: "" }, veiculos: [taos], teste: true, fotosTeste: [], provedor: "deepseek", chaves: { deepseek: "chave-do-painel" } },
+      [{ id: "m1", lead_id: "teste", autor: "cliente", autor_nome: "", texto: "tem taos?", midia_url: null, wa_message_id: null, criada_em: "" }],
+    );
+    assertEquals(r.provedor, "deepseek");
+    assertEquals(r.texto, "Temos o Taos 2024 por R$ 154.900!");
+    assertEquals(r.uso.entrada, 1700);
+    assertEquals(r.uso.cache, 600);
+    assertEquals(pedidos[0].model, "deepseek-flash");
+    const msgs = pedidos[1].messages as Record<string, unknown>[];
+    assertEquals(msgs.map((m) => m.role), ["system", "user", "assistant", "tool"]);
+    assertEquals(msgs[2].reasoning_content, "vou buscar");
+    assertEquals(msgs[3].tool_call_id, "c1");
+    assertStringIncludes(String(msgs[3].content), "154900");
+    assert(!String(msgs[3].content).includes("140000"));
+    assertEquals(dados.mensagens.length, 0);
+  } finally {
+    globalThis.fetch = fetchOriginal;
+  }
+});
+
 Deno.test("webhook: ignora reações e mensagens de sistema", () => {
   const payload = {
     entry: [{ changes: [{ value: {

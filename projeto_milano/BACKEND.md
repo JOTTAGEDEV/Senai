@@ -101,10 +101,14 @@ npx supabase secrets set \
 ```
 
 - `ANTHROPIC_API_KEY`: crie em [console.anthropic.com](https://console.anthropic.com) → API Keys. Coloque um **limite de gasto** lá.
+- **Ou** use outra IA no lugar (basta uma chave; com mais de uma, `IA_PROVEDOR` escolhe `anthropic`, `gemini` ou `deepseek`):
+  - `GEMINI_API_KEY`: [aistudio.google.com/apikey](https://aistudio.google.com/apikey). Ative a cobrança no projeto antes de clientes reais (no plano grátis o Google pode usar as conversas para treinar).
+  - `DEEPSEEK_API_KEY`: [platform.deepseek.com](https://platform.deepseek.com) → API keys (pré-pago). Os dados vão para servidores na China.
+    Serve também para qualquer IA compatível com a OpenAI (Qwen, Kimi, MiniMax, Mistral, Groq, OpenRouter): troque `DEEPSEEK_BASE_URL` e `DEEPSEEK_MODELO`.
 - `WHATSAPP_VERIFY_TOKEN`: você inventa; vai digitar igual na Meta (passo 5).
 - `WHATSAPP_APP_SECRET`: no app da Meta → App settings → Basic → App secret.
 
-Opcionais: `IA_MODELO` (padrão `claude-haiku-5-5`), `IA_ESPERA_MS` (padrão 8000), `ANALISTA_ESPERA_MIN` (padrão 10), `WHATSAPP_GRAPH_VERSION` (padrão `v23.0`).
+Opcionais: `IA_MODELO` (padrão `claude-haiku-5-5`), `GEMINI_MODELO` (padrão `gemini-3-flash-preview`), `GEMINI_RACIOCINIO` (padrão `low`), `DEEPSEEK_MODELO` (padrão `deepseek-flash`), `DEEPSEEK_BASE_URL` (padrão `https://api.deepseek.com`), `IA_ESPERA_MS` (padrão 8000), `ANALISTA_ESPERA_MIN` (padrão 10), `WHATSAPP_GRAPH_VERSION` (padrão `v23.0`).
 
 ## Passo 5 — WhatsApp oficial (Meta)
 

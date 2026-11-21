@@ -6,6 +6,7 @@ import type { Agendamento, CredenciaisWhatsApp, Empresa, Lead, Mensagem, Veiculo
 import { ORDEM_ETAPAS } from "./tipos.ts";
 import { enviarImagem, enviarTexto } from "./whatsapp.ts";
 import { type ConteudoGemini, esquemaParaGemini, GEMINI_MODELO, gerarGemini, textoGemini } from "./gemini.ts";
+import { DEEPSEEK_MODELO, gerarDeepSeek, type MensagemOA, usoDeepSeek } from "./deepseek.ts";
 
 /** Modelo barato e rápido para atendimento. Pode trocar pela variável IA_MODELO. */
 export const MODELO = Deno.env.get("IA_MODELO") ?? "claude-haiku-5-5";
@@ -25,6 +26,7 @@ export function anthropic(chave?: string): Anthropic {
 export interface ChavesIA {
   anthropic?: string;
   gemini?: string;
+  deepseek?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -387,24 +389,23 @@ export interface Uso {
   modelo: string;
 }
 
-export type Provedor = "anthropic" | "gemini";
+export type Provedor = "anthropic" | "gemini" | "deepseek";
+
+const PROVEDORES: Provedor[] = ["anthropic", "gemini", "deepseek"];
+const SECRET: Record<Provedor, string> = { anthropic: "ANTHROPIC_API_KEY", gemini: "GEMINI_API_KEY", deepseek: "DEEPSEEK_API_KEY" };
 
 /** Qual IA usar: pedido explícito (Testar IA) > variável IA_PROVEDOR > a chave que existir. */
 export function escolherProvedor(pedido?: string | null, chaves?: ChavesIA): Provedor | null {
-  const temAnthropic = Boolean(chaves?.anthropic || Deno.env.get("ANTHROPIC_API_KEY"));
-  const temGemini = Boolean(chaves?.gemini || Deno.env.get("GEMINI_API_KEY"));
   const disponivel = (p: string | null | undefined): p is Provedor =>
-    (p === "anthropic" && temAnthropic) || (p === "gemini" && temGemini);
+    PROVEDORES.includes(p as Provedor) && Boolean(chaves?.[p as Provedor] || Deno.env.get(SECRET[p as Provedor]));
   if (disponivel(pedido)) return pedido;
   const padrao = Deno.env.get("IA_PROVEDOR");
   if (disponivel(padrao)) return padrao;
-  if (temAnthropic) return "anthropic";
-  if (temGemini) return "gemini";
-  return null;
+  return PROVEDORES.find((p) => disponivel(p)) ?? null;
 }
 
 export function provedoresDisponiveis(): Provedor[] {
-  return (["anthropic", "gemini"] as Provedor[]).filter((p) => Boolean(Deno.env.get(p === "anthropic" ? "ANTHROPIC_API_KEY" : "GEMINI_API_KEY")));
+  return PROVEDORES.filter((p) => Boolean(Deno.env.get(SECRET[p])));
 }
 
 interface Geracao {
@@ -533,6 +534,58 @@ async function gerarComGemini(ctx: Contexto, historico: Mensagem[]): Promise<Ger
   return { texto: null, uso, esgotou: true };
 }
 
+/* ---------- DeepSeek (ou outra IA compatível com a OpenAI) ---------- */
+
+const FERRAMENTAS_OA = FERRAMENTAS.map((f) => ({
+  type: "function",
+  function: { name: f.name, description: f.description, parameters: f.input_schema },
+}));
+
+async function gerarComDeepSeek(ctx: Contexto, historico: Mensagem[]): Promise<Geracao> {
+  const uso: Uso = { entrada: 0, saida: 0, cache: 0, modelo: DEEPSEEK_MODELO };
+  const sistema = montarSistema(ctx.empresa, resumoEstoque(ctx.veiculos, ctx.empresa.ia.podeInformarPreco)) + `\n\n${lembreteAgora(ctx)}`;
+  const conversa = montarHistorico(historico);
+  if (!conversa.length) return { texto: null, uso };
+  const mensagens: MensagemOA[] = [
+    { role: "system", content: sistema },
+    ...conversa.map((m) => ({ role: m.role as "user" | "assistant", content: typeof m.content === "string" ? m.content : "" })),
+  ];
+
+  for (let rodada = 0; rodada < MAX_RODADAS; rodada++) {
+    const resposta = await gerarDeepSeek({ messages: mensagens, tools: FERRAMENTAS_OA, max_tokens: 4000 }, ctx.chaves?.deepseek);
+    const gasto = usoDeepSeek(resposta);
+    uso.entrada += gasto.entrada;
+    uso.saida += gasto.saida;
+    uso.cache += gasto.cache;
+
+    const escolha = resposta.choices?.[0];
+    if (escolha?.finish_reason === "content_filter") return { texto: null, uso, recusou: true };
+    if (!escolha?.message) return { texto: null, uso, esgotou: true };
+
+    const chamadas = escolha.message.tool_calls ?? [];
+    if (chamadas.length) {
+      // Devolve a mensagem do modelo como veio (inclui o raciocínio, que a API exige nas rodadas seguintes)
+      mensagens.push(escolha.message);
+      for (const c of chamadas) {
+        let entrada: Record<string, unknown> = {};
+        let resultado: string;
+        try {
+          entrada = JSON.parse(c.function.arguments || "{}");
+          resultado = (await rodarFerramenta(ctx, c.function.name, entrada)).resultado;
+        } catch {
+          resultado = "Erro: argumentos inválidos (JSON). Tente de novo.";
+        }
+        mensagens.push({ role: "tool", tool_call_id: c.id, content: resultado });
+      }
+      continue;
+    }
+    const texto = (escolha.message.content ?? "").trim();
+    if (!texto || escolha.finish_reason === "length") return { texto: null, uso, esgotou: true };
+    return { texto, uso };
+  }
+  return { texto: null, uso, esgotou: true };
+}
+
 /* ---------- Resposta ao cliente ---------- */
 
 /**
@@ -541,8 +594,12 @@ async function gerarComGemini(ctx: Contexto, historico: Mensagem[]): Promise<Ger
  */
 export async function responderCliente(ctx: Contexto, historico: Mensagem[]): Promise<{ texto: string | null; uso: Uso; provedor: Provedor | null }> {
   const provedor = escolherProvedor(ctx.provedor, ctx.chaves);
-  if (!provedor) throw new Error("Nenhuma chave de IA configurada (ANTHROPIC_API_KEY ou GEMINI_API_KEY).");
-  const r = provedor === "gemini" ? await gerarComGemini(ctx, historico) : await gerarComAnthropic(ctx, historico);
+  if (!provedor) throw new Error("Nenhuma chave de IA configurada (ANTHROPIC_API_KEY, GEMINI_API_KEY ou DEEPSEEK_API_KEY).");
+  const r = provedor === "gemini"
+    ? await gerarComGemini(ctx, historico)
+    : provedor === "deepseek"
+    ? await gerarComDeepSeek(ctx, historico)
+    : await gerarComAnthropic(ctx, historico);
 
   if (r.recusou || r.esgotou) {
     if (ctx.teste) return { texto: "(A IA não conseguiu responder esta mensagem e passaria para um vendedor.)", uso: r.uso, provedor };

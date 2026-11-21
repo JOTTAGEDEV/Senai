@@ -1,6 +1,7 @@
 // "Testar IA" do painel: conversa com a IA de verdade usando o estoque da loja,
 // sem mandar nada pelo WhatsApp e sem gravar agendamentos (modo teste).
 import Anthropic from "npm:@anthropic-ai/sdk@1.6.0";
+import { ErroDeepSeek } from "../_shared/deepseek.ts";
 import { ErroGemini } from "../_shared/gemini.ts";
 import { escolherProvedor, provedoresDisponiveis, registrarUso, responderCliente } from "../_shared/ia.ts";
 import { admin, comoUsuario, CORS, json, ok } from "../_shared/supabase.ts";
@@ -11,12 +12,12 @@ const LIMITE_POR_HORA = 60;
 
 interface Pedido {
   conversa?: { autor: "cliente" | "ia"; texto: string }[];
-  /** "anthropic" ou "gemini" (opcional) */
+  /** "anthropic", "gemini" ou "deepseek" (opcional) */
   provedor?: string;
   /** Só perguntar quais IAs estão configuradas */
   status?: boolean;
   /** Chaves coladas no painel (opcional). Usadas só nesta resposta; nada é guardado. */
-  chaves?: { anthropic?: string; gemini?: string };
+  chaves?: { anthropic?: string; gemini?: string; deepseek?: string };
 }
 
 Deno.serve(async (req) => {
@@ -36,10 +37,10 @@ Deno.serve(async (req) => {
   if (status) return json({ disponiveis: provedoresDisponiveis(), padrao: escolherProvedor() });
 
   const limpa = (c?: string) => (typeof c === "string" && c.trim().length > 10 && c.trim().length < 300 ? c.trim() : undefined);
-  const chaves = { anthropic: limpa(brutas?.anthropic), gemini: limpa(brutas?.gemini) };
+  const chaves = { anthropic: limpa(brutas?.anthropic), gemini: limpa(brutas?.gemini), deepseek: limpa(brutas?.deepseek) };
   const provedor = escolherProvedor(pedido, chaves);
   if (!provedor) {
-    return json({ erro: "Nenhuma chave de IA configurada. Coloque ANTHROPIC_API_KEY ou GEMINI_API_KEY em Supabase → Edge Functions → Secrets." }, 503);
+    return json({ erro: "Nenhuma chave de IA configurada. Cole uma chave em Chaves ou coloque ANTHROPIC_API_KEY, GEMINI_API_KEY ou DEEPSEEK_API_KEY em Supabase → Edge Functions → Secrets." }, 503);
   }
   // Só mensagens válidas, e no máximo LIMITE_CARACTERES no total (corta as mais antigas)
   const validas = (Array.isArray(conversa) ? conversa : []).filter(
@@ -114,6 +115,10 @@ Deno.serve(async (req) => {
   } catch (e) {
     if (e instanceof ErroGemini) {
       const erro = e.status === 400 || e.status === 403 ? "A chave do Gemini é inválida ou não tem acesso a esse modelo." : e.status === 429 ? "Limite de uso do Gemini atingido. Tente de novo em instantes." : `O Gemini respondeu com erro ${e.status}.`;
+      return json({ erro, detalhe: e.detalhe.slice(0, 300) }, 502);
+    }
+    if (e instanceof ErroDeepSeek) {
+      const erro = e.status === 401 ? "A chave do DeepSeek é inválida." : e.status === 402 ? "A conta do DeepSeek está sem saldo. Coloque créditos em platform.deepseek.com." : e.status === 429 ? "Limite de uso do DeepSeek atingido. Tente de novo em instantes." : `O DeepSeek respondeu com erro ${e.status}.`;
       return json({ erro, detalhe: e.detalhe.slice(0, 300) }, 502);
     }
     if (e instanceof Anthropic.AuthenticationError) return json({ erro: "A chave da Anthropic é inválida. Confira o ANTHROPIC_API_KEY." }, 502);
