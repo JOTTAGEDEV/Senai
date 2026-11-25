@@ -29,6 +29,13 @@ export function explicarErroWhatsApp(codigo: number | null, mensagem = ""): stri
       return "O token do WhatsApp expirou ou é inválido. Gere um novo token permanente e atualize no sistema.";
     case 131026:
       return "A Meta não entregou: o número do cliente não pode receber a mensagem (sem WhatsApp, versão antiga ou bloqueou a loja).";
+    // Códigos nossos para os provedores não oficiais (Evolution API, Z-API)
+    case 9001:
+      return "O WhatsApp da loja está desconectado do servidor. Abra a conexão e leia o QR Code de novo com o celular da loja.";
+    case 9002:
+      return "O servidor do WhatsApp não respondeu (fora do ar ou endereço errado). Confira se ele está ligado.";
+    case 9003:
+      return "Esse número não tem WhatsApp.";
     default:
       return `A Meta não entregou a mensagem${codigo ? ` (erro ${codigo})` : ""}${mensagem ? `: ${mensagem}` : "."}`;
   }

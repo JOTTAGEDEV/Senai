@@ -8,6 +8,14 @@ export interface HorarioDia {
   fecha: string; // "18:00"
 }
 
+export interface ConfigFollowup {
+  ativo: boolean;
+  dias: number; // dias sem resposta do cliente antes de mandar
+  maximo: number; // follow-ups por cliente (zera quando ele responde)
+  abre: string; // janela de envio, ex. "10:00"
+  fecha: string; // ex. "18:00"
+}
+
 export interface ConfigIA {
   modo: ModoIA;
   horarios: HorarioDia[]; // 0 = domingo
@@ -17,7 +25,10 @@ export interface ConfigIA {
   tom: "formal" | "amigavel" | "descontraido";
   instrucoes: string;
   boasVindas: string;
+  followup?: ConfigFollowup;
 }
+
+export const FOLLOWUP_PADRAO: ConfigFollowup = { ativo: false, dias: 3, maximo: 2, abre: "10:00", fecha: "18:00" };
 
 export interface Empresa {
   id: string;
@@ -30,10 +41,23 @@ export interface Empresa {
   ia: ConfigIA;
 }
 
+export type ProvedorWhatsApp = "meta" | "evolution" | "zapi";
+
+/**
+ * Como falar com o WhatsApp da loja.
+ * - meta: phone_number_id + access_token (API oficial)
+ * - evolution: api_url + instancia + access_token (apikey do servidor)
+ * - zapi: instancia (id) + access_token (token da instância) + client_token (token de segurança da conta)
+ */
 export interface CredenciaisWhatsApp {
   empresa_id: string;
-  phone_number_id: string;
+  provedor?: ProvedorWhatsApp; // ausente = meta (registros antigos)
+  phone_number_id: string | null;
   access_token: string;
+  api_url?: string;
+  instancia?: string;
+  client_token?: string;
+  webhook_token?: string;
 }
 
 export interface Foto {
@@ -94,6 +118,8 @@ export interface Lead {
   nao_lidas: number;
   ultima_mensagem_em: string;
   analisado_em: string | null;
+  followups_enviados?: number;
+  ultimo_followup_em?: string | null;
 }
 
 export interface Mensagem {

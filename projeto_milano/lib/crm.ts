@@ -1,4 +1,5 @@
 import type {
+  ConfigFollowup,
   ConfigIA,
   ConfigLoja,
   Etapa,
@@ -60,6 +61,8 @@ function dia(aberto: boolean, abre = "08:30", fecha = "18:00"): HorarioDia {
   return { aberto, abre, fecha };
 }
 
+export const FOLLOWUP_PADRAO: ConfigFollowup = { ativo: false, dias: 3, maximo: 2, abre: "10:00", fecha: "18:00" };
+
 export function configIAPadrao(): ConfigIA {
   return {
     modo: "fora_horario",
@@ -71,6 +74,7 @@ export function configIAPadrao(): ConfigIA {
     instrucoes:
       "Nunca dar desconto: diga que o vendedor pode negociar pessoalmente.\nFinanciamento: coletar entrada desejada e parcela que cabe no bolso; quem simula é o vendedor.\nCarro na troca: pedir modelo, ano, km e fotos; quem avalia é o vendedor.",
     boasVindas: "Olá! Aqui é a assistente virtual da Milano Multimarcas 🚗 Como posso te ajudar?",
+    followup: { ...FOLLOWUP_PADRAO },
   };
 }
 

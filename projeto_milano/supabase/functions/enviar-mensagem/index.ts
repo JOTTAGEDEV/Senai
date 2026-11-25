@@ -1,8 +1,9 @@
-// O vendedor responde pelo painel: a mensagem sai pelo WhatsApp oficial da loja.
+// O vendedor responde pelo painel: a mensagem sai pelo WhatsApp da loja (Meta, Evolution ou Z-API).
 // Chamado pelo navegador com o login do usuário (Authorization: Bearer <jwt>).
 import { admin, comoUsuario, CORS, json, ok } from "../_shared/supabase.ts";
 import type { CredenciaisWhatsApp, Lead } from "../_shared/tipos.ts";
-import { enviarTexto, ErroWhatsApp, explicarErroWhatsApp } from "../_shared/whatsapp.ts";
+import { canal } from "../_shared/canal.ts";
+import { ErroWhatsApp, explicarErroWhatsApp } from "../_shared/whatsapp.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
@@ -29,7 +30,7 @@ Deno.serve(async (req) => {
 
   // 3) Envia e registra
   try {
-    const waId = await enviarTexto(whatsapp.phone_number_id, whatsapp.access_token, lead.telefone, texto.trim());
+    const waId = await canal(whatsapp).enviarTexto(lead.telefone, texto.trim());
     const agora = new Date().toISOString();
     ok(await db.from("mensagens").insert({
       empresa_id: lead.empresa_id,

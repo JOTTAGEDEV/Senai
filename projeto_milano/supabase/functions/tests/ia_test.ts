@@ -499,3 +499,119 @@ Deno.test("Gemini: término diferente de STOP vira 'passar para vendedor' (modo 
     Deno.env.delete("GEMINI_API_KEY");
   }
 });
+
+/* ---------------- WhatsApp por QR Code (Evolution / Z-API) e follow-up ---------------- */
+
+Deno.test("Evolution: lê texto, foto e mensagem do celular da loja; ignora grupo, status e reação", async () => {
+  const { lerWebhookEvolution } = await import("../_shared/provedores.ts");
+  const base = { event: "messages.upsert", instance: "milano" };
+  const texto = lerWebhookEvolution({ ...base, data: { key: { remoteJid: "554899990001@s.whatsapp.net", fromMe: false, id: "A1" }, pushName: "João", message: { conversation: "tem SUV?" }, messageType: "conversation", messageTimestamp: 1763500000 } });
+  assertEquals(texto.instancia, "milano");
+  assertEquals(texto.lidas[0].de, "554899990001");
+  assertEquals(texto.lidas[0].texto, "tem SUV?");
+  assertEquals(texto.lidas[0].nome, "João");
+  assertEquals(texto.lidas[0].quando, new Date(1763500000 * 1000).toISOString());
+  const foto = lerWebhookEvolution({ ...base, data: { key: { remoteJid: "554899990001@s.whatsapp.net", id: "A2" }, message: { imageMessage: { caption: "meu carro" } }, messageType: "imageMessage" } });
+  assertEquals(foto.lidas[0].texto, "[foto] meu carro");
+  const loja = lerWebhookEvolution({ ...base, data: { key: { remoteJid: "554899990001@s.whatsapp.net", fromMe: true, id: "A3" }, message: { extendedTextMessage: { text: "Oi, aqui é o Carlos" } } } });
+  assertEquals(loja.lidas[0].fromMe, true);
+  const lid = lerWebhookEvolution({ ...base, data: { key: { remoteJid: "123456@lid", remoteJidAlt: "554899990002@s.whatsapp.net", id: "A4" }, message: { conversation: "oi" } } });
+  assertEquals(lid.lidas[0].de, "554899990002");
+  for (const data of [
+    { key: { remoteJid: "1203630@g.us", id: "G" }, message: { conversation: "grupo" } },
+    { key: { remoteJid: "status@broadcast", id: "S" }, message: { conversation: "status" } },
+    { key: { remoteJid: "554899990001@s.whatsapp.net", id: "R" }, message: { reactionMessage: { text: "👍" } }, messageType: "reactionMessage" },
+  ]) assertEquals(lerWebhookEvolution({ ...base, data }).lidas.length, 0);
+  assertEquals(lerWebhookEvolution({ event: "connection.update", instance: "milano", data: { state: "open" } }).lidas.length, 0);
+});
+
+Deno.test("Z-API: lê mensagem recebida, marca o que saiu pela API e ignora grupo", async () => {
+  const { lerZapi } = await import("../_shared/provedores.ts");
+  const m = lerZapi({ type: "ReceivedCallback", instanceId: "INST", phone: "554899990001", fromMe: false, messageId: "Z1", senderName: "Ana", momment: 1763500000000, text: { message: "Aceita troca?" } });
+  assertEquals(m?.texto, "Aceita troca?");
+  assertEquals(m?.nome, "Ana");
+  assertEquals(m?.quando, new Date(1763500000000).toISOString());
+  const api = lerZapi({ type: "ReceivedCallback", phone: "554899990001", fromMe: true, fromApi: true, messageId: "Z2", text: { message: "resposta da IA" } });
+  assertEquals(api?.fromApi, true);
+  assertEquals(lerZapi({ type: "ReceivedCallback", phone: "1203630", isGroup: true, text: { message: "grupo" } }), null);
+  assertEquals(lerZapi({ type: "MessageStatusCallback", phone: "554899990001" }), null);
+});
+
+Deno.test("Canal: Evolution e Z-API montam a chamada certa e explicam desconexão", async () => {
+  const { canal } = await import("../_shared/canal.ts");
+  const { ErroWhatsApp, explicarErroWhatsApp } = await import("../_shared/whatsapp.ts");
+  const chamadas: { url: string; cab: Headers; corpo: Record<string, unknown> }[] = [];
+  const fetchOriginal = globalThis.fetch;
+  let resposta: Response = new Response("{}");
+  globalThis.fetch = (async (e: RequestInfo | URL, init?: RequestInit) => {
+    chamadas.push({ url: String(e), cab: new Headers(init?.headers), corpo: JSON.parse(String(init?.body)) });
+    return resposta.clone();
+  }) as typeof fetch;
+  try {
+    resposta = new Response(JSON.stringify({ key: { id: "EVO1" } }));
+    const evo = canal({ empresa_id: "e", provedor: "evolution", phone_number_id: null, access_token: "chave", api_url: "https://wa.exemplo.com/", instancia: "milano" });
+    assertEquals(await evo.enviarTexto("554899990001", "oi"), "EVO1");
+    assertEquals(chamadas[0].url, "https://wa.exemplo.com/message/sendText/milano");
+    assertEquals(chamadas[0].cab.get("apikey"), "chave");
+    assertEquals(chamadas[0].corpo, { number: "554899990001", text: "oi" });
+    await evo.enviarImagem("lid:999", "https://x/foto.jpg", "Taos");
+    assertEquals(chamadas[1].corpo.number, "999@lid");
+    assertEquals(chamadas[1].corpo.mediatype, "image");
+
+    resposta = new Response(JSON.stringify({ zaapId: "Q", messageId: "ZAP1" }));
+    const z = canal({ empresa_id: "e", provedor: "zapi", phone_number_id: null, access_token: "tok", instancia: "INST", client_token: "seg" });
+    assertEquals(await z.enviarTexto("+55 48 99999-0001", "oi"), "ZAP1");
+    assertEquals(chamadas[2].url, "https://api.z-api.io/instances/INST/token/tok/send-text");
+    assertEquals(chamadas[2].cab.get("client-token"), "seg");
+    assertEquals(chamadas[2].corpo, { phone: "5548999990001", message: "oi" });
+
+    resposta = new Response(JSON.stringify({ status: 404, error: "Not Found", response: { message: ["The \"milano\" instance does not exist"] } }), { status: 404 });
+    let pegou: unknown = null;
+    try { await evo.enviarTexto("554899990001", "oi"); } catch (e) { pegou = e; }
+    assert(pegou instanceof ErroWhatsApp);
+    assertEquals((pegou as InstanceType<typeof ErroWhatsApp>).codigo, 9001);
+    assertStringIncludes(explicarErroWhatsApp(9001), "QR Code");
+    assertEquals(evo.textoLivreForaDaJanela, true);
+    assertEquals(canal({ empresa_id: "e", phone_number_id: "1", access_token: "t" }).textoLivreForaDaJanela, false);
+  } finally {
+    globalThis.fetch = fetchOriginal;
+  }
+});
+
+Deno.test("Follow-up: respeita a janela e os dias em que a loja abre; a instrução vai para a IA", async () => {
+  const { podeEnviarAgora, instrucaoFollowup } = await import("../_shared/followup.ts");
+  const emp = { ...empresa, ia: { ...empresa.ia, followup: { ativo: true, dias: 3, maximo: 2, abre: "10:00", fecha: "18:00" } } };
+  assertEquals(podeEnviarAgora(emp, new Date("2026-11-25T14:00:00Z")), true); // quarta 11:00 em SP
+  assertEquals(podeEnviarAgora(emp, new Date("2026-11-25T12:30:00Z")), false); // quarta 09:30
+  assertEquals(podeEnviarAgora(emp, new Date("2026-11-29T15:00:00Z")), false); // domingo (loja fechada)
+  assertStringIncludes(instrucaoFollowup(3, 2, 2), "última tentativa");
+
+  const pedidos: Record<string, unknown>[] = [];
+  const fetchOriginal = globalThis.fetch;
+  globalThis.fetch = (async (e: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(e instanceof Request ? e.url : e);
+    if (url.includes("message/sendText")) return new Response(JSON.stringify({ key: { id: "FU1" } }));
+    const corpo = JSON.parse(String(init?.body ?? "{}"));
+    pedidos.push(corpo);
+    return new Response(JSON.stringify({ id: "m", type: "message", role: "assistant", model: corpo.model, stop_sequence: null, stop_reason: "end_turn", usage: { input_tokens: 10, output_tokens: 5 }, content: [{ type: "text", text: "Oi João! O SUV ainda está aqui. Quer agendar uma visita?" }] }), { headers: { "content-type": "application/json" } });
+  }) as typeof fetch;
+  try {
+    const lead = { ...leadTeste, id: "lead-fu", telefone: "554899990001" };
+    const dados: Record<string, Linha[]> = { leads: [lead as unknown as Linha], mensagens: [], agendamentos: [], vendedores: [], veiculos: [] };
+    const hist: Mensagem[] = [
+      { id: "1", lead_id: "lead-fu", autor: "cliente", autor_nome: "", texto: "tem SUV?", midia_url: null, wa_message_id: null, criada_em: "" },
+      { id: "2", lead_id: "lead-fu", autor: "ia", autor_nome: "", texto: "Temos o Taos!", midia_url: null, wa_message_id: null, criada_em: "" },
+    ];
+    const r = await responderCliente(
+      { db: bancoFalso(dados), empresa, lead, whatsapp: { empresa_id: "emp1", provedor: "evolution", phone_number_id: null, access_token: "k", api_url: "https://wa", instancia: "milano" }, veiculos: [taos], provedor: "anthropic", instrucaoInterna: instrucaoFollowup(3, 1, 2) },
+      hist,
+    );
+    assertStringIncludes(r.texto ?? "", "agendar");
+    const msgs = pedidos[0].messages as { role: string; content: string }[];
+    const ultimaDoCliente = [...msgs].reverse().find((m) => m.role === "user")!;
+    assertStringIncludes(String(ultimaDoCliente.content), "Mensagem interna da loja");
+    assertEquals(dados.mensagens[0].wa_message_id, "FU1");
+  } finally {
+    globalThis.fetch = fetchOriginal;
+  }
+});

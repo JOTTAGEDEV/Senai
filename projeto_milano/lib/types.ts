@@ -173,6 +173,19 @@ export interface ConfigIA {
   tom: "formal" | "amigavel" | "descontraido";
   instrucoes: string;
   boasVindas: string;
+  /** Follow-up automático com quem já conversou e parou de responder */
+  followup?: ConfigFollowup;
+}
+
+export interface ConfigFollowup {
+  ativo: boolean;
+  /** Dias sem resposta do cliente antes de mandar */
+  dias: number;
+  /** Quantos follow-ups por cliente (zera quando ele responde) */
+  maximo: number;
+  /** Janela de envio (horário de Brasília) */
+  abre: string;
+  fecha: string;
 }
 
 export interface ConfigLoja {

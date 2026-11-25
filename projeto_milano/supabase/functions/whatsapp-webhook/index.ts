@@ -5,16 +5,9 @@
 //
 // Secrets necessários: WHATSAPP_VERIFY_TOKEN, WHATSAPP_APP_SECRET e a chave de uma IA
 // (DEEPSEEK_API_KEY, GEMINI_API_KEY ou ANTHROPIC_API_KEY; IA_PROVEDOR escolhe se houver mais de uma)
-import { iaDeveAtender } from "../_shared/horario.ts";
-import { registrarUso, responderCliente } from "../_shared/ia.ts";
-import { admin, ok } from "../_shared/supabase.ts";
-import type { CredenciaisWhatsApp, Empresa, Lead, Mensagem, Veiculo } from "../_shared/tipos.ts";
-import { assinaturaValida, explicarErroWhatsApp, type FalhaEntrega, lerFalhas, lerWebhook, type MensagemRecebida } from "../_shared/whatsapp.ts";
-
-declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void } | undefined;
-
-/** Espera o cliente terminar de digitar (várias mensagens seguidas viram uma resposta só). */
-const ESPERA_MS = Number(Deno.env.get("IA_ESPERA_MS") ?? 8000);
+import { emSegundoPlano, processarMensagens, registrarFalha } from "../_shared/atendimento.ts";
+import { admin } from "../_shared/supabase.ts";
+import { assinaturaValida, lerFalhas, lerWebhook } from "../_shared/whatsapp.ts";
 
 Deno.serve(async (req) => {
   const url = new URL(req.url);
@@ -46,118 +39,25 @@ Deno.serve(async (req) => {
     await registrarFalha(falha).catch((e) => console.error("Erro ao registrar falha", e));
   }
 
-  const recebidas = lerWebhook(payload);
+  // Agrupa as mensagens por número da loja (phone_number_id → empresa)
   const tarefas: Promise<unknown>[] = [];
   let falhou = false;
-  for (const m of recebidas) {
-    try {
-      const salvo = await salvarMensagem(m);
-      if (salvo) tarefas.push(responderDepois(salvo.leadId, salvo.mensagemId));
-    } catch (e) {
-      falhou = true;
-      console.error("Erro ao salvar mensagem", m.waId, e);
+  const porNumero = new Map<string, ReturnType<typeof lerWebhook>>();
+  for (const m of lerWebhook(payload)) porNumero.set(m.phoneNumberId, [...(porNumero.get(m.phoneNumberId) ?? []), m]);
+  for (const [phoneNumberId, lista] of porNumero) {
+    const cred = (await admin().from("empresa_whatsapp").select("empresa_id").eq("phone_number_id", phoneNumberId).maybeSingle()).data;
+    if (!cred) {
+      console.warn("Número sem empresa cadastrada:", phoneNumberId);
+      continue;
     }
+    const r = await processarMensagens(cred.empresa_id as string, lista);
+    falhou ||= r.falhou;
+    tarefas.push(...r.tarefas);
   }
 
-  // Responde 200 já (a Meta reenvia se demorar); a IA continua em segundo plano
-  const segundoPlano = Promise.allSettled(tarefas);
-  if (typeof EdgeRuntime !== "undefined") EdgeRuntime.waitUntil(segundoPlano);
-  else await segundoPlano;
-  // Se alguma mensagem não foi salva, devolve erro para a Meta reenviar
-  // (as que já foram salvas não duplicam: wa_message_id é único).
+  // Responde 200 já (a Meta reenvia se demorar); a IA continua em segundo plano.
+  // Se alguma mensagem não foi salva, devolve erro para a Meta reenviar (as salvas não duplicam).
+  await emSegundoPlano(tarefas);
   if (falhou) return new Response("Erro ao salvar", { status: 500 });
   return new Response("ok");
 });
-
-async function salvarMensagem(m: MensagemRecebida): Promise<{ leadId: string; mensagemId: string } | null> {
-  const db = admin();
-  const cred = (await db.from("empresa_whatsapp").select("empresa_id").eq("phone_number_id", m.phoneNumberId).maybeSingle()).data;
-  if (!cred) {
-    console.warn("Número sem empresa cadastrada:", m.phoneNumberId);
-    return null;
-  }
-  const empresaId = cred.empresa_id as string;
-
-  // Lead: um por telefone
-  let lead = (await db.from("leads").select("id,nome,nao_lidas").eq("empresa_id", empresaId).eq("telefone", m.de).maybeSingle()).data as
-    | Pick<Lead, "id" | "nome" | "nao_lidas">
-    | null;
-  if (!lead) {
-    const criado = await db
-      .from("leads")
-      .insert({ empresa_id: empresaId, telefone: m.de, nome: m.nome, etapa: "novo", atendente: "ia", ultima_mensagem_em: m.quando })
-      .select("id,nome,nao_lidas")
-      .single();
-    if (criado.error) {
-      // Duas mensagens ao mesmo tempo podem criar o lead em paralelo: busca de novo
-      lead = ok(await db.from("leads").select("id,nome,nao_lidas").eq("empresa_id", empresaId).eq("telefone", m.de).single());
-    } else {
-      lead = criado.data;
-    }
-  }
-
-  const inserida = await db
-    .from("mensagens")
-    .insert({ empresa_id: empresaId, lead_id: lead!.id, autor: "cliente", autor_nome: m.nome, texto: m.texto, wa_message_id: m.waId, criada_em: m.quando })
-    .select("id")
-    .single();
-  if (inserida.error) {
-    if (inserida.error.code === "23505") return null; // a Meta reenviou uma mensagem que já temos
-    throw new Error(inserida.error.message);
-  }
-
-  // Incremento atômico de não lidas (mensagens simultâneas não perdem contagem)
-  ok(await db.rpc("registrar_mensagem_cliente", { p_lead: lead!.id, p_quando: m.quando, p_nome: m.nome ?? "" }));
-
-  return { leadId: lead!.id, mensagemId: inserida.data.id as string };
-}
-
-async function registrarFalha(f: FalhaEntrega) {
-  const db = admin();
-  const enviada = (await db.from("mensagens").select("lead_id,empresa_id").eq("wa_message_id", f.waId).maybeSingle()).data;
-  if (!enviada) return;
-  await db.from("mensagens").insert({
-    empresa_id: enviada.empresa_id,
-    lead_id: enviada.lead_id,
-    autor: "sistema",
-    texto: explicarErroWhatsApp(f.codigo, f.erro),
-  });
-}
-
-async function responderDepois(leadId: string, mensagemId: string) {
-  await new Promise((r) => setTimeout(r, ESPERA_MS));
-  const db = admin();
-
-  // Só responde se esta ainda for a última mensagem do cliente (senão, a mais nova cuida disso)
-  const ultima = (
-    await db.from("mensagens").select("id").eq("lead_id", leadId).eq("autor", "cliente").order("criada_em", { ascending: false }).order("id", { ascending: false }).limit(1).single()
-  ).data;
-  if (ultima?.id !== mensagemId) return;
-
-  const lead = ok(await db.from("leads").select("*").eq("id", leadId).single()) as Lead;
-  if (lead.atendente !== "ia") return; // um vendedor assumiu
-
-  const empresa = ok(await db.from("empresas").select("*").eq("id", lead.empresa_id).single()) as Empresa;
-  if (!iaDeveAtender(empresa.ia)) return; // loja aberta e modo "fora do horário", ou IA desligada
-
-  const whatsapp = ok(await db.from("empresa_whatsapp").select("*").eq("empresa_id", empresa.id).single()) as CredenciaisWhatsApp;
-  const veiculos = ok(await db.from("veiculos").select("*").eq("empresa_id", empresa.id).in("status", ["disponivel", "reservado", "preparacao"])) as Veiculo[];
-  const historico = (
-    ok(await db.from("mensagens").select("*").eq("lead_id", leadId).order("criada_em", { ascending: false }).limit(40)) as Mensagem[]
-  ).reverse();
-
-  try {
-    const { uso } = await responderCliente({ db, empresa, lead, whatsapp, veiculos }, historico);
-    await registrarUso(db, empresa.id, "atendente", uso);
-  } catch (e) {
-    console.error("Erro da IA ao responder", leadId, e);
-    // Se a IA falhar, avisa no painel para um vendedor assumir
-    await db.from("leads").update({ atendente: "humano", importancia: "importante" }).eq("id", leadId);
-    await db.from("mensagens").insert({
-      empresa_id: empresa.id,
-      lead_id: leadId,
-      autor: "sistema",
-      texto: "A IA teve um problema para responder. Um vendedor precisa assumir esta conversa.",
-    });
-  }
-}

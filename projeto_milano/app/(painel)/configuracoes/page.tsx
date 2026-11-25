@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Bot, CheckCircle2, CircleDashed, MapPin, Plus, RotateCcw, Save, Store, Trash2, UserRound, Users, Wifi } from "lucide-react";
+import { Bot, CheckCircle2, CircleDashed, MapPin, MessageCircleReply, Plus, RotateCcw, Save, Store, Trash2, UserRound, Users, Wifi } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Carregando } from "@/components/crm/ui";
-import { DIAS_SEMANA, iaDeveAtender } from "@/lib/crm";
+import { DIAS_SEMANA, FOLLOWUP_PADRAO, iaDeveAtender } from "@/lib/crm";
 import { useDados } from "@/lib/dados";
-import type { ConfigIA, ConfigLoja, ModoIA, Vendedor } from "@/lib/types";
+import type { ConfigFollowup, ConfigIA, ConfigLoja, ModoIA, Vendedor } from "@/lib/types";
 
 export default function ConfiguracoesPage() {
   const { carregando, config } = useDados();
@@ -163,6 +163,8 @@ function ConfiguracaoIA({ config }: { config: ConfigLoja }) {
     setSalvo(false);
   };
   const atendendoAgora = iaDeveAtender(ia);
+  const fu: ConfigFollowup = { ...FOLLOWUP_PADRAO, ...ia.followup };
+  const mudarFu = (alteracoes: Partial<ConfigFollowup>) => mudar({ followup: { ...fu, ...alteracoes } });
 
   return (
     <Secao id="ia" icone={<Bot className="h-5 w-5" />} titulo="Inteligência artificial" descricao="Quando a IA atende e o que ela pode fazer.">
@@ -247,6 +249,49 @@ function ConfiguracaoIA({ config }: { config: ConfigLoja }) {
           ))}
         </div>
         <p className="-mt-3 text-xs text-white/50">A IA nunca dá desconto e nunca inventa carro ou preço: ela só usa o que está no estoque.</p>
+
+        <div className={`rounded-lg border p-4 ${fu.ativo ? "border-marca-500/40 bg-marca-500/10" : "border-white/10"}`}>
+          <label className="flex cursor-pointer items-start gap-3">
+            <input type="checkbox" className="mt-0.5 h-4 w-4 accent-marca-600" checked={fu.ativo} onChange={() => mudarFu({ ativo: !fu.ativo })} />
+            <span>
+              <span className="flex items-center gap-2 text-sm font-medium text-white">
+                <MessageCircleReply aria-hidden className="h-4 w-4" /> Follow-up automático
+              </span>
+              <span className="mt-1 block text-xs text-white/50">
+                A IA retoma a conversa com quem já falou com a loja e parou de responder. Nunca manda para quem não puxou conversa, nem para quem
+                comprou ou desistiu. Se o cliente responder, a contagem recomeça.
+              </span>
+            </span>
+          </label>
+          {fu.ativo && (
+            <div className="mt-4 grid gap-3 sm:grid-cols-4">
+              <div>
+                <label className="rotulo" htmlFor="fu-dias">Depois de</label>
+                <select id="fu-dias" className="campo" value={fu.dias} onChange={(e) => mudarFu({ dias: Number(e.target.value) })}>
+                  {[2, 3, 4, 5, 7].map((d) => <option key={d} value={d}>{d} dias sem resposta</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="rotulo" htmlFor="fu-max">No máximo</label>
+                <select id="fu-max" className="campo" value={fu.maximo} onChange={(e) => mudarFu({ maximo: Number(e.target.value) })}>
+                  {[1, 2, 3].map((n) => <option key={n} value={n}>{n} {n === 1 ? "follow-up" : "follow-ups"} por cliente</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="rotulo" htmlFor="fu-abre">Enviar a partir de</label>
+                <input id="fu-abre" type="time" className="campo" value={fu.abre} onChange={(e) => mudarFu({ abre: e.target.value })} />
+              </div>
+              <div>
+                <label className="rotulo" htmlFor="fu-fecha">até</label>
+                <input id="fu-fecha" type="time" className="campo" value={fu.fecha} onChange={(e) => mudarFu({ fecha: e.target.value })} />
+              </div>
+              <p className="text-xs text-white/50 sm:col-span-4">
+                Só nos dias em que a loja abre, poucos por vez e com intervalo entre um e outro. Funciona com o WhatsApp conectado por QR Code
+                (Evolution ou Z-API); na API oficial da Meta, mensagem depois de 24h exige modelo aprovado.
+              </p>
+            </div>
+          )}
+        </div>
 
         <div className="grid gap-4 lg:grid-cols-[200px_1fr]">
           <div>
