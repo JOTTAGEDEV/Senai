@@ -65,7 +65,18 @@ No fim, **guarde o Endereço e a Chave** que aparecem. O endereço começa com `
 
 ## 5. Configure o webhook e leia o QR Code
 
-1. Tenha em mãos a **URL completa do webhook** da loja. No Milano, ela vem da configuração da conexão Evolution no Supabase, que usa o endereço e a chave do passo anterior. Se ainda não tiver a URL, peça ao responsável pelo painel para configurar a conexão `milano` e fornecer a URL. Copie tudo, inclusive o trecho `?token=...`.
+1. Gere a **URL do webhook** ligando o servidor ao painel. No Supabase do projeto, abra **SQL Editor → New query**, cole o comando abaixo, troque `ENDERECO` e `CHAVE` pelo endereço e pela chave do passo 4 (mantenha as aspas simples) e clique em **Run**:
+
+   ```sql
+   insert into public.empresa_whatsapp (empresa_id, provedor, api_url, instancia, access_token, phone_number_id)
+   values ('d0bf0426-7490-4d70-aa91-c054952f82a6', 'evolution', 'ENDERECO', 'milano', 'CHAVE', null)
+   on conflict (empresa_id) do update
+     set provedor = 'evolution', api_url = excluded.api_url, instancia = 'milano',
+         access_token = excluded.access_token, phone_number_id = null
+   returning 'https://tobmcmqluydaxrdxsxbi.supabase.co/functions/v1/whatsapp-evolution?token=' || webhook_token as url_do_webhook;
+   ```
+
+   O resultado é a **URL completa do webhook**. Copie tudo, inclusive o trecho `?token=...`. Ela é um segredo: não mande em chat nem em print.
 2. No terminal da VM, dentro de `~/servidor-whatsapp`, rode o comando abaixo e substitua `<URL do webhook>` pela URL completa. Mantenha as aspas.
 
    ```bash
