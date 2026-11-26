@@ -15,3 +15,19 @@ verify_jwt = true
 # Chamada pelo painel (botão Testar IA) com o login do usuário
 [functions.testar-ia]
 verify_jwt = true
+
+# Evolution API (WhatsApp por QR Code): segurança é o ?token= na URL do webhook
+[functions.whatsapp-evolution]
+verify_jwt = false
+
+# Z-API (WhatsApp por QR Code): segurança é o ?token= na URL do webhook
+[functions.whatsapp-zapi]
+verify_jwt = false
+
+# Chamada pelo pg_cron com o cabeçalho x-cron-secret
+[functions.ia-followup]
+verify_jwt = false
+
+# Desativada (função temporária usada na configuração do webhook da Meta)
+[functions.configurar-webhook]
+verify_jwt = true
